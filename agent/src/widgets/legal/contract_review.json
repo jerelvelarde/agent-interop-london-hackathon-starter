@@ -1,0 +1,81 @@
+[
+  {
+    "id": "root",
+    "component": "LegalDocumentShell",
+    "title": { "path": "/title" },
+    "parties": { "path": "/parties" },
+    "effectiveDate": { "path": "/effectiveDate" },
+    "verdictChild": "verdict",
+    "children": { "componentId": "clause-item", "path": "/clauses" }
+  },
+  {
+    "id": "verdict",
+    "component": "Verdict",
+    "headline": { "path": "/verdict/headline" },
+    "summary": { "path": "/verdict/summary" },
+    "tone": { "path": "/verdict/tone" }
+  },
+  {
+    "id": "clause-item",
+    "component": "Clause",
+    "number": { "path": "number" },
+    "heading": { "path": "heading" },
+    "body": { "path": "body" },
+    "risk": { "path": "risk" },
+    "marginChild": { "componentId": "margin-note-item", "path": "marginNotes" },
+    "redlineChildren": { "componentId": "redline-item", "path": "redlines" }
+  },
+  {
+    "id": "redline-item",
+    "component": "Redline",
+    "redlineId": { "path": "id" },
+    "original": { "path": "original" },
+    "suggested": { "path": "suggested" },
+    "rationale": { "path": "rationale" },
+    "status": { "path": "status" },
+    "action": {
+      "componentId": "redline-action-bar",
+      "path": ""
+    }
+  },
+  {
+    "id": "redline-action-bar",
+    "component": "AcceptRejectBar",
+    "redlineId": { "path": "id" },
+    "acceptAction": {
+      "event": {
+        "name": "redline_accepted",
+        "context": {
+          "redlineId": { "path": "id" },
+          "clauseId": { "path": "clauseId" }
+        }
+      }
+    },
+    "rejectAction": {
+      "event": {
+        "name": "redline_rejected",
+        "context": {
+          "redlineId": { "path": "id" },
+          "clauseId": { "path": "clauseId" }
+        }
+      }
+    }
+  },
+  {
+    "id": "margin-note-item",
+    "component": "MarginNote",
+    "body": { "path": "body" },
+    "severity": { "path": "severity" },
+    "citation": {
+      "componentId": "citation-item",
+      "path": "citation"
+    }
+  },
+  {
+    "id": "citation-item",
+    "component": "Citation",
+    "label": { "path": "label" },
+    "url": { "path": "url" },
+    "pinpoint": { "path": "pinpoint" }
+  }
+]

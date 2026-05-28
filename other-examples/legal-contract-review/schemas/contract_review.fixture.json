@@ -1,0 +1,236 @@
+{
+  "name": "contract-review-nda-default",
+  "description": "Canonical Paper-catalog scenario: Mutual NDA reviewed by the legal agent. Verdict + 9 clauses (3 with risk, 2 with body+redline), 2 redlines in pending state, 3 margin notes including a citation.",
+  "surfaceId": "contract-review",
+  "catalogId": "copilotkit://legal-paper-catalog",
+  "components": [
+    {
+      "id": "root",
+      "component": "LegalDocumentShell",
+      "title": { "path": "/title" },
+      "parties": { "path": "/parties" },
+      "effectiveDate": { "path": "/effectiveDate" },
+      "verdictChild": "verdict",
+      "children": { "componentId": "clause-item", "path": "/clauses" }
+    },
+    {
+      "id": "verdict",
+      "component": "Verdict",
+      "headline": { "path": "/verdict/headline" },
+      "summary": { "path": "/verdict/summary" },
+      "tone": { "path": "/verdict/tone" }
+    },
+    {
+      "id": "clause-item",
+      "component": "Clause",
+      "number": { "path": "number" },
+      "heading": { "path": "heading" },
+      "body": { "path": "body" },
+      "risk": { "path": "risk" },
+      "marginChild": { "componentId": "margin-note-item", "path": "marginNotes" },
+      "redlineChildren": { "componentId": "redline-item", "path": "redlines" }
+    },
+    {
+      "id": "redline-item",
+      "component": "Redline",
+      "redlineId": { "path": "id" },
+      "original": { "path": "original" },
+      "suggested": { "path": "suggested" },
+      "rationale": { "path": "rationale" },
+      "status": { "path": "status" },
+      "action": {
+        "componentId": "redline-action-bar",
+        "path": ""
+      }
+    },
+    {
+      "id": "redline-action-bar",
+      "component": "AcceptRejectBar",
+      "redlineId": { "path": "id" },
+      "acceptAction": {
+        "event": {
+          "name": "redline_accepted",
+          "context": {
+            "redlineId": { "path": "id" },
+            "clauseId": { "path": "clauseId" }
+          }
+        }
+      },
+      "rejectAction": {
+        "event": {
+          "name": "redline_rejected",
+          "context": {
+            "redlineId": { "path": "id" },
+            "clauseId": { "path": "clauseId" }
+          }
+        }
+      }
+    },
+    {
+      "id": "margin-note-item",
+      "component": "MarginNote",
+      "body": { "path": "body" },
+      "severity": { "path": "severity" },
+      "citation": {
+        "componentId": "citation-item",
+        "path": "citation"
+      }
+    },
+    {
+      "id": "citation-item",
+      "component": "Citation",
+      "label": { "path": "label" },
+      "url": { "path": "url" },
+      "pinpoint": { "path": "pinpoint" }
+    }
+  ],
+  "data": {
+    "title": "Mutual Non-Disclosure Agreement",
+    "parties": ["Acme Corp.", "Beta Labs Ltd."],
+    "effectiveDate": "2026-03-18",
+    "verdict": {
+      "headline": "Two material issues — review before signing.",
+      "summary": "The IP assignment clause is one-sided and the indemnification cap is missing. Suggested redlines attached.",
+      "tone": "negative"
+    },
+    "clauses": [
+      {
+        "id": "1",
+        "number": "1",
+        "heading": "Definitions",
+        "body": "\"Confidential Information\" means all non-public information disclosed by one party to the other, in any form, that is identified as confidential at the time of disclosure or that a reasonable person would understand to be confidential.",
+        "risk": null,
+        "marginNotes": [],
+        "redlines": []
+      },
+      {
+        "id": "2",
+        "number": "2",
+        "heading": "Obligations of Receiving Party",
+        "body": "The Receiving Party shall use Confidential Information solely for the Purpose and shall protect it using at least the same degree of care it uses for its own confidential information of similar importance, and in no event less than reasonable care.",
+        "risk": null,
+        "marginNotes": [],
+        "redlines": []
+      },
+      {
+        "id": "3",
+        "number": "3",
+        "heading": "Permitted Disclosures",
+        "body": "Receiving Party may disclose Confidential Information to its employees, officers, and professional advisors who have a need to know and who are bound by confidentiality obligations no less restrictive than those herein.",
+        "risk": null,
+        "marginNotes": [
+          {
+            "body": "Standard need-to-know language. No action required.",
+            "severity": "info",
+            "citation": null
+          }
+        ],
+        "redlines": []
+      },
+      {
+        "id": "4",
+        "number": "4",
+        "heading": "Term",
+        "body": "This Agreement shall remain in effect for three (3) years from the Effective Date, after which the obligations of confidentiality shall continue for an additional two (2) years.",
+        "risk": "low",
+        "marginNotes": [],
+        "redlines": []
+      },
+      {
+        "id": "5",
+        "number": "5",
+        "heading": "Indemnification",
+        "body": "Each party shall indemnify the other against any losses arising from a breach of this Agreement.",
+        "risk": "medium",
+        "marginNotes": [
+          {
+            "body": "No liability cap. Recommend adding a cap equal to fees paid in the prior 12 months.",
+            "severity": "warning",
+            "citation": {
+              "label": "ABA Model Indemnity Clause § 4.2",
+              "url": "https://www.americanbar.org/groups/business_law/",
+              "pinpoint": "§ 4.2(b)"
+            }
+          }
+        ],
+        "redlines": [
+          {
+            "id": "rl-002",
+            "clauseId": "5",
+            "original": "Each party shall indemnify the other against any losses arising from a breach of this Agreement.",
+            "suggested": "Each party shall indemnify the other against direct losses arising from a breach of this Agreement, provided that each party's aggregate liability under this Agreement shall not exceed the fees paid by the Disclosing Party in the twelve (12) months preceding the claim.",
+            "rationale": "Adds a liability cap (industry standard for NDAs of this type).",
+            "status": "pending"
+          }
+        ]
+      },
+      {
+        "id": "5.2",
+        "number": "5.2",
+        "heading": "IP Assignment",
+        "body": "all derivative works shall vest exclusively in Disclosing Party",
+        "risk": "high",
+        "marginNotes": [
+          {
+            "body": "One-sided IP assignment. Receiving Party's independent work product would also vest with Disclosing Party — almost certainly unintended.",
+            "severity": "critical",
+            "citation": null
+          }
+        ],
+        "redlines": [
+          {
+            "id": "rl-001",
+            "clauseId": "5.2",
+            "original": "all derivative works shall vest exclusively in Disclosing Party",
+            "suggested": "derivative works created independently by Receiving Party shall remain Receiving Party's property",
+            "rationale": "Carves out independently developed work. This is the standard mutual-NDA position.",
+            "status": "pending"
+          }
+        ]
+      },
+      {
+        "id": "6",
+        "number": "6",
+        "heading": "Return or Destruction of Materials",
+        "body": "Upon written request, the Receiving Party shall return or destroy all Confidential Information within thirty (30) days, and certify such destruction in writing.",
+        "risk": null,
+        "marginNotes": [],
+        "redlines": []
+      },
+      {
+        "id": "7",
+        "number": "7",
+        "heading": "Governing Law",
+        "body": "This Agreement shall be governed by the laws of the State of Delaware, without regard to its conflict of laws principles.",
+        "risk": null,
+        "marginNotes": [],
+        "redlines": []
+      },
+      {
+        "id": "8",
+        "number": "8",
+        "heading": "Entire Agreement",
+        "body": "This Agreement constitutes the entire agreement between the parties with respect to the subject matter hereof and supersedes all prior negotiations.",
+        "risk": null,
+        "marginNotes": [],
+        "redlines": []
+      }
+    ],
+    "redlines": {
+      "rl-001": {
+        "clauseId": "5.2",
+        "original": "all derivative works shall vest exclusively in Disclosing Party",
+        "suggested": "derivative works created independently by Receiving Party shall remain Receiving Party's property",
+        "rationale": "Carves out independently developed work. This is the standard mutual-NDA position.",
+        "status": "pending"
+      },
+      "rl-002": {
+        "clauseId": "5",
+        "original": "Each party shall indemnify the other against any losses arising from a breach of this Agreement.",
+        "suggested": "Each party shall indemnify the other against direct losses arising from a breach of this Agreement, provided that each party's aggregate liability under this Agreement shall not exceed the fees paid by the Disclosing Party in the twelve (12) months preceding the claim.",
+        "rationale": "Adds a liability cap (industry standard for NDAs of this type).",
+        "status": "pending"
+      }
+    }
+  }
+}

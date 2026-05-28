@@ -1,3 +1,9 @@
+// @ts-nocheck — Docker-only route override. Not part of the dev/local
+// typecheck graph; copied into place by the Dockerfile. Depends on
+// `@ag-ui/client`, which is only installed inside the Docker image (see
+// docker/Dockerfile.app). Disabling typecheck here is the right move so
+// `pnpm typecheck` on a local checkout is exit-0 without forcing
+// `@ag-ui/client` into the host devDependencies.
 /**
  * Docker-specific route override.
  * In Docker, the agent is served via AG-UI (not LangGraph Platform)

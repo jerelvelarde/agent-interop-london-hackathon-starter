@@ -146,7 +146,6 @@ export default function LegalContractReviewPage() {
               input={{
                 disclaimer: () => null,
                 className: "pb-6",
-                placeholder: "Ask about a clause, or 'review the NDA'…",
               }}
             />
           }

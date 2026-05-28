@@ -1,13 +1,18 @@
 "use client";
 
 import "./globals.css";
-import "@copilotkit/react-core/v2/styles.css";
 
-import { CopilotKit } from "@copilotkit/react-core/v2";
 import { ThemeProvider } from "@/hooks/use-theme";
-// A2UI catalog: definitions + renderers in ./declarative-generative-ui/
-import { demonstrationCatalog } from "./declarative-generative-ui/renderers";
 
+/**
+ * Root layout.
+ *
+ * Intentionally minimal: only `<html>`, `<body>`, and `<ThemeProvider>`. The
+ * Copilot provider is mounted per route group (see
+ * `src/app/(default)/layout.tsx` and `src/app/(legal)/layout.tsx`) so each
+ * group can carry its own agent + A2UI catalog without double-mounting the
+ * provider. See PLAN.md §5 ("multi-catalog wiring") for details.
+ */
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -22,17 +27,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`antialiased`}>
-        <ThemeProvider>
-          <CopilotKit
-            runtimeUrl="/api/copilotkit"
-            inspectorDefaultAnchor={{ horizontal: "right", vertical: "top" }}
-            a2ui={{ catalog: demonstrationCatalog }}
-            openGenerativeUI={{}}
-            useSingleEndpoint={false}
-          >
-            {children}
-          </CopilotKit>
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

@@ -151,3 +151,135 @@ first open.
 3. Copy its shape. Swap content. Run `pnpm validate-widget` then `pnpm smoke`.
 4. If the hacker is asking for something that doesn't have a seam, push back
    before inventing new architecture. The build window is 5 hours.
+
+## Working from a worktree (AI assistants)
+
+This section is for AI assistants (Claude Code blitz agents, Gemini CLI,
+Cursor, Codex) running in a git worktree under `.claude/worktrees/<slot>/`.
+Worktrees give you isolated branches for parallel work — read this before
+running anything in one.
+
+### Fresh-worktree setup
+
+Worktrees inherit git history but **not** `node_modules` or `.venv`. On the
+first command in a fresh worktree you will see `sh: tsx: command not found`
+(or similar) until you install. Run this once after `git worktree add`:
+
+```
+pnpm install --frozen-lockfile
+```
+
+Takes ~12s. After that, `pnpm validate-widget`, `pnpm typecheck`, and the
+other scripts work normally inside the worktree.
+
+### Worktree-aware env loading (langgraph)
+
+`langgraph dev` started from a worktree's `agent/` directory will **not**
+pick up the main checkout's `.env` — it only looks at the worktree root.
+Two workarounds, in order of preference:
+
+1. Copy `.env` into the worktree root: `cp ../../.env .env` (from the
+   worktree). Don't commit it — `.env` is already gitignored.
+2. Export the var inline: `GEMINI_API_KEY=... langgraph dev`.
+
+`pnpm dev` from the **main** checkout is unaffected — the issue only
+applies when launching langgraph from inside a worktree.
+
+### What you can't smoke-test from a worktree
+
+`pnpm dev:ui` is rooted in the main repo. A dev server started from the
+main checkout will **not** see edits inside a worktree — different working
+trees, same node process. The worktree-safe smoke gates are:
+
+- `pnpm typecheck` — once B4's `typecheck` script lands
+- `pnpm validate-widget <path>` — widget JSON validation
+- `pnpm test:widgets` — fixture/catalog tests
+
+If you need a real dev server against worktree changes, push the branch
+and check out that branch in the main repo (or in a fresh terminal in the
+worktree itself).
+
+### Benign lefthook warning on commit
+
+`git commit` from a worktree prints `Can't find lefthook in PATH` twice.
+**The commit still succeeds.** Don't retry, don't `--no-verify`, don't
+investigate further. Tracked at GitHub #5; safe to ignore.
+
+### Resume-an-interrupted-agent recipe
+
+Heavy multi-file blitz slots (≥4 files, ≥800 LOC in one session) risk
+mid-flight context exhaustion. Evidence: two confirmed cases in Wave 1
+where an agent's session ended at a natural file boundary after writing
+most of the artifacts but before the final aggregator/index file and the
+commit. The artifacts on disk were complete and well-formed; the agent
+simply ran out of context.
+
+**Mitigations, in order of preference:**
+
+1. **Decompose** heavy slots into smaller per-file slots
+   (defs / renderers / theme / index dispatched separately).
+2. **Write the cheapest aggregator/index file first** (or mid-stream) so
+   even a partial completion produces a wireable artifact. Example:
+   write `index.ts` (28 lines re-exporting from siblings) **before** the
+   heavier renderers, so the catalog is registerable even if the agent
+   exhausts context on the heavy file.
+3. Keep slot LOC budget under ~800 lines across ≤3 files where possible.
+
+**Recipe for picking up an interrupted agent.** From the orchestrator:
+
+```
+cd .claude/worktrees/<slot>
+git status                  # see committed vs uncommitted
+git log --oneline -5        # see what the prior agent did
+git diff HEAD               # see uncommitted partial work
+ls -la <expected outputs>   # confirm which files exist
+```
+
+Then dispatch a follow-up agent with **explicit scope = only the
+unfinished file(s)**. Paste-ready orchestrator wording:
+
+> The prior B-N agent in worktree `.claude/worktrees/blitz-BN` wrote
+> `<file-a>` and `<file-b>` but did not finish `<file-c>` (or did not
+> commit). Read the worktree state with `git status` and `git log
+> --oneline -5`. Your scope is **only** `<file-c>` (and the commit +
+> push if the prior agent did not). Do not re-touch the files the prior
+> agent completed. When done, push to branch `<branch>` and report the
+> PR URL.
+
+The follow-up agent inherits the partial work via the existing branch
+and only needs context for the remaining file.
+
+### JSDoc `*/` comment-terminator gotcha
+
+The two-character substring `*` followed by `/` inside a JSDoc
+`/** ... */` block terminates the comment early. esbuild then chokes on
+whatever follows. This bites when writing path or glob examples in a
+top-of-file JSDoc, e.g. a path like `other-examples/<star>/EXAMPLE.json`
+where `<star>` is the literal wildcard.
+
+**Safe options:**
+
+- **Escape the slash** so the two characters are no longer adjacent — put
+  a backslash between them: `other-examples/<star>\<slash>EXAMPLE.json`.
+  The compiler still sees the original path; the comment scanner does not
+  see a terminator.
+- **Rephrase** to avoid the substring entirely — use
+  `other-examples/<dir>/EXAMPLE.json` (angle-bracket placeholder) instead
+  of a literal wildcard.
+- **Move the path example** out of the JSDoc into a regular `//` line
+  comment below it. Line comments have no terminator.
+
+### Acceptance-criteria grep patterns
+
+When writing ACs that say "no X in file Y", specify the **semantic match**,
+not the literal substring. Brand text and import statements both contain
+the same word, and a naive grep gives false positives.
+
+- **Bad:** `grep -l 'CopilotKit' src/app/layout.tsx`
+  — matches `<title>CopilotKit</title>` (page brand text, intentional).
+- **Good:** `grep -E '<CopilotKit|@copilotkit/react-core' src/app/layout.tsx`
+  — matches the provider component and the import path; ignores brand
+  text.
+
+Pattern: anchor on the JSX open-tag (`<Name`) or the package import path
+(`@scope/pkg`), not the bare identifier.

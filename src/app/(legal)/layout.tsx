@@ -3,7 +3,7 @@
 import "@copilotkit/react-core/v2/styles.css";
 
 import { CopilotKit } from "@copilotkit/react-core/v2";
-import { legalPaperCatalog } from "../../../../other-examples/legal-contract-review/catalog";
+import { legalPaperCatalog } from "../../../other-examples/legal-contract-review/catalog";
 
 /**
  * (legal) route group layout.

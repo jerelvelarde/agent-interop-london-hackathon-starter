@@ -144,6 +144,17 @@ first pass is wrong. Less reliable in front of judges, faster to iterate.
 This is the right seam when "swap data" alone isn't enough — when the
 whole agent personality needs to change.
 
+> **If you're spinning up a whole second LangGraph agent in a sub-repo**
+> (the legal-contract-review pattern — a separate `agent/` dir under
+> `other-examples/<name>/agent/`), the gotcha to know is langgraph's
+> path-based graph loader bypasses Python's package machinery, so
+> relative imports (`from .tools import ...`) break. The canonical fix
+> is four lines of sys.path injection at the top of `graph.py` plus
+> absolute imports. `other-examples/legal-contract-review/agent/graph.py`
+> is the reference; PLAN.md §6.1 has the full recipe (including the
+> Docker variant for issue #12 and the package-name non-collision trick
+> for issue #15). Don't try to make relative imports work — they won't.
+
 ---
 
 ## §6 — BYO A2A agent (Track 1 interop)

@@ -2,94 +2,73 @@
   "name": "flight_card_two_results",
   "description": "Canonical fixed-schema scenario: search_flights returns two flight cards (one on-time, one delayed).",
   "surfaceId": "flight-search-results",
-  "envelopes": [
+  "catalogId": "copilotkit://app-dashboard-catalog",
+  "components": [
     {
-      "version": "v0.9",
-      "createSurface": {
-        "surfaceId": "flight-search-results",
-        "catalogId": "copilotkit://app-dashboard-catalog"
-      }
+      "id": "root",
+      "component": "Row",
+      "children": { "componentId": "flight-card", "path": "/flights" },
+      "gap": 16
     },
     {
-      "version": "v0.9",
-      "updateComponents": {
-        "surfaceId": "flight-search-results",
-        "components": [
-          {
-            "id": "root",
-            "component": "Row",
-            "children": { "componentId": "flight-card", "path": "/flights" },
-            "gap": 16
-          },
-          {
-            "id": "flight-card",
-            "component": "FlightCard",
-            "airline": { "path": "airline" },
-            "airlineLogo": { "path": "airlineLogo" },
+      "id": "flight-card",
+      "component": "FlightCard",
+      "airline": { "path": "airline" },
+      "airlineLogo": { "path": "airlineLogo" },
+      "flightNumber": { "path": "flightNumber" },
+      "origin": { "path": "origin" },
+      "destination": { "path": "destination" },
+      "date": { "path": "date" },
+      "departureTime": { "path": "departureTime" },
+      "arrivalTime": { "path": "arrivalTime" },
+      "duration": { "path": "duration" },
+      "status": { "path": "status" },
+      "price": { "path": "price" },
+      "action": {
+        "event": {
+          "name": "book_flight",
+          "context": {
             "flightNumber": { "path": "flightNumber" },
             "origin": { "path": "origin" },
             "destination": { "path": "destination" },
-            "date": { "path": "date" },
-            "departureTime": { "path": "departureTime" },
-            "arrivalTime": { "path": "arrivalTime" },
-            "duration": { "path": "duration" },
-            "status": { "path": "status" },
-            "price": { "path": "price" },
-            "action": {
-              "event": {
-                "name": "book_flight",
-                "context": {
-                  "flightNumber": { "path": "flightNumber" },
-                  "origin": { "path": "origin" },
-                  "destination": { "path": "destination" },
-                  "price": { "path": "price" }
-                }
-              }
-            }
+            "price": { "path": "price" }
           }
-        ]
-      }
-    },
-    {
-      "version": "v0.9",
-      "updateDataModel": {
-        "surfaceId": "flight-search-results",
-        "path": "/",
-        "value": {
-          "flights": [
-            {
-              "id": "ua-2841",
-              "airline": "United Airlines",
-              "airlineLogo": "https://www.google.com/s2/favicons?domain=united.com&sz=128",
-              "flightNumber": "UA 2841",
-              "origin": "SFO",
-              "destination": "JFK",
-              "date": "Tue, Jun 9",
-              "departureTime": "08:15",
-              "arrivalTime": "16:42",
-              "duration": "5h 27m",
-              "status": "On Time",
-              "statusIcon": "https://placehold.co/12/22c55e/22c55e.png",
-              "price": "$329"
-            },
-            {
-              "id": "dl-1107",
-              "airline": "Delta",
-              "airlineLogo": "https://www.google.com/s2/favicons?domain=delta.com&sz=128",
-              "flightNumber": "DL 1107",
-              "origin": "SFO",
-              "destination": "JFK",
-              "date": "Tue, Jun 9",
-              "departureTime": "10:30",
-              "arrivalTime": "19:08",
-              "duration": "5h 38m",
-              "status": "Delayed",
-              "statusIcon": "https://placehold.co/12/eab308/eab308.png",
-              "price": "$289"
-            }
-          ]
         }
       }
     }
-  ]
+  ],
+  "data": {
+    "flights": [
+      {
+        "id": "ua-2841",
+        "airline": "United Airlines",
+        "airlineLogo": "https://www.google.com/s2/favicons?domain=united.com&sz=128",
+        "flightNumber": "UA 2841",
+        "origin": "SFO",
+        "destination": "JFK",
+        "date": "Tue, Jun 9",
+        "departureTime": "08:15",
+        "arrivalTime": "16:42",
+        "duration": "5h 27m",
+        "status": "On Time",
+        "statusIcon": "https://placehold.co/12/22c55e/22c55e.png",
+        "price": "$329"
+      },
+      {
+        "id": "dl-1107",
+        "airline": "Delta",
+        "airlineLogo": "https://www.google.com/s2/favicons?domain=delta.com&sz=128",
+        "flightNumber": "DL 1107",
+        "origin": "SFO",
+        "destination": "JFK",
+        "date": "Tue, Jun 9",
+        "departureTime": "10:30",
+        "arrivalTime": "19:08",
+        "duration": "5h 38m",
+        "status": "Delayed",
+        "statusIcon": "https://placehold.co/12/eab308/eab308.png",
+        "price": "$289"
+      }
+    ]
+  }
 }

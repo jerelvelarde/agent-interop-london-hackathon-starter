@@ -2,20 +2,28 @@
 /**
  * pnpm validate-widget <path> — A2UI v0.9 envelope/schema shape validator.
  *
- * Recognized shapes (chosen empirically to match every JSON shipped under
- * agent/src/widgets/ and other-examples/<id>/EXAMPLE.json):
+ * The starter uses ONE canonical fixture shape (issue #16 — three incompatible
+ * fixture shapes used to coexist; we picked the validator's `{components, data}`
+ * shape because the validator is the authority). The two non-fixture shapes
+ * (bare catalog schemas and the `pnpm new-widget`-style wrapper widget) are
+ * still recognized, because they describe DIFFERENT files (the catalog
+ * registration), not fixtures.
  *
- *   (a) Bare catalog schema (array of components — like legal/contract_review.json
- *       or agent/src/a2ui/schemas/flight_schema.json):
+ * Three recognized JSON shapes:
+ *
+ *   (a) Bare catalog schema — array of v0.9 components. Lives at
+ *       `agent/src/a2ui/schemas/<name>_schema.json` and
+ *       `agent/src/widgets/<sub>/<name>.json`. Canonical example:
+ *       `agent/src/a2ui/schemas/flight_schema.json`.
  *
  *         [
  *           { "id": "root", "component": "Row", "children": {...} },
  *           { "id": "card", "component": "FlightCard", ... }
  *         ]
  *
- *   (b) Wrapper widget JSON — what `pnpm new-widget` scaffolds and what the
- *       canonical flight_card.json / product_card.json files use. The schema
- *       array is nested under "schema":
+ *   (b) Wrapper widget JSON — what `pnpm new-widget` scaffolds. The schema
+ *       array is nested under a `schema` key. Canonical example:
+ *       `agent/src/widgets/flight_card.json` (when present).
  *
  *         {
  *           "id": "flight-card",
@@ -26,30 +34,30 @@
  *           "schema": [ ...catalog-schema components... ]
  *         }
  *
- *   (c) Envelope-array fixture — the canonical *.fixture.json shipped for
- *       flight_card / product_card. A list of A2UI envelopes (createSurface,
- *       updateComponents, updateDataModel):
+ *   (c) CANONICAL FIXTURE — every *.fixture.json under agent/src/widgets/
+ *       MUST use this shape. One flat object with the createSurface fields at
+ *       the top level, the component tree under `components`, and the data
+ *       model under `data`. Canonical example:
+ *       `agent/src/widgets/flight_card.fixture.json`.
  *
  *         {
- *           "name": "...",
- *           "surfaceId": "...",
- *           "envelopes": [ { version, createSurface }, { version, updateComponents }, ... ]
+ *           "name": "flight_card_two_results",
+ *           "description": "...",
+ *           "surfaceId": "flight-search-results",
+ *           "catalogId": "copilotkit://app-dashboard-catalog",
+ *           "components": [ ...catalog components... ],
+ *           "data": { "flights": [ ... ] }
  *         }
  *
- *   (d) Single-envelope fixture — the legacy fixture shape used by the legal
- *       example. createSurface fields are top-level, components are flat:
- *
- *         {
- *           "surfaceId": "...",
- *           "catalogId": "copilotkit://...",
- *           "components": [...],
- *           "data": {...}
- *         }
+ *       Why this shape: the validator is the authority (issue #16). Tests,
+ *       offline mode, and the prompt skeleton all point here. If you see a
+ *       `*.fixture.json` with `envelopes: [...]` it's a stale pre-#16 file
+ *       and should be migrated.
  *
  * The validator picks one shape per file by inspecting the top-level keys
  * (see pickShape() below). Error messages then teach against the chosen
  * shape, not the others — the failure mode "I added 'envelopes' and now it
- * yells about a missing 'components'" is the exact thing FRICTION #3 logged.
+ * yells about a missing 'components'" is the exact thing issue #16 logged.
  *
  * EXAMPLE mode (`pnpm validate-widget --examples`):
  *   Validates every other-examples/<id>/EXAMPLE.json against the §3.2 catalog
@@ -60,7 +68,12 @@
 import { existsSync, readFileSync, statSync, readdirSync } from "node:fs";
 import { join, resolve, basename } from "node:path";
 
-const CANONICAL_WIDGET_JSON = "agent/src/widgets/flight_card.json";
+// Canonical references — these are real JSON files in the repo a hacker can
+// open and copy-paste. Issue #17: the validator used to point at a Python
+// file (`agent/src/a2ui_fixed_schema.py:search_flights`) which is not a
+// template you can mirror.
+const CANONICAL_CATALOG_SCHEMA_JSON = "agent/src/a2ui/schemas/flight_schema.json";
+const CANONICAL_WIDGET_JSON = "agent/src/a2ui/schemas/flight_schema.json";
 const CANONICAL_FIXTURE_JSON = "agent/src/widgets/flight_card.fixture.json";
 const CANONICAL_EXAMPLE_JSON = "other-examples/legal-contract-review/EXAMPLE.json";
 const SCHEMA_REF = "https://a2ui.org/specification/v0.9-a2ui/";
@@ -81,7 +94,7 @@ function teach(filePath: string, errors: ValidationError[], canonical: string): 
   for (const err of errors) {
     console.error(`${RED}✗${RESET} Widget JSON failed validation at ${BOLD}${filePath}${RESET}`);
     console.error(`  ${err.message}`);
-    console.error(`  ${DIM}Canonical example:${RESET} ${canonical}`);
+    console.error(`  ${DIM}Canonical example (JSON to copy-paste):${RESET} ${canonical}`);
     console.error(`  ${DIM}Fix:${RESET} ${err.fix}`);
     console.error(`  ${DIM}Schema reference:${RESET} ${SCHEMA_REF}`);
     console.error();
@@ -137,14 +150,14 @@ function validateCatalogSchema(
   if (!Array.isArray(data)) {
     errors.push({
       message: "Expected an array of components.",
-      fix: `Make it an array of catalog components, each shaped like { "id": "root", "component": "Row", ... }.`,
+      fix: `Make it an array of catalog components, each shaped like { "id": "root", "component": "Row", ... }. See ${CANONICAL_CATALOG_SCHEMA_JSON}.`,
     });
     return;
   }
   if (data.length === 0) {
     errors.push({
       message: "Empty components array — v0.9 requires at least a root component.",
-      fix: "Add a root component: { \"id\": \"root\", \"component\": \"Row\", ... }",
+      fix: `Add a root component: { "id": "root", "component": "Row", ... }. See ${CANONICAL_CATALOG_SCHEMA_JSON}.`,
     });
     return;
   }
@@ -156,7 +169,7 @@ function validateCatalogSchema(
   if (!hasRoot) {
     errors.push({
       message: "Missing required component with id 'root'. v0.9 schemas must have a root component.",
-      fix: "Add a component with id \"root\" — typically a layout component like Row, Column, or Stack.",
+      fix: `Add a component with id "root" — typically a layout component like Row, Column, or Stack. See ${CANONICAL_CATALOG_SCHEMA_JSON}.`,
     });
   }
 }
@@ -170,7 +183,7 @@ function validateCatalogId(value: unknown, errors: ValidationError[]): void {
   if (typeof value !== "string" || value.length === 0) {
     errors.push({
       message: "Missing or invalid 'catalogId'.",
-      fix: `Add a catalogId string, e.g. "copilotkit://app-dashboard-catalog".`,
+      fix: `Add a catalogId string, e.g. "copilotkit://app-dashboard-catalog". See ${CANONICAL_FIXTURE_JSON}.`,
     });
     return;
   }
@@ -183,8 +196,7 @@ function validateCatalogId(value: unknown, errors: ValidationError[]): void {
 }
 
 /**
- * Shape (b): Wrapper widget JSON (`flight_card.json`, `product_card.json`,
- * what `pnpm new-widget` scaffolds).
+ * Shape (b): Wrapper widget JSON (what `pnpm new-widget` scaffolds).
  *
  * Required: id (string), name (string), catalogId (URI-ish), schema (array).
  * Optional: description, pythonTool.
@@ -209,7 +221,7 @@ function validateWrapperWidget(
   if (!Array.isArray(obj.schema)) {
     errors.push({
       message: "Wrapper widget JSON missing 'schema' array (the v0.9 component tree).",
-      fix: `Add a "schema" field whose value is the catalog-schema array. See ${CANONICAL_WIDGET_JSON}.`,
+      fix: `Add a "schema" field whose value is the catalog-schema array. See ${CANONICAL_CATALOG_SCHEMA_JSON}.`,
     });
   } else {
     validateCatalogSchema(obj.schema, errors);
@@ -217,188 +229,89 @@ function validateWrapperWidget(
 }
 
 /**
- * Validate a single A2UI envelope (one item of the `envelopes` array in
- * shape (c)). v0.9 envelopes carry exactly one operation per envelope:
- * createSurface, updateComponents, or updateDataModel.
- */
-function validateEnvelope(
-  env: unknown,
-  index: number,
-  errors: ValidationError[],
-): void {
-  if (typeof env !== "object" || env === null || Array.isArray(env)) {
-    errors.push({
-      message: `Envelope at index ${index} is not an object.`,
-      fix: `Wrap the envelope in an object: { "version": "v0.9", "createSurface": { ... } }`,
-    });
-    return;
-  }
-  const e = env as Record<string, unknown>;
-
-  if (typeof e.version !== "string" || e.version.length === 0) {
-    errors.push({
-      message: `Envelope at index ${index} missing 'version'.`,
-      fix: `Add "version": "v0.9".`,
-    });
-  }
-
-  const opKeys = ["createSurface", "updateComponents", "updateDataModel"];
-  const presentOps = opKeys.filter((k) => k in e);
-  if (presentOps.length === 0) {
-    errors.push({
-      message: `Envelope at index ${index} carries no recognized operation (expected one of createSurface / updateComponents / updateDataModel).`,
-      fix: `Add exactly one operation key. See ${CANONICAL_FIXTURE_JSON} for canonical examples.`,
-    });
-    return;
-  }
-  if (presentOps.length > 1) {
-    errors.push({
-      message: `Envelope at index ${index} carries ${presentOps.length} operations (${presentOps.join(", ")}). v0.9 envelopes carry exactly one operation.`,
-      fix: `Split into ${presentOps.length} envelopes, each with one op.`,
-    });
-  }
-
-  // Per-op shape checks
-  if ("createSurface" in e) {
-    const cs = e.createSurface as Record<string, unknown>;
-    if (typeof cs?.surfaceId !== "string" || cs.surfaceId.length === 0) {
-      errors.push({
-        message: `Envelope at index ${index} (createSurface) missing 'surfaceId'.`,
-        fix: `Add a unique surfaceId string, e.g. "flight-search-results".`,
-      });
-    }
-    validateCatalogId(cs?.catalogId, errors);
-  }
-  if ("updateComponents" in e) {
-    const uc = e.updateComponents as Record<string, unknown>;
-    if (typeof uc?.surfaceId !== "string" || uc.surfaceId.length === 0) {
-      errors.push({
-        message: `Envelope at index ${index} (updateComponents) missing 'surfaceId'.`,
-        fix: `Add a surfaceId matching the createSurface envelope above.`,
-      });
-    }
-    if (!Array.isArray(uc?.components)) {
-      // The agent sometimes ships a "root" object instead of "components" (see
-      // src/hooks/use-envelope-stream.tsx demo envelopes). We accept either to
-      // avoid false negatives on the demo path, but warn on neither.
-      if (!("root" in (uc ?? {}))) {
-        errors.push({
-          message: `Envelope at index ${index} (updateComponents) has neither 'components' (array) nor 'root' (object).`,
-          fix: `Add a "components" array of catalog components. See ${CANONICAL_FIXTURE_JSON}.`,
-        });
-      }
-    } else {
-      validateCatalogSchema(uc.components, errors);
-    }
-  }
-  if ("updateDataModel" in e) {
-    const ud = e.updateDataModel as Record<string, unknown>;
-    if (typeof ud?.surfaceId !== "string" || ud.surfaceId.length === 0) {
-      errors.push({
-        message: `Envelope at index ${index} (updateDataModel) missing 'surfaceId'.`,
-        fix: `Add a surfaceId matching the createSurface envelope above.`,
-      });
-    }
-    // `path` and `value` are optional in some pre-v0.9 shapes; we don't enforce
-    // them strictly here. v0.9 wants both, but we accept what the demo emits
-    // (sometimes a flat `data` field).
-  }
-}
-
-/**
- * Shape (c): Envelopes-array fixture (`flight_card.fixture.json`,
- * `product_card.fixture.json`).
+ * Shape (c): CANONICAL FIXTURE (every `*.fixture.json` under agent/src/widgets/).
  *
- * Required: surfaceId, envelopes (non-empty array). Optional: name, description.
+ * Required: surfaceId, catalogId, components (non-empty array with a root),
+ *           data (object).
+ * Optional: name, description.
+ *
+ * Issue #16: this is the ONE canonical fixture shape. Files that still use
+ * the legacy `envelopes: [...]` shape are migrated to this shape and the
+ * legacy branch is rejected on purpose so a hacker reading the error message
+ * gets pointed at the canonical fixture, not a stale shape.
  */
-function validateEnvelopesFixture(
+function validateCanonicalFixture(
   obj: Record<string, unknown>,
   errors: ValidationError[],
 ): void {
   if (typeof obj.surfaceId !== "string" || obj.surfaceId.length === 0) {
     errors.push({
-      message: "Envelopes-array fixture missing 'surfaceId'.",
-      fix: `Add a unique surfaceId string at the top level, e.g. "flight-search-results".`,
-    });
-  }
-  if (!Array.isArray(obj.envelopes)) {
-    errors.push({
-      message: "Envelopes-array fixture missing 'envelopes' array.",
-      fix: `Add an "envelopes" field — an array of A2UI envelopes. See ${CANONICAL_FIXTURE_JSON}.`,
-    });
-    return;
-  }
-  if (obj.envelopes.length === 0) {
-    errors.push({
-      message: "Empty 'envelopes' array.",
-      fix: `Add at least one createSurface envelope. See ${CANONICAL_FIXTURE_JSON}.`,
-    });
-    return;
-  }
-  obj.envelopes.forEach((env, i) => validateEnvelope(env, i, errors));
-}
-
-/**
- * Shape (d): Single-envelope fixture (`legal/contract_review.fixture.json`).
- *
- * Required: surfaceId, catalogId, components.
- * Optional: data, name, description.
- */
-function validateSingleEnvelopeFixture(
-  obj: Record<string, unknown>,
-  errors: ValidationError[],
-): void {
-  if (typeof obj.surfaceId !== "string" || obj.surfaceId.length === 0) {
-    errors.push({
-      message: "Single-envelope fixture missing 'surfaceId'.",
-      fix: `Add a unique surfaceId string, e.g. "contract-review".`,
+      message: "Fixture missing 'surfaceId' (the unique surface identifier).",
+      fix: `Add a top-level "surfaceId" string, e.g. "flight-search-results". See ${CANONICAL_FIXTURE_JSON}.`,
     });
   }
   validateCatalogId(obj.catalogId, errors);
   if (!("components" in obj)) {
     errors.push({
-      message: "Single-envelope fixture missing 'components' array.",
-      fix: `Add a components array, or switch to the envelopes-array shape and put it under envelopes[].updateComponents.components.`,
+      message: "Fixture missing 'components' array (the v0.9 component tree).",
+      fix: `Add a top-level "components" array of catalog components. See ${CANONICAL_FIXTURE_JSON}.`,
     });
   } else {
     validateCatalogSchema(obj.components, errors);
   }
-
-  if ("data" in obj && (typeof obj.data !== "object" || obj.data === null || Array.isArray(obj.data))) {
+  if (!("data" in obj)) {
+    errors.push({
+      message: "Fixture missing 'data' object (the data model components bind to via 'path').",
+      fix: `Add a top-level "data" object whose keys match the paths your components reference, e.g. { "flights": [...] }. See ${CANONICAL_FIXTURE_JSON}.`,
+    });
+  } else if (typeof obj.data !== "object" || obj.data === null || Array.isArray(obj.data)) {
     errors.push({
       message: "'data' must be an object (the data model components bind to via 'path').",
-      fix: `Make 'data' an object whose keys match the paths your components reference, e.g. { "flights": [...] }.`,
+      fix: `Make 'data' an object whose keys match the paths your components reference, e.g. { "flights": [...] }. See ${CANONICAL_FIXTURE_JSON}.`,
     });
   }
 }
 
 /**
- * Decide which of the four supported shapes a parsed JSON is. Inspects the
+ * Decide which of the three supported shapes a parsed JSON is. Inspects the
  * top-level keys — no validation here, just routing.
+ *
+ * Files ending in `.fixture.json` are always validated as the canonical
+ * fixture shape (issue #16). Files with `envelopes: [...]` no longer have a
+ * dedicated branch; they fall through to the canonical fixture validator,
+ * which yells about the missing `components`/`data` keys and points at the
+ * canonical example.
  */
 function pickShape(
   parsed: unknown,
+  filePath: string,
 ): {
-  kind: "catalog-schema" | "wrapper-widget" | "envelopes-fixture" | "single-envelope-fixture" | "unknown";
+  kind: "catalog-schema" | "wrapper-widget" | "canonical-fixture" | "unknown";
   canonical: string;
 } {
+  // Fixture files always validated as the canonical fixture shape — no
+  // matter what top-level keys they happen to have. This is what issue #16
+  // calls "the authoritative shape."
+  if (filePath.endsWith(".fixture.json")) {
+    return { kind: "canonical-fixture", canonical: CANONICAL_FIXTURE_JSON };
+  }
   if (Array.isArray(parsed)) {
-    return { kind: "catalog-schema", canonical: CANONICAL_WIDGET_JSON };
+    return { kind: "catalog-schema", canonical: CANONICAL_CATALOG_SCHEMA_JSON };
   }
   if (typeof parsed !== "object" || parsed === null) {
-    return { kind: "unknown", canonical: CANONICAL_WIDGET_JSON };
+    return { kind: "unknown", canonical: CANONICAL_CATALOG_SCHEMA_JSON };
   }
   const obj = parsed as Record<string, unknown>;
-  if (Array.isArray(obj.envelopes)) {
-    return { kind: "envelopes-fixture", canonical: CANONICAL_FIXTURE_JSON };
-  }
   if (Array.isArray(obj.schema)) {
     return { kind: "wrapper-widget", canonical: CANONICAL_WIDGET_JSON };
   }
-  if (Array.isArray(obj.components) || "surfaceId" in obj) {
-    return { kind: "single-envelope-fixture", canonical: CANONICAL_FIXTURE_JSON };
+  // Any non-fixture top-level object with surfaceId/components is treated
+  // as if a hacker dropped a fixture in the wrong place — validate it as
+  // the canonical fixture shape and let the error messages teach.
+  if (Array.isArray(obj.components) || "surfaceId" in obj || Array.isArray(obj.envelopes)) {
+    return { kind: "canonical-fixture", canonical: CANONICAL_FIXTURE_JSON };
   }
-  return { kind: "unknown", canonical: CANONICAL_WIDGET_JSON };
+  return { kind: "unknown", canonical: CANONICAL_CATALOG_SCHEMA_JSON };
 }
 
 function validateFile(filePath: string): boolean {
@@ -420,12 +333,12 @@ function validateFile(filePath: string): boolean {
           fix: "Fix the JSON syntax. `python3 -m json.tool < file` will point at the bad character.",
         },
       ],
-      CANONICAL_WIDGET_JSON,
+      CANONICAL_CATALOG_SCHEMA_JSON,
     );
     return false;
   }
 
-  const { kind, canonical } = pickShape(parsed);
+  const { kind, canonical } = pickShape(parsed, filePath);
   const errors: ValidationError[] = [];
   let shapeLabel: string;
 
@@ -438,13 +351,31 @@ function validateFile(filePath: string): boolean {
       shapeLabel = "wrapper widget (schema-under-key)";
       validateWrapperWidget(parsed as Record<string, unknown>, errors);
       break;
-    case "envelopes-fixture":
-      shapeLabel = "envelopes-array fixture";
-      validateEnvelopesFixture(parsed as Record<string, unknown>, errors);
-      break;
-    case "single-envelope-fixture":
-      shapeLabel = "single-envelope fixture";
-      validateSingleEnvelopeFixture(parsed as Record<string, unknown>, errors);
+    case "canonical-fixture":
+      shapeLabel = "canonical fixture";
+      // Pre-flight: a stale envelopes-array fixture will fail the canonical
+      // checks; teach against the canonical shape directly so the hacker
+      // doesn't have to guess.
+      if (
+        typeof parsed === "object" &&
+        parsed !== null &&
+        !Array.isArray(parsed) &&
+        Array.isArray((parsed as Record<string, unknown>).envelopes)
+      ) {
+        teach(
+          filePath,
+          [
+            {
+              message:
+                "Fixture uses the legacy `envelopes: [...]` shape. The canonical fixture shape is `{ surfaceId, catalogId, components, data }` (issue #16 — one canonical shape, validator is the authority).",
+              fix: `Flatten the envelopes array: lift createSurface's surfaceId+catalogId to the top level, put updateComponents.components under "components", put updateDataModel.value under "data". See ${CANONICAL_FIXTURE_JSON}.`,
+            },
+          ],
+          canonical,
+        );
+        return false;
+      }
+      validateCanonicalFixture(parsed as Record<string, unknown>, errors);
       break;
     default:
       teach(
@@ -452,8 +383,8 @@ function validateFile(filePath: string): boolean {
         [
           {
             message:
-              "Top-level value isn't one of the four supported shapes (bare array, wrapper widget, envelopes-array fixture, single-envelope fixture).",
-            fix: `Pick a shape and restructure. See ${CANONICAL_WIDGET_JSON} (wrapper) or ${CANONICAL_FIXTURE_JSON} (fixture).`,
+              "Top-level value isn't one of the three supported shapes (bare catalog array, wrapper widget object with `schema`, or canonical fixture object with `surfaceId`+`components`+`data`).",
+            fix: `Pick a shape and restructure. See ${CANONICAL_CATALOG_SCHEMA_JSON} (catalog) or ${CANONICAL_FIXTURE_JSON} (fixture).`,
           },
         ],
         canonical,

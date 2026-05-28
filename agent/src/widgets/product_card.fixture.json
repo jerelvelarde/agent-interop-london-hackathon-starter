@@ -2,110 +2,89 @@
   "name": "product_card_running_shoes",
   "description": "Canonical fixed-schema scenario: search_products returns three running-shoe cards rendered with the base v0.9 catalog.",
   "surfaceId": "product-search-results",
-  "envelopes": [
+  "catalogId": "https://a2ui.org/specification/v0_9/basic_catalog.json",
+  "components": [
     {
-      "version": "v0.9",
-      "createSurface": {
-        "surfaceId": "product-search-results",
-        "catalogId": "https://a2ui.org/specification/v0_9/basic_catalog.json"
-      }
+      "id": "root",
+      "component": "List",
+      "direction": "horizontal",
+      "gap": 16,
+      "children": { "componentId": "product-card", "path": "/products" }
+    },
+    { "id": "product-card", "component": "Card", "children": ["product-card-col"] },
+    {
+      "id": "product-card-col",
+      "component": "Column",
+      "gap": 12,
+      "children": [
+        "product-card-image",
+        "product-card-name",
+        "product-card-price",
+        "product-card-meta",
+        "product-card-button"
+      ]
     },
     {
-      "version": "v0.9",
-      "updateComponents": {
-        "surfaceId": "product-search-results",
-        "components": [
-          {
-            "id": "root",
-            "component": "List",
-            "direction": "horizontal",
-            "gap": 16,
-            "children": { "componentId": "product-card", "path": "/products" }
-          },
-          { "id": "product-card", "component": "Card", "children": ["product-card-col"] },
-          {
-            "id": "product-card-col",
-            "component": "Column",
-            "gap": 12,
-            "children": [
-              "product-card-image",
-              "product-card-name",
-              "product-card-price",
-              "product-card-meta",
-              "product-card-button"
-            ]
-          },
-          {
-            "id": "product-card-image",
-            "component": "Image",
-            "variant": "smallFeature",
-            "src": { "path": "imageUrl" },
-            "alt": { "path": "name" }
-          },
-          { "id": "product-card-name", "component": "Text", "variant": "h3", "text": { "path": "name" } },
-          { "id": "product-card-price", "component": "Text", "variant": "h2", "text": { "path": "price" } },
-          {
-            "id": "product-card-meta",
-            "component": "Row",
-            "justify": "spaceBetween",
-            "children": ["product-card-rating", "product-card-category"]
-          },
-          { "id": "product-card-rating", "component": "Text", "variant": "caption", "text": { "path": "rating" } },
-          { "id": "product-card-category", "component": "Text", "variant": "caption", "text": { "path": "category" } },
-          {
-            "id": "product-card-button",
-            "component": "Button",
-            "variant": "primary",
-            "children": ["product-card-button-text"],
-            "action": {
-              "event": {
-                "name": "add_to_cart",
-                "context": {
-                  "productId": { "path": "id" },
-                  "name": { "path": "name" },
-                  "price": { "path": "price" }
-                }
-              }
-            }
-          },
-          { "id": "product-card-button-text", "component": "Text", "text": "Add to cart" }
-        ]
-      }
+      "id": "product-card-image",
+      "component": "Image",
+      "variant": "smallFeature",
+      "src": { "path": "imageUrl" },
+      "alt": { "path": "name" }
     },
+    { "id": "product-card-name", "component": "Text", "variant": "h3", "text": { "path": "name" } },
+    { "id": "product-card-price", "component": "Text", "variant": "h2", "text": { "path": "price" } },
     {
-      "version": "v0.9",
-      "updateDataModel": {
-        "surfaceId": "product-search-results",
-        "path": "/",
-        "value": {
-          "products": [
-            {
-              "id": "sneaker-001",
-              "name": "Nimbus Stride 8",
-              "price": "$129",
-              "rating": "4.7 stars",
-              "category": "Running",
-              "imageUrl": "https://placehold.co/256x256/4f46e5/ffffff?text=Nimbus"
-            },
-            {
-              "id": "sneaker-002",
-              "name": "Trail Blazer Lite",
-              "price": "$149",
-              "rating": "4.5 stars",
-              "category": "Trail",
-              "imageUrl": "https://placehold.co/256x256/059669/ffffff?text=Trail"
-            },
-            {
-              "id": "sneaker-003",
-              "name": "Pacer Pro",
-              "price": "$179",
-              "rating": "4.8 stars",
-              "category": "Racing",
-              "imageUrl": "https://placehold.co/256x256/dc2626/ffffff?text=Pacer"
-            }
-          ]
+      "id": "product-card-meta",
+      "component": "Row",
+      "justify": "spaceBetween",
+      "children": ["product-card-rating", "product-card-category"]
+    },
+    { "id": "product-card-rating", "component": "Text", "variant": "caption", "text": { "path": "rating" } },
+    { "id": "product-card-category", "component": "Text", "variant": "caption", "text": { "path": "category" } },
+    {
+      "id": "product-card-button",
+      "component": "Button",
+      "variant": "primary",
+      "children": ["product-card-button-text"],
+      "action": {
+        "event": {
+          "name": "add_to_cart",
+          "context": {
+            "productId": { "path": "id" },
+            "name": { "path": "name" },
+            "price": { "path": "price" }
+          }
         }
       }
-    }
-  ]
+    },
+    { "id": "product-card-button-text", "component": "Text", "text": "Add to cart" }
+  ],
+  "data": {
+    "products": [
+      {
+        "id": "sneaker-001",
+        "name": "Nimbus Stride 8",
+        "price": "$129",
+        "rating": "4.7 stars",
+        "category": "Running",
+        "imageUrl": "https://placehold.co/256x256/4f46e5/ffffff?text=Nimbus"
+      },
+      {
+        "id": "sneaker-002",
+        "name": "Trail Blazer Lite",
+        "price": "$149",
+        "rating": "4.5 stars",
+        "category": "Trail",
+        "imageUrl": "https://placehold.co/256x256/059669/ffffff?text=Trail"
+      },
+      {
+        "id": "sneaker-003",
+        "name": "Pacer Pro",
+        "price": "$179",
+        "rating": "4.8 stars",
+        "category": "Racing",
+        "imageUrl": "https://placehold.co/256x256/dc2626/ffffff?text=Pacer"
+      }
+    ]
+  }
 }

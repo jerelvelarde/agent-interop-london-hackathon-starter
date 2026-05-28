@@ -98,13 +98,28 @@ If it fails, the validator points at the failing field with a fix hint. Fix and 
 
 ### Step 3 — Write the fixture
 
-Create `agent/src/widgets/<name>.fixture.json`. This is a named test scenario — the data the widget will render against in tests and offline mode:
+Create `agent/src/widgets/<name>.fixture.json`. This is a named test scenario — the data the widget will render against in tests and offline mode. Use the **canonical fixture shape** (`{surfaceId, catalogId, components, data}` — see issue #16 — one shape, validator is the authority). The canonical example to mirror is `agent/src/widgets/flight_card.fixture.json`:
 
 ```json
 {
   "name": "<name>-default",
+  "description": "One-sentence test scenario description.",
   "surfaceId": "<name>-surface",
   "catalogId": "copilotkit://app-dashboard-catalog",
+  "components": [
+    {
+      "id": "root",
+      "component": "Row",
+      "children": { "componentId": "<name>-card", "path": "/<plural>" },
+      "gap": 16
+    },
+    {
+      "id": "<name>-card",
+      "component": "Card",
+      "title": { "path": "title" },
+      "subtitle": { "path": "subtitle" }
+    }
+  ],
   "data": {
     "<plural>": [
       { "title": "Sample 1", "subtitle": "Demo data" },
@@ -113,6 +128,8 @@ Create `agent/src/widgets/<name>.fixture.json`. This is a named test scenario �
   }
 }
 ```
+
+Note: the `components` array is the same shape as the catalog entry in Step 2 — fixtures inline the schema so the renderer (and `pnpm test:widgets`) can hydrate them without loading any other file. If your catalog entry changes, copy it into the fixture's `components` array.
 
 Run `pnpm test:widgets` to confirm the fixture renders against the catalog entry.
 

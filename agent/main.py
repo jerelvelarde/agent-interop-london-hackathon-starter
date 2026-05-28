@@ -20,13 +20,17 @@ from langchain_openai import ChatOpenAI
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # CUSTOMIZATION SEAM — LLM provider
-# Default: Gemini 3.5 Flash via Google's OpenAI-compatible endpoint.
-# Why this default: agentic-tuned, free tier, sponsor alignment, zero code rewrite.
-# Model ID empirically verified 2026-05-28 (scripts/probe-gemini.sh). See FROZEN.md.
+# Default: Gemini 2.5 Flash via Google's OpenAI-compatible endpoint.
+# Why 2.5 (not 3.5): Gemini 3.x requires thought_signature replay across
+# tool turns (https://ai.google.dev/gemini-api/docs/thought-signatures);
+# langchain-openai 1.1.9 does not implement this, so 3.5 Flash 400s after
+# the first tool call. 2.5 Flash has no such requirement.
+# Model ID empirically verified 2026-05-28 via scripts/probe-gemini.sh.
+# See FROZEN.md for the full probe results and the 3.x upgrade path.
 # To swap providers (OpenAI / Anthropic / LiteLLM): see .env.example.
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 model = ChatOpenAI(
-    model=os.getenv("MODEL", "gemini-3.5-flash"),
+    model=os.getenv("MODEL", "gemini-2.5-flash"),
     api_key=os.getenv("GEMINI_API_KEY"),
     base_url=os.getenv("MODEL_BASE_URL", "https://generativelanguage.googleapis.com/v1beta/openai/"),
     model_kwargs={"parallel_tool_calls": False},

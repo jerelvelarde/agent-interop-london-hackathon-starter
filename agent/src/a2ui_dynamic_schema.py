@@ -9,6 +9,7 @@ middleware detects in the TOOL_CALL_RESULT and renders automatically.
 from __future__ import annotations
 
 import json
+import os
 from typing import Any
 
 from langchain.tools import tool, ToolRuntime
@@ -69,7 +70,16 @@ def generate_a2ui(runtime: ToolRuntime[Any]) -> str:
 
     prompt = context_text
 
-    model = ChatOpenAI(model="gpt-4.1")
+    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    # Secondary LLM — designs the A2UI schema for dynamic surfaces.
+    # Reads the same MODEL / MODEL_BASE_URL / GEMINI_API_KEY env as the
+    # primary agent (agent/main.py). Keep the two providers in sync.
+    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    model = ChatOpenAI(
+        model=os.getenv("MODEL", "gemini-2.5-flash"),
+        api_key=os.getenv("GEMINI_API_KEY"),
+        base_url=os.getenv("MODEL_BASE_URL", "https://generativelanguage.googleapis.com/v1beta/openai/"),
+    )
     model_with_tool = model.bind_tools(
         [render_a2ui],
         tool_choice="render_a2ui",

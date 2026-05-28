@@ -17,19 +17,42 @@ a Google or upstream change is caught before event day.
 |---|---|
 | Provider | Google Gemini |
 | Endpoint | `https://generativelanguage.googleapis.com/v1beta/openai/` |
-| Model ID | `gemini-3.5-flash` |
+| Model ID | **`gemini-2.5-flash`** |
 | Env var | `GEMINI_API_KEY` |
 | Free-tier key | https://aistudio.google.com/apikey |
 | Verified via | `scripts/probe-gemini.sh` on 2026-05-28 |
-| Probe result | HTTP 200 + tool_calls confirmed, 1629ms |
-| Backup | `gemini-2.5-flash` (also 200 + tool_calls, 1704ms) |
+| Probe result | HTTP 200 + tool_calls confirmed, 1704ms |
+| Multi-turn verified | Yes — survives `user → assistant(tool_call) → tool → assistant(reply)` cleanly |
 
-### Why this default
+### Why this default (and why NOT 3.5 Flash)
 
-1. **Agentic-tuned.** Google positions Gemini 3.5 Flash as the agentic flagship.
+1. **Agentic-tuned.** Google positions Gemini Flash as the agentic flagship.
 2. **Sponsor alignment.** Google is the venue + platform sponsor.
 3. **Free tier.** No credit card required.
 4. **Zero code rewrite.** OpenAI-compat endpoint works with existing `ChatOpenAI`.
+5. **Multi-turn compatible with `langchain-openai`.** This is the load-bearing one.
+
+#### The Gemini 3.5 Flash trap
+
+`gemini-3.5-flash` 200s on a single-turn tool-calling probe but **400s on the
+follow-up turn** with:
+
+```
+Function call is missing a thought_signature in functionCall parts.
+This is required for tools to work correctly … Please refer to
+https://ai.google.dev/gemini-api/docs/thought-signatures
+```
+
+Gemini 3.x emits "thought signatures" with every tool call and requires the
+client to replay them on subsequent turns. `langchain-openai 1.1.9` does not
+implement this — it strips thought metadata. `reasoning_effort: "none"` does
+NOT disable the requirement.
+
+**Upgrade path to 3.5 Flash:** wait until langchain-openai (or another OpenAI-
+compatible client) ships thought_signature passthrough, OR switch the agent
+to `langchain-google-genai` for native Gemini multi-turn handling. Neither is
+in scope for the hackathon starter. CI should re-run the multi-turn probe
+nightly so the day langchain-openai gains support, we can flip the default.
 
 ### Models that 404'd in the probe (do not use)
 

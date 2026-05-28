@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # scripts/probe-gemini.sh — Empirically verify which Gemini model IDs 200 with
-# tool-calling against the OpenAI-compat endpoint. Workstream A done-criterion.
+# *multi-turn* tool-calling against the OpenAI-compat endpoint. Workstream A
+# done-criterion. Tests TWO turns because Gemini 3.x requires thought_signature
+# replay and silently 400s on the second turn — see FROZEN.md.
 #
 # Usage:  GEMINI_API_KEY=... ./scripts/probe-gemini.sh
-# Output: one line per candidate: <model-id>  <http-status>  <tool-called?>  <latency-ms>
+# Output: one line per candidate: <model-id>  <single-turn>  <multi-turn>  <latency-ms>
 
 set -euo pipefail
 
@@ -27,71 +29,90 @@ CANDIDATES=(
   "gemini-1.5-flash-latest"
 )
 
-REQUEST_BODY=$(cat <<'JSON'
+TURN1_BODY=$(cat <<'JSON'
 {
   "model": "__MODEL__",
   "messages": [
     {"role": "user", "content": "What's the weather in London? Use the tool."}
   ],
-  "tools": [{
-    "type": "function",
-    "function": {
-      "name": "get_weather",
-      "description": "Get the current weather for a city",
-      "parameters": {
-        "type": "object",
-        "properties": {"city": {"type": "string"}},
-        "required": ["city"]
-      }
-    }
-  }],
+  "tools": [{"type":"function","function":{"name":"get_weather","description":"Get current weather","parameters":{"type":"object","properties":{"city":{"type":"string"}},"required":["city"]}}}],
   "tool_choice": "auto",
   "max_tokens": 200
 }
 JSON
 )
 
-printf "%-30s %-8s %-12s %-12s %s\n" "MODEL" "STATUS" "TOOL-CALLED" "LATENCY-MS" "NOTES"
-printf "%-30s %-8s %-12s %-12s %s\n" "------------------------------" "------" "-----------" "----------" "-----"
+# Turn 2: assistant called the tool, here's the tool response; expect another LLM reply.
+TURN2_BODY=$(cat <<'JSON'
+{
+  "model": "__MODEL__",
+  "messages": [
+    {"role": "user", "content": "What's the weather in London? Use the tool."},
+    {"role": "assistant", "tool_calls": [{"id":"c1","type":"function","function":{"name":"get_weather","arguments":"{\"city\":\"London\"}"}}]},
+    {"role": "tool", "tool_call_id": "c1", "content": "{\"temp\":15,\"condition\":\"cloudy\"}"}
+  ],
+  "tools": [{"type":"function","function":{"name":"get_weather","description":"Get current weather","parameters":{"type":"object","properties":{"city":{"type":"string"}},"required":["city"]}}}],
+  "max_tokens": 200
+}
+JSON
+)
 
-for model in "${CANDIDATES[@]}"; do
-  body=$(printf '%s' "$REQUEST_BODY" | sed "s/__MODEL__/$model/")
-
-  start=$(python3 -c 'import time; print(int(time.time()*1000))')
-  # Capture HTTP status and body in one shot.
-  resp=$(curl -sS -w "\n%{http_code}" -X POST "$ENDPOINT" \
+probe_one() {
+  local model="$1" body_template="$2"
+  local body=$(printf '%s' "$body_template" | sed "s/__MODEL__/$model/")
+  local start=$(python3 -c 'import time; print(int(time.time()*1000))')
+  local resp=$(curl -sS -w "\n%{http_code}" -X POST "$ENDPOINT" \
     -H "Authorization: Bearer $GEMINI_API_KEY" \
     -H "Content-Type: application/json" \
-    -d "$body" || echo -e "\nERR")
-  end=$(python3 -c 'import time; print(int(time.time()*1000))')
-  latency=$((end - start))
+    -d "$body" 2>&1 || echo -e "\nERR")
+  local end=$(python3 -c 'import time; print(int(time.time()*1000))')
+  local status=$(printf '%s' "$resp" | tail -n1)
+  local body_out=$(printf '%s' "$resp" | sed '$d')
+  local latency=$((end - start))
 
-  status=$(printf '%s' "$resp" | tail -n1)
-  body_out=$(printf '%s' "$resp" | sed '$d')
-
-  # Did it call the tool?
-  tool_called="no"
-  notes=""
   if [[ "$status" == "200" ]]; then
-    if printf '%s' "$body_out" | python3 -c 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d.get("choices",[{}])[0].get("message",{}).get("tool_calls") else 1)' 2>/dev/null; then
-      tool_called="yes"
+    if printf '%s' "$body_out" | python3 -c 'import json,sys
+d=json.load(sys.stdin)
+msg=d.get("choices",[{}])[0].get("message",{})
+# turn1: expect tool_calls; turn2: expect content (reply) and no error
+sys.exit(0 if (msg.get("tool_calls") or msg.get("content")) else 1)' 2>/dev/null; then
+      echo "200:$latency:"
     else
-      tool_called="no"
-      notes="200 but no tool_call in response"
+      echo "200:$latency:empty-response"
     fi
   else
-    # Try to extract the API error message
-    notes=$(printf '%s' "$body_out" | python3 -c 'import json,sys
+    local err=$(printf '%s' "$body_out" | python3 -c 'import json,sys
 try:
-  d = json.load(sys.stdin)
-  msg = d.get("error",{}).get("message","")
-  print(msg[:80])
+  d=json.load(sys.stdin); print(d.get("error",{}).get("message","")[:60])
 except: pass' 2>/dev/null || true)
+    echo "$status:$latency:$err"
   fi
+}
 
-  printf "%-30s %-8s %-12s %-12s %s\n" "$model" "$status" "$tool_called" "$latency" "$notes"
+printf "%-28s %-22s %-22s %s\n" "MODEL" "SINGLE-TURN" "MULTI-TURN" "NOTES"
+printf "%-28s %-22s %-22s %s\n" "----------------------------" "----------------------" "----------------------" "-----"
+
+best=""
+for model in "${CANDIDATES[@]}"; do
+  r1=$(probe_one "$model" "$TURN1_BODY")
+  s1=${r1%%:*}; rest=${r1#*:}; l1=${rest%%:*}; n1=${rest#*:}
+
+  if [[ "$s1" == "200" ]]; then
+    r2=$(probe_one "$model" "$TURN2_BODY")
+    s2=${r2%%:*}; rest=${r2#*:}; l2=${rest%%:*}; n2=${rest#*:}
+    notes="$n2"
+    [[ "$s2" == "200" && -z "$best" ]] && best="$model"
+    printf "%-28s %-22s %-22s %s\n" "$model" "200 (${l1}ms)" "${s2} (${l2}ms)" "$notes"
+  else
+    printf "%-28s %-22s %-22s %s\n" "$model" "${s1} (${l1}ms)" "—" "$n1"
+  fi
 done
 
 echo
-echo "VERDICT: pick the highest-priority candidate above with STATUS=200 and TOOL-CALLED=yes."
-echo "Write that ID into agent/main.py, .env.example, agent/pyproject.toml (if applicable), and FROZEN.md."
+if [[ -n "$best" ]]; then
+  echo "VERDICT: use $best (highest-priority candidate that passed BOTH single- and multi-turn)."
+  echo "Write that ID into agent/main.py, agent/src/a2ui_dynamic_schema.py, .env.example, and FROZEN.md."
+else
+  echo "VERDICT: NO candidate passed multi-turn. The base starter cannot run agentic loops on Gemini today."
+  echo "Investigate: thought_signature passthrough in langchain-openai, or switch to langchain-google-genai."
+fi

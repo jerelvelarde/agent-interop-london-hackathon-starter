@@ -35,7 +35,7 @@ other-examples/<example-id>/
 ## How to add another
 
 1. **Re-read [plan §0.6 dogfooding policy](https://www.notion.so/36e3aa38185281e49674f95ea7039b90).** The example must be built through the documented hackathon paths only — `pnpm new-widget`, the `create-a2ui-widget` skill, `AGENTS.md`, in-tree READMEs, validators. Every workaround gets a row in `FRICTION.md`.
-2. **(Future) `pnpm new-widget --example <name>`.** When this generator ships, it will scaffold the sub-repo layout above so you don't hand-author the skeleton. Until then, copy `legal-contract-review/` and rename.
+2. **`pnpm new-example <name>`.** Scaffolds the sub-repo layout above (README, EXAMPLE.json, catalog/, agent/) under `other-examples/<name>/` so you don't hand-author the skeleton. The scaffold is intentionally thin — fill it in by copying from `legal-contract-review/` (the canonical content-complete example).
 3. **Honesty about portability.** The §3.1 callout applies to every new example: the folder is content, not a complete repo. Document the host requirements (pinned deps, route shim, route-group layout, langgraph entry) in your example's README so a hacker who forks isn't surprised.
 4. **Build the FRICTION.md as you go.** End-of-day cadence (17:00): convert friction rows to GitHub issues with the `dogfood-friction` label and the `hackathon-readiness-jun13` milestone. See §0.7 for the row template and label taxonomy.
 5. **Add an entry to the index table above** and to the gallery — the gallery enumerates `other-examples/*/EXAMPLE.json` (see §3.2 for the shape).

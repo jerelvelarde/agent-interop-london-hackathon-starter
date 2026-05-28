@@ -53,6 +53,91 @@ The Generative UI Hackathon is a **globally-coordinated, multi-city, 5-hour buil
 
 ---
 
+## §0.7 Friction protocol (in-tree mirror of Notion canonical)
+
+> Canonical source: [parent plan §0.7](https://www.notion.so/36e3aa38185281e49674f95ea7039b90).
+> This in-tree section mirrors it so AI assistants without web access still have
+> the protocol on hand. If the two diverge, Notion wins. GitHub issue #6 tracked
+> the mirror.
+
+The starter is dogfooded — Jerel and assigned build engineers ship the
+starter through the same documented surfaces a hackathon attendee would,
+and every snag becomes data. The friction protocol is how that data flows
+out of an example folder and into the issue tracker so it can be fixed
+before doors open.
+
+**Local artifact:** `other-examples/<example>/FRICTION.md`. Stays with the
+example so it ships as transparent evidence of dogfooding. The legal-review
+example's `FRICTION.md` is the canonical reference.
+
+**Conversion rule:** every entry in `FRICTION.md` becomes a GitHub issue
+with the `dogfood-friction` label, a severity label, an area label, and the
+`hackathon-readiness-jun13` milestone.
+
+### Row template
+
+Both the in-tree `FRICTION.md` entry and the GitHub issue body use this
+shape (also lives at `.github/ISSUE_TEMPLATE/dogfood-friction.md`):
+
+```markdown
+## [P0/P1/P2/P3] One-line title
+
+- **Encountered while:** [step from create-a2ui-widget skill / this plan / AGENTS.md section]
+- **What I tried:** [the documented path]
+- **What happened:** [error / confusion / missing piece — paste actual error if any]
+- **What I wanted:** [the right outcome]
+- **Suggested fix:** [if obvious; else "needs design"]
+- **Who hits this:** [hackathon attendee profile — Claude Code / Gemini CLI / Cursor / human-only / new-to-LangGraph / etc.]
+- **Filed as:** [#NNN]
+```
+
+### Severity rubric
+
+| Label | Meaning |
+|---|---|
+| `severity:P0-blocker` | Hacker cannot proceed via the documented path. Must close before kickoff. |
+| `severity:P1-pain` | Works but with significant unintended difficulty. Must close before kickoff. |
+| `severity:P2-polish` | Minor wording, error-message clarity, doc gaps. Carries to backlog if needed. |
+| `severity:P3-nice-to-have` | Small ergonomic wins. Carries to backlog. |
+
+### Area + persona labels
+
+`area:agent-py`, `area:catalog-ts`, `area:scripts`, `area:docs`,
+`area:ax-rules` cover where the fix lands. `target-persona:claude-code`,
+`target-persona:gemini-cli`, `target-persona:cursor`,
+`target-persona:human-only` cover who hits it.
+
+### Milestone + gate
+
+Milestone `hackathon-readiness-jun13` is mandatory on every
+`dogfood-friction` issue. The hard gate at **Jun 10 17:00** is:
+
+```bash
+gh issue list \
+  --label dogfood-friction \
+  --milestone hackathon-readiness-jun13 \
+  --state open \
+  --label severity:P0-blocker \
+  --label severity:P1-pain
+```
+
+This must return zero rows. P2 and P3 can carry into backlog.
+
+### Triage cadence
+
+| When | Who | What |
+|---|---|---|
+| End of each build day (17:00) | Builder | Convert that day's `FRICTION.md` rows to GitHub issues using the template. |
+| Each morning (09:30) | Triager (Jerel default) | Sort by severity, assign owners, link related issues, decompose blockers. |
+| Continuous | Owners | Fix or document workaround; close with a commit referencing the issue. |
+| **Jun 10 17:00** | All | Run the hard-gate query above. Zero rows = green. |
+
+> Tooling note: the `triage` skill is the state-machine processor for the
+> morning pass when one is configured. Use `gh issue list --label
+> dogfood-friction --state open` as the day-to-day driver.
+
+---
+
 ## Architecture
 
 ```text
@@ -511,6 +596,147 @@ A 30-parallel-request load test against the resolved model ID is part of Workstr
 | One canonical stub domain (`shopping`) | |
 
 Teams' time should mostly go to **widget design + prompt engineering + domain content** with their AI assistant doing most of the typing.
+
+---
+
+## §6.1 Adding a sub-repo example agent (multi-graph, canonical recipe)
+
+> v2/v3 of the plan documented a `__init__.py` + `pyproject.toml` +
+> `dependencies` recipe and claimed `from .tools import ...` would work
+> under langgraph CLI. **It does not.** GitHub issue #4 (P0) captured the
+> failure and the actual working pattern; this section is the canonical
+> answer. (`other-examples/legal-contract-review/agent/graph.py` is the
+> reference implementation.)
+
+**The constraint:** langgraph CLI (0.7.101) loads graphs specified by
+path (anything in `graphs:` whose value contains `/`) via
+`importlib.util.spec_from_file_location`. That loader bypasses Python's
+package machinery — the module is loaded as bare top-level, never as a
+package member. As a result:
+
+- `from .tools import review_contract` raises
+  `ImportError: attempted relative import with no known parent package`.
+- The `pyproject.toml` + `__init__.py` + `dependencies: ["..."]` trio is
+  not enough on its own to enable relative imports under the path loader.
+
+**Canonical recipe — sys.path injection with absolute imports.** This is
+what actually ships in the legal-review example, what passes `pnpm smoke`,
+and what every future sub-repo agent should copy.
+
+### Step 1 — Package marker + non-colliding name (`pyproject.toml`)
+
+`other-examples/<example>/agent/pyproject.toml`:
+
+```toml
+[project]
+name = "legal-review-agent"          # PyPI-style name
+version = "0.1.0"
+description = "LangGraph agent for the Contract Review Copilot example."
+requires-python = ">=3.12"
+dependencies = []                    # inherits via parent agent's venv
+
+# Explicit non-colliding package name so setuptools doesn't auto-discover
+# `agent` and shadow project-root `agent/`. See GitHub issue #15.
+[tool.setuptools]
+packages = ["legal_review_agent"]
+
+[tool.setuptools.package-dir]
+legal_review_agent = "."
+```
+
+`other-examples/<example>/agent/__init__.py` is a near-empty marker (a one-line comment is enough). Its presence allows
+`pip install -e ./other-examples/<example>/agent` to expose the directory
+as the `legal_review_agent` package — useful for non-langgraph entry points
+(IDEs, unit tests). The langgraph CLI path still doesn't see it as a
+package; sys.path injection is what carries that case.
+
+### Step 2 — sys.path injection in `graph.py`
+
+`other-examples/<example>/agent/graph.py` opens with:
+
+```python
+import os
+import sys
+from pathlib import Path
+
+from copilotkit import CopilotKitMiddleware
+from langchain.agents import create_agent
+from langchain_openai import ChatOpenAI
+
+# Make sibling modules importable when langgraph CLI loads this file via
+# spec_from_file_location (the loader skips package machinery).
+_HERE = Path(__file__).resolve().parent
+if str(_HERE) not in sys.path:
+    sys.path.insert(0, str(_HERE))
+
+from tools import review_contract, apply_redline  # noqa: E402  (sys.path tweak above)
+```
+
+Use **absolute imports against the sibling module name** (`from tools
+import ...`), not relative imports (`from .tools import ...`). The
+sys.path tweak makes `tools` resolvable as a top-level module from this
+directory; the noqa suppresses the E402 "import not at top of file"
+lint that ruff would otherwise flag.
+
+This same file works under three load paths:
+- `langgraph dev` (path loader) — sys.path tweak fires; absolute import resolves.
+- `python -c "from legal_review_agent.graph import graph"` — package install path; the tweak is a no-op and absolute `tools` still resolves because `_HERE` is the package dir.
+- `pytest` against the agent dir — sys.path tweak makes sibling test files importable.
+
+### Step 3 — Register both graphs in `agent/langgraph.json`
+
+```json
+{
+  "python_version": "3.12",
+  "package_manager": "uv",
+  "dependencies": [".", "../other-examples/<example>/agent"],
+  "graphs": {
+    "sample_agent": "./main.py:graph",
+    "legal_review_agent": "../other-examples/<example>/agent/graph.py:graph"
+  },
+  "env": "../.env"
+}
+```
+
+`dependencies` listing the dir is still required (the CLI walks it for the
+graph module file). The path-form graph spec is what triggers the
+spec_from_file_location loader — which is fine, because the sys.path
+workaround in graph.py handles it.
+
+### Step 4 — Docker variant (issue #12)
+
+`langgraph dockerfile` mis-routes `LANGSERVE_GRAPHS` for the second
+dependency (basename collision: both dirs are called `agent`, the second
+is uniquified to `/deps/agent_1` but the env var still points at
+`/deps/agent`). Ship a custom Dockerfile in the example —
+`other-examples/<example>/Dockerfile` is the reference — that names each
+copied dep distinctly (`/deps/sample_agent`, `/deps/legal_review_agent`)
+and sets `LANGSERVE_GRAPHS` to a JSON map keyed by graph name. When the
+upstream CLI fix lands, the custom Dockerfile can be deleted.
+
+### Verification
+
+After scaffolding a new sub-repo agent against this recipe:
+
+1. `uv run langgraph dev` from `agent/` — both graphs register, no
+   `ImportError`.
+2. `python -c "from legal_review_agent.graph import graph"` from the repo
+   root with the parent venv activated — graph object imports.
+3. `pnpm smoke` — composite gate still green.
+4. (Optional, Docker deploy demo) `docker build -f
+   other-examples/<example>/Dockerfile .` succeeds and `docker run`
+   serves both graphs on the standard port.
+
+### Why not the other route (renaming the inner package)
+
+The original v2 plan and issue #4's alternative suggested renaming the
+inner `agent/` directory to (e.g.) `legal_review_agent/` and using
+module-form graph specs (`legal_review_agent.graph:graph`) instead of
+path-form. That works too, but it forces every sub-repo example to
+diverge from the project-root pattern (`agent/` is the convention) and
+makes the folder less greppable. The sys.path workaround keeps the
+on-disk convention uniform and confines the workaround to four lines at
+the top of `graph.py`.
 
 ---
 

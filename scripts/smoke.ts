@@ -60,6 +60,51 @@ function shellRun(cmd: string, args: string[], opts: { cwd?: string } = {}): { p
   };
 }
 
+/**
+ * Serialize an array of records as Python tuple literals.
+ *
+ * Why this exists: `JSON.stringify([{a:1,b:2}])` produces `[{"a":1,"b":2}]`,
+ * which Python parses as `[dict]`, not `[tuple]`. If the Python side uses
+ * the common `for a, b in items: ...` unpack form, you get
+ * `ValueError: not enough values to unpack`. See issue #21.
+ *
+ * Cross the JS → Python boundary with one of these two shapes:
+ *
+ *   1. **Tuple form** (when Python wants to unpack positional fields):
+ *        const py = toPythonTuples(items, ["name", "spec"]);
+ *        // Embeds: [("name1", "spec1"), ("name2", "spec2")]
+ *
+ *   2. **Dict form** (when Python wants `item["key"]` lookups):
+ *        const py = JSON.stringify(items);
+ *        // Embeds: [{"name":"...","spec":"..."}]
+ *
+ * Don't mix them on accident — pick one and match the Python side.
+ *
+ * Caveat: this emits valid Python literal syntax for primitive JSON values
+ * (string, number, boolean, null). For nested structures use JSON.stringify
+ * and the dict form instead.
+ */
+function toPythonTuples(
+  items: Record<string, unknown>[],
+  keys: string[],
+): string {
+  function pyLiteral(v: unknown): string {
+    if (v === null || v === undefined) return "None";
+    if (typeof v === "boolean") return v ? "True" : "False";
+    if (typeof v === "number") return Number.isFinite(v) ? String(v) : "None";
+    // Strings (and anything else): rely on JSON for safe escaping. JSON
+    // double-quoted strings are also valid Python string literals.
+    return JSON.stringify(String(v));
+  }
+  const tuples = items.map((item) => {
+    const vals = keys.map((k) => pyLiteral(item[k]));
+    // Single-element tuple needs trailing comma in Python; keep it general.
+    const inner = vals.length === 1 ? `${vals[0]},` : vals.join(", ");
+    return `(${inner})`;
+  });
+  return `[${tuples.join(", ")}]`;
+}
+
 function findWidgetJsons(): string[] {
   const widgetsDir = join(REPO_ROOT, "agent", "src", "widgets");
   if (!existsSync(widgetsDir)) return [];
@@ -243,13 +288,20 @@ const STEPS: Step[] = [
       // the existing dependency wiring in agent/langgraph.json — graphs are
       // anchored to the agent/ working directory.
       const agentDir = join(REPO_ROOT, "agent");
-      const graphPairs = graphs.map((g) => [g.name, g.spec]);
+      // Cross the JS → Python boundary as a list of Python tuples so the
+      // `for name, spec in ...` unpack form below works. See toPythonTuples()
+      // and issue #21 — JSON.stringify of an object array would embed as
+      // dicts and break unpacking.
+      const graphPairs = toPythonTuples(
+        graphs.map((g) => ({ name: g.name, spec: g.spec })),
+        ["name", "spec"],
+      );
       const script = `
 import sys, importlib.util, os
 from pathlib import Path
 
 failed = []
-for name, spec in ${JSON.stringify(graphPairs)}:
+for name, spec in ${graphPairs}:
     # spec looks like "./main.py:graph" or "../other-examples/.../graph.py:graph"
     path_part, attr = spec.rsplit(":", 1)
     # Resolve relative to agent/ (the langgraph.json dir).
@@ -290,8 +342,11 @@ sys.exit(0)
 `;
       // Provide a dummy GEMINI_API_KEY when probing — both agents construct a
       // ChatOpenAI client at module import time and openai-python refuses to
-      // initialize without one. The probe is a registration check, not a live
-      // call, so a placeholder is sufficient.
+      // initialize without one (issue #22). The probe is a registration
+      // check, not a live call, so a placeholder is sufficient. See
+      // `agent/src/widgets/README.md` § "Probing an agent module from a
+      // health-check / smoke script" for the canonical pattern any other
+      // import-only probe should follow.
       const probeEnv = {
         ...process.env,
         AGENT_DIR: agentDir,

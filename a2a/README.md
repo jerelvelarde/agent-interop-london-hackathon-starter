@@ -157,5 +157,4 @@ If `check-a2a` complains, follow the teaching message it prints — the validato
 
 - `src/app/api/copilotkit/[[...slug]]/route.ts` — the seam where the middleware wires up
 - `agent/src/a2ui_fixed_schema.py` — canonical A2UI v0.9 envelope-emitting tool
-- `PLAN.md` — Architecture diagram + Workstream B rationale
 - <https://a2ui.org/specification/v0.9-a2ui/> — the v0.9 envelope spec

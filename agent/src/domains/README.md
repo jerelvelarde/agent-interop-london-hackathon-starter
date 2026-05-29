@@ -31,5 +31,5 @@ agent/src/domains/
 
 ## Why one canonical stub, not two
 
-PLAN.md is explicit: two half-finished stubs create more confusion than they
-solve. `shopping/` is the deeply-finished example. Treat it as a template.
+Two half-finished stubs create more confusion than they solve. `shopping/`
+is the deeply-finished example. Treat it as a template.

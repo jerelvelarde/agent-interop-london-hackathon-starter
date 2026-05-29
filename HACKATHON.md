@@ -151,9 +151,7 @@ whole agent personality needs to change.
 > relative imports (`from .tools import ...`) break. The canonical fix
 > is four lines of sys.path injection at the top of `graph.py` plus
 > absolute imports. `other-examples/legal-contract-review/agent/graph.py`
-> is the reference; PLAN.md §6.1 has the full recipe (including the
-> Docker variant for issue #12 and the package-name non-collision trick
-> for issue #15). Don't try to make relative imports work — they won't.
+> is the reference. Don't try to make relative imports work — they won't.
 
 ---
 

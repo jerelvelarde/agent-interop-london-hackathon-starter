@@ -7,7 +7,6 @@
  * Route group: (legal) — provides the legalPaperCatalog + `legal` agent via
  * sibling `src/app/(legal)/layout.tsx`. The route-group convention lets this
  * page coexist with the dashboard at `/` without double-mounting CopilotKit.
- * See PLAN.md §5 for the multi-catalog wiring.
  *
  * Behavior:
  *   - Renders a CopilotChat (left) + paper-styled contract surface (right)

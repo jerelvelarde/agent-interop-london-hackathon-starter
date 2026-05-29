@@ -6,12 +6,10 @@
  * Reads every `other-examples/<example-id>/EXAMPLE.json` manifest at build
  * time (server component → Node fs) and renders a card grid. New examples
  * appear here automatically once they ship their `EXAMPLE.json`. See
- * `other-examples/README.md` for the manifest shape (also documented in
- * PLAN.md §3.2).
+ * `other-examples/README.md` for the manifest shape.
  *
- * Styling is intentionally minimal here — B9 owns the polish pass. The cards
- * just need to be readable and clickable so the gallery is functional out of
- * the box.
+ * Styling is intentionally minimal here — the cards just need to be
+ * readable and clickable so the gallery is functional out of the box.
  *
  * Note: this page is NOT inside the `(legal)` route group, so it does NOT
  * mount a CopilotKit provider. It's a plain catalog page.

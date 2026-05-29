@@ -15,8 +15,7 @@ If you're here because you want to send a real improvement back upstream
   hackers have been doing repeatedly — file an issue first so we can talk about
   the anchor comment + the AGENTS.md slash-command vocabulary entry.
 - New domain stubs alongside `agent/src/domains/shopping/` — must be fully
-  finished (data, prompt, fixtures, anchor comments). Half-finished stubs rot;
-  see PLAN.md non-goal #4.
+  finished (data, prompt, fixtures, anchor comments). Half-finished stubs rot.
 - New canonical examples for fixed-schema A2UI widgets, provided they pass
   `pnpm validate-widget` and ship with a fixture.
 
@@ -52,8 +51,8 @@ build. If CI is red, your PR will be auto-blocked until it's green.
 ## AI-assisted contributions
 
 PRs co-authored with Claude Code, Gemini CLI, Cursor, Windsurf, Codex, or
-similar are fine — this starter is explicitly designed to be vibe-code-friendly
-(see PLAN.md § AX). Two expectations:
+similar are fine — this starter is explicitly designed to be vibe-code-friendly.
+Two expectations:
 
 1. The PR still passes `pnpm smoke`. The AI assistant should run the gate
    before opening the PR; if they didn't, you should before you push.
@@ -70,7 +69,7 @@ identically whether the typist is a human or an AI assistant.
   "feat(domains): add shopping stub").
 - Keep PRs scoped — one seam or one fix per PR.
 - Reference the seam number (e.g. "Seam #4") in the description if it
-  applies. Link out to the PLAN.md or HACKATHON.md section you're touching.
+  applies. Link out to the HACKATHON.md section you're touching.
 
 ## Reporting bugs
 

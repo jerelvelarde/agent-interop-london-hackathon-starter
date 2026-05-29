@@ -11,8 +11,7 @@ import { legalPaperCatalog } from "../../../other-examples/legal-contract-review
  * Mirrors the (default) group but mounts the legal-contract-review catalog
  * and the `legal` agent. This lets `/legal` routes operate on a completely
  * different A2UI surface from the dashboard at `/`, both fronted by the same
- * runtime endpoint (`/api/copilotkit`). See PLAN.md §5 / §5.1 for the
- * multi-catalog wiring rationale.
+ * runtime endpoint (`/api/copilotkit`).
  */
 export default function LegalGroupLayout({
   children,

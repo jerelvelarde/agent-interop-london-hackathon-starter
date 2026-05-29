@@ -102,9 +102,9 @@ with a single API key. Tool see `scripts/load-test-gemini.py`.
 
 Single-key cliff is well above 100 concurrent agentic tool-calling requests.
 At London-hackathon scale (~30 teams × per-team API keys + a small mentor
-fallback pool), this is comfortable headroom. PLAN.md's three rate-limit
-mitigations (per-team keys via prereq email, mentor fallback pool, `OFFLINE=1`
-insurance) are sufficient; we do NOT need to ship a shared key.
+fallback pool), this is comfortable headroom. Three rate-limit mitigations
+(per-team keys via prereq email, mentor fallback pool, `OFFLINE=1` insurance)
+are sufficient; we do NOT need to ship a shared key.
 
 > **HACKATHON.md "if you get rate-limited" runbook:** if a `429` ever appears
 > in chat, fall back to `OFFLINE=1` for the demo. The envelope inspector still

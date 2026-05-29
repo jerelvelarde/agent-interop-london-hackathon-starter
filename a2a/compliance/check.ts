@@ -6,8 +6,8 @@
  *
  * Hits the given A2A endpoint, exercises a basic agent-run, parses the
  * response (JSON-RPC or SSE), and reports whether the agent emitted
- * recognizable A2UI v0.9 envelopes. Output follows PLAN.md's
- * "validators that teach" pattern — point at the canonical example
+ * recognizable A2UI v0.9 envelopes. Output follows the "validators that
+ * teach" pattern — point at the canonical example
  * (agent/src/a2ui_fixed_schema.py:search_flights) for fixes and link
  * to the v0.9 spec.
  *

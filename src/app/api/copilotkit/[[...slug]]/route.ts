@@ -21,7 +21,7 @@ const defaultAgent = new LangGraphAgent({
 // Sibling agent that powers the /other-examples/legal-contract-review
 // surface. Points at the same LangGraph deployment as `defaultAgent` —
 // both graphs (`sample_agent`, `legal_review_agent`) are registered in
-// `agent/langgraph.json`. See PLAN.md §5.1 for the multi-graph wiring.
+// `agent/langgraph.json`.
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const legalAgent = new LangGraphAgent({
   deploymentUrl:
@@ -44,8 +44,6 @@ const legalAgent = new LangGraphAgent({
 // verify it emits A2UI v0.9 envelopes. See a2a/README.md for the
 // envelope-shape contract and a2a/sample-subagent/ for a toy
 // A2A server you can boot locally to try the seam.
-//
-// Architecture diagram + rationale: PLAN.md §Architecture.
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const a2aAgentUrls = (process.env.A2A_AGENT_URL || "")
   .split(",")

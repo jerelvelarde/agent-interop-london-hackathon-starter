@@ -377,12 +377,11 @@ sys.exit(0)
   {
     name: "agent connectivity probe (one-shot tool call against Gemini)",
     run: async () => {
-      // TODO(blitz-D): Replace this with a real "boot agent → POST canned
-      // prompt → assert createSurface envelope" pipeline. The standalone
-      // probe-gemini.sh script already exercises a tool call against the
-      // configured model; we reuse it here as a stand-in. Once the LangGraph
-      // dev server has a deterministic boot ritual we can call from CI, swap
-      // this for the real composite check.
+      // Reuses the standalone probe-gemini.sh script — it exercises a tool
+      // call against the configured model. Future improvement: replace with
+      // a real "boot agent → POST canned prompt → assert createSurface
+      // envelope" pipeline once the LangGraph dev server has a deterministic
+      // boot ritual we can call from CI.
       const probeScript = join(REPO_ROOT, "scripts", "probe-gemini.sh");
       if (!existsSync(probeScript)) {
         console.log(`${YELLOW}!${RESET} ${DIM}probe-gemini.sh not found. Skipping.${RESET}\n`);

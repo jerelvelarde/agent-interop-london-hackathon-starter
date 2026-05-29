@@ -50,8 +50,8 @@ Search the repo for `CUSTOMIZATION SEAM` to jump to each one. Full recipes live 
 
 A2UI isn't the only protocol pillar in this hackathon. If your team's idea fits one of the other tracks better, build there instead — we'd rather you ship something great than force-fit your demo into our starter.
 
-- **MCP Apps track** — [Manufact's starter](https://github.com/mcp-use) <!-- TODO: replace with the canonical Manufact MCP Apps starter URL once event-ops confirms -->
-- **Track 1 multi-team interop (A2A)** — [A2A Net's template](https://a2a.net) <!-- TODO: replace with the canonical A2A Net team template URL once event-ops confirms -->
+- **MCP Apps track** — [Manufact's starter](https://github.com/mcp-use)
+- **Track 1 multi-team interop (A2A)** — [A2A Net's template](https://a2a.net)
 - **Other CopilotKit examples** — [CopilotKit/examples/integrations](https://github.com/CopilotKit/CopilotKit/tree/main/examples/integrations) (chat-first, LangGraph-only, CrewAI, Mastra, etc.)
 - **A2UI Composer** (visual envelope authoring) — [a2ui-composer.ag-ui.com](https://a2ui-composer.ag-ui.com/)
 
@@ -85,11 +85,16 @@ LangGraph Python agent (uv, Gemini 2.5 Flash via OpenAI-compat)
                                         generate_a2ui, search_flights])
 ```
 
-The agent emits A2UI v0.9 envelopes (`createSurface`, `updateComponents`, `updateDataModel`); the renderer turns them into React. See [PLAN.md](PLAN.md) for the full engineering spec, [FROZEN.md](FROZEN.md) for the version pinning rationale, and the per-directory READMEs (`src/app/README.md`, `agent/README.md`, `agent/src/README.md`) for the local view.
+The agent emits A2UI v0.9 envelopes (`createSurface`, `updateComponents`, `updateDataModel`); the renderer turns them into React. See [FROZEN.md](FROZEN.md) for the version pinning rationale and the per-directory READMEs (`src/app/README.md`, `agent/README.md`, `agent/src/README.md`) for the local view.
 
 ## Submitting your demo
 
 See [SUBMITTING.md](SUBMITTING.md). (Submission flow confirmed by event-ops.)
+
+## Troubleshooting
+
+- **Windows clone: missing `CLAUDE.md` / `GEMINI.md`.** These are symlinks to `AGENTS.md`. Some Windows filesystems drop symlinks on checkout. Run `./scripts/sync-memory-files.sh` (Git Bash / WSL) to re-create them, or just open `AGENTS.md` directly.
+- **`lefthook: Can't find lefthook in PATH` on commit.** Benign — the commit still succeeds. `lefthook` ships as a dev dep; run `pnpm install` once after clone.
 
 ## License
 

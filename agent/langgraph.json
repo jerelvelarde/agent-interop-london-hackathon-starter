@@ -7,5 +7,5 @@
     "sample_agent": "./main.py:graph"
   },
   "env": "../.env",
-  "_note": "legal_review_agent registration removed pending multi-graph layout fix (see ROADMAP). It referenced ../other-examples/legal-contract-review/agent which langgraph-cli rejects as a non-subdirectory local dependency. To restore: either (a) move this config to project root + ensure Python 3.12 across both subpkgs, or (b) run a second langgraph dev server on a different port for the legal agent."
+  "_note": "legal_review_agent registration disabled in dev. The IMPORT recipe is canonical (sys.path injection — see other-examples/legal-contract-review/agent/graph.py), but `langgraph dev` ALSO enforces 'Local dependency must be a subdirectory of the config file', which rejects `../other-examples/legal-contract-review/agent`. pnpm smoke's static probe imports cleanly; `langgraph dev` does not. To activate in dev: (a) move agent/langgraph.json to project root so the dependency becomes a subdirectory, or (b) run a second langgraph dev server on a different port for the legal agent."
 }

@@ -63,7 +63,7 @@
  *   Validates every other-examples/<id>/EXAMPLE.json against the §3.2 catalog
  *   entry schema (id, name, route starting with `/other-examples/`, etc.).
  *
- * Error format follows the "validators that teach" pattern from PLAN.md.
+ * Error format follows the "validators that teach" pattern.
  */
 import { existsSync, readFileSync, statSync, readdirSync } from "node:fs";
 import { join, resolve, basename } from "node:path";

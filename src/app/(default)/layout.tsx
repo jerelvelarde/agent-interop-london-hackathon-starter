@@ -13,8 +13,7 @@ import { demonstrationCatalog } from "../declarative-generative-ui/renderers";
  * default agent to every route under this group. The root layout
  * (`src/app/layout.tsx`) intentionally does NOT mount `<CopilotKit>` so that
  * sibling groups like `(legal)` can mount their own provider with a
- * different agent + catalog, avoiding the double-mount problem documented
- * in PLAN.md §5.
+ * different agent + catalog, avoiding the double-mount problem.
  */
 export default function DefaultGroupLayout({
   children,

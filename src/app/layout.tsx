@@ -11,7 +11,7 @@ import { ThemeProvider } from "@/hooks/use-theme";
  * Copilot provider is mounted per route group (see
  * `src/app/(default)/layout.tsx` and `src/app/(legal)/layout.tsx`) so each
  * group can carry its own agent + A2UI catalog without double-mounting the
- * provider. See PLAN.md §5 ("multi-catalog wiring") for details.
+ * provider.
  */
 export default function RootLayout({
   children,

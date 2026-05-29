@@ -59,7 +59,7 @@ export default function HomePage() {
         className="pointer-events-none fixed bottom-1 left-1/2 -translate-x-1/2 z-10 text-[10px] text-[var(--muted-foreground,#9ca3af)] opacity-60 select-none max-lg:hidden"
       >
         Built for the Generative UI Hackathon. Sponsored by Google DeepMind
-        &middot; CopilotKit &middot; Manufact.
+        &middot; CopilotKit &middot; A2A Net.
       </p>
     </>
   );

@@ -322,8 +322,8 @@ demo — judges remember broken demos more than missing features.
       the canned prompts, confirm envelopes render. This is your insurance.
 - [ ] **Envelope inspector is visible** and shows real envelopes (not just
       the "no envelopes yet" empty state).
-- [ ] **Read the sponsor footer.** Google DeepMind, CopilotKit, Manufact,
-      A2A Net — credit them, judges will notice.
+- [ ] **Read the sponsor footer.** Google DeepMind, CopilotKit, A2A Net —
+      credit them, judges will notice.
 
 > The scripts D delivers (`pnpm doctor`, `pnpm smoke`, `pnpm verify-pins`,
 > `pnpm test:widgets`, `pnpm validate-widget`, `pnpm new-widget`, `pnpm

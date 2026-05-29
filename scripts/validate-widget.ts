@@ -66,7 +66,7 @@
  * Error format follows the "validators that teach" pattern.
  */
 import { existsSync, readFileSync, statSync, readdirSync } from "node:fs";
-import { join, resolve, basename } from "node:path";
+import { join, resolve, basename, isAbsolute } from "node:path";
 
 // Canonical references — these are real JSON files in the repo a hacker can
 // open and copy-paste. Issue #17: the validator used to point at a Python
@@ -176,10 +176,19 @@ function validateCatalogSchema(
 
 /**
  * Soft-check that a catalogId looks like a URI (`scheme://...`). The starter
- * ships two valid catalogIds: `copilotkit://app-dashboard-catalog` and
- * `https://a2ui.org/specification/v0_9/basic_catalog.json`.
+ * ships one valid catalogId: `copilotkit://app-dashboard-catalog`.
+ *
+ * F18 pitfall: catalogIds shaped as `https://...` look valid syntactically
+ * but don't resolve at runtime — the renderer needs the `copilotkit://`
+ * scheme to route to the in-process catalog. We emit a non-fatal WARN here
+ * so a hacker reading the validator output sees the gotcha before they hit
+ * the renderer's "Catalog not found" error.
  */
-function validateCatalogId(value: unknown, errors: ValidationError[]): void {
+function validateCatalogId(
+  value: unknown,
+  errors: ValidationError[],
+  filePath: string,
+): void {
   if (typeof value !== "string" || value.length === 0) {
     errors.push({
       message: "Missing or invalid 'catalogId'.",
@@ -192,6 +201,95 @@ function validateCatalogId(value: unknown, errors: ValidationError[]): void {
       message: `'catalogId' ("${value}") doesn't look like a URI (expected scheme://...).`,
       fix: `Use a URI-shaped catalogId. The starter uses "copilotkit://app-dashboard-catalog".`,
     });
+    return;
+  }
+  if (/^https?:\/\//.test(value)) {
+    console.warn(
+      `${YELLOW}WARN${RESET} ${BOLD}${filePath}${RESET}: catalogId is a URL ("${value}") — likely won't resolve at runtime. Use "copilotkit://<name>-catalog" instead (F18: EdTech hit "Catalog not found" with the URL form).`,
+    );
+  }
+}
+
+// Repo root resolved once from this script's location (scripts/validate-widget.ts).
+const REPO_ROOT = resolve(__dirname, "..");
+
+/**
+ * Resolve the optional pythonTool field on a wrapper widget JSON.
+ *
+ * Format: `<path>:<symbol>`, e.g. `agent/src/a2ui_fixed_schema.py:search_flights`.
+ *
+ * Behaviour:
+ *   - Missing or malformed value → push a validation error (fails the file).
+ *   - Path exists but symbol can't be confirmed → emit a `WARN:` line and
+ *     continue (does NOT fail). This is the F13 contract: a confidence
+ *     signal, not a gate.
+ *   - Path doesn't exist on disk → push a validation error (fails the file).
+ *
+ * The symbol check uses a regex looking for `@tool`-decorated functions:
+ *
+ *     @tool
+ *     [optional decorator/whitespace lines]
+ *     def <symbol>(
+ *
+ * That covers the canonical `@tool\ndef foo(...)` shape and is intentionally
+ * loose enough to also recognise `@tool\n@something_else\ndef foo(...)`.
+ */
+function validatePythonTool(
+  value: unknown,
+  errors: ValidationError[],
+  filePath: string,
+): void {
+  if (typeof value !== "string" || value.length === 0) {
+    errors.push({
+      message: "'pythonTool' is present but not a non-empty string.",
+      fix: `Set pythonTool to "<path>:<symbol>", e.g. "agent/src/a2ui_fixed_schema.py:search_flights".`,
+    });
+    return;
+  }
+  const sep = value.lastIndexOf(":");
+  if (sep <= 0 || sep === value.length - 1) {
+    errors.push({
+      message: `'pythonTool' ("${value}") doesn't match "<path>:<symbol>".`,
+      fix: `Use "<path>:<symbol>", e.g. "agent/src/a2ui_fixed_schema.py:search_flights".`,
+    });
+    return;
+  }
+  const rawPath = value.slice(0, sep);
+  const symbol = value.slice(sep + 1).trim();
+  if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(symbol)) {
+    errors.push({
+      message: `'pythonTool' symbol ("${symbol}") isn't a valid Python identifier.`,
+      fix: `Use a Python function name after the colon, e.g. "search_flights".`,
+    });
+    return;
+  }
+  // Resolve the path relative to the repo root so the validator works
+  // regardless of the user's cwd.
+  const absPath = isAbsolute(rawPath) ? rawPath : resolve(REPO_ROOT, rawPath);
+  if (!existsSync(absPath)) {
+    errors.push({
+      message: `'pythonTool' file not found: ${rawPath} (resolved to ${absPath}).`,
+      fix: `Either create the Python tool at that path, or update pythonTool to point at the right file. The path is relative to the repo root.`,
+    });
+    return;
+  }
+  // File exists — try to confirm the @tool-decorated function. Warn (don't
+  // fail) if we can't find it; the path may resolve at runtime through some
+  // dynamic mechanism we don't statically understand.
+  try {
+    const src = readFileSync(absPath, "utf-8");
+    const symbolPattern = new RegExp(
+      `@tool\\b[\\s\\S]*?def\\s+${symbol}\\s*\\(`,
+    );
+    if (!symbolPattern.test(src)) {
+      console.warn(
+        `${YELLOW}WARN${RESET} ${BOLD}${filePath}${RESET}: could not resolve pythonTool symbol "${symbol}" in ${rawPath} (looked for an @tool-decorated def). If you've spelled the function name right, ignore this; otherwise fix the symbol or add the @tool decorator.`,
+      );
+    }
+  } catch (e) {
+    console.warn(
+      `${YELLOW}WARN${RESET} ${BOLD}${filePath}${RESET}: could not read pythonTool file ${rawPath}: ${(e as Error).message}`,
+    );
   }
 }
 
@@ -204,6 +302,7 @@ function validateCatalogId(value: unknown, errors: ValidationError[]): void {
 function validateWrapperWidget(
   obj: Record<string, unknown>,
   errors: ValidationError[],
+  filePath: string,
 ): void {
   if (typeof obj.id !== "string" || obj.id.length === 0) {
     errors.push({
@@ -217,7 +316,7 @@ function validateWrapperWidget(
       fix: `Add a "name" field — convention is PascalCase, e.g. "FlightCard".`,
     });
   }
-  validateCatalogId(obj.catalogId, errors);
+  validateCatalogId(obj.catalogId, errors, filePath);
   if (!Array.isArray(obj.schema)) {
     errors.push({
       message: "Wrapper widget JSON missing 'schema' array (the v0.9 component tree).",
@@ -225,6 +324,12 @@ function validateWrapperWidget(
     });
   } else {
     validateCatalogSchema(obj.schema, errors);
+  }
+  // Resolve and report on the optional pythonTool field. Returns errors when
+  // the file is missing, or warns to stderr when the file exists but the
+  // symbol can't be confirmed.
+  if ("pythonTool" in obj) {
+    validatePythonTool(obj.pythonTool, errors, filePath);
   }
 }
 
@@ -243,6 +348,7 @@ function validateWrapperWidget(
 function validateCanonicalFixture(
   obj: Record<string, unknown>,
   errors: ValidationError[],
+  filePath: string,
 ): void {
   if (typeof obj.surfaceId !== "string" || obj.surfaceId.length === 0) {
     errors.push({
@@ -250,7 +356,7 @@ function validateCanonicalFixture(
       fix: `Add a top-level "surfaceId" string, e.g. "flight-search-results". See ${CANONICAL_FIXTURE_JSON}.`,
     });
   }
-  validateCatalogId(obj.catalogId, errors);
+  validateCatalogId(obj.catalogId, errors, filePath);
   if (!("components" in obj)) {
     errors.push({
       message: "Fixture missing 'components' array (the v0.9 component tree).",
@@ -349,7 +455,7 @@ function validateFile(filePath: string): boolean {
       break;
     case "wrapper-widget":
       shapeLabel = "wrapper widget (schema-under-key)";
-      validateWrapperWidget(parsed as Record<string, unknown>, errors);
+      validateWrapperWidget(parsed as Record<string, unknown>, errors, filePath);
       break;
     case "canonical-fixture":
       shapeLabel = "canonical fixture";
@@ -375,7 +481,7 @@ function validateFile(filePath: string): boolean {
         );
         return false;
       }
-      validateCanonicalFixture(parsed as Record<string, unknown>, errors);
+      validateCanonicalFixture(parsed as Record<string, unknown>, errors, filePath);
       break;
     default:
       teach(

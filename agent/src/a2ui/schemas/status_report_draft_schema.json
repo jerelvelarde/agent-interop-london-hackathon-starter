@@ -116,20 +116,8 @@
     "component": "Row",
     "gap": 12,
     "children": [
-      "btn-edit",
       "btn-send"
     ]
-  },
-  {
-    "id": "btn-edit",
-    "component": "Button",
-    "variant": "secondary",
-    "child": "btn-edit-label"
-  },
-  {
-    "id": "btn-edit-label",
-    "component": "Paragraph",
-    "text": "\u270e Edit draft"
   },
   {
     "id": "btn-send",

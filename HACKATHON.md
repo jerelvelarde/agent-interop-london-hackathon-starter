@@ -40,8 +40,20 @@ to generate ad-hoc UI. Better a polished re-skin than a half-shipped widget.
 ## §1 — Re-theme
 
 **Files to edit:**
-- `src/lib/a2ui-theme.css` — CSS variables (colors, spacing, fonts)
-- `src/hooks/use-theme.tsx` — dark/light/system toggle if you want one
+- `src/app/globals.css` — semantic token families (surface, text, border,
+  radius, elevation, blur backdrop tints). Both light + dark mode defined.
+- `src/lib/a2ui-theme.css` — the MD3 colour ramp consumed by the A2UI
+  renderer (`--primary`, `--p-*`, `--s-*`, `--t-*`, `--n-*`).
+- `src/hooks/use-theme.tsx` — dark/light/system toggle (see §2 for the UI).
+
+> **Quick note on the chat framework workarounds.** `src/app/globals.css`
+> ends with a clearly labelled block of three defensive CSS overrides that
+> patch known issues on our pinned CopilotKit `1.56.5`: (1) restoring
+> `pointer-events` on items below the input pill (disclaimer slot),
+> (2) adding a default 12px cushion below the chat input, and
+> (3) making chat descendants transparent so the frosted backdrop shows
+> through. Leave them in place unless you upgrade CopilotKit past 1.56.5
+> — and you can't, because it's [FROZEN](FROZEN.md).
 
 **Recipe:**
 1. Open `src/lib/a2ui-theme.css`. Look for the `--primary`, `--background-*`,
@@ -57,21 +69,89 @@ to generate ad-hoc UI. Better a polished re-skin than a half-shipped widget.
 **AI assistant slash:** "theme it for X" — they should only edit these two
 files. Push back if they want to restructure components.
 
+### Semantic tokens in `globals.css`
+
+These give you more memorable levers than the full `--n-*`/`--p-*`/`--s-*`/`--t-*`
+ramp in `a2ui-theme.css`. Reach for them when you're styling new components or
+tweaking the shell:
+
+- **Surface family** — `--surface-main`, `--surface-container`,
+  `--surface-background`. Use for any container background. Both light and
+  dark mode values are defined; the `[data-theme="dark"]` block flips them
+  automatically.
+- **Text family** — `--text-primary`, `--text-secondary`, `--text-disabled`.
+- **Border family** — `--border-container`, `--border-default`.
+- **Radius scale** — `--radius-xs` (4px), `--radius-sm` (8px),
+  `--radius-md` (12px), `--radius-lg` (16px), `--radius-full` (9999px).
+  Consume via arbitrary values: `rounded-[var(--radius-md)]`.
+- **Elevation scale** — `--elevation-sm`, `--elevation-md`, `--elevation-lg`,
+  `--elevation-xl`. Consume via `shadow-[var(--elevation-sm)]`.
+- **Blur backdrop tints** — `--cpk-blur-lilac`, `--cpk-blur-orange`,
+  `--cpk-blur-yellow`. Consumed by `BackgroundBlurCircles` (see §2).
+  Edit these three vars to re-tint the ambient backdrop without touching
+  the component.
+
+Example — a card matching the new system:
+
+```tsx
+<div
+  className="rounded-[var(--radius-md)] shadow-[var(--elevation-sm)] border"
+  style={{
+    background: "var(--surface-container)",
+    borderColor: "var(--border-container)",
+    color: "var(--text-primary)",
+  }}
+>
+  …
+</div>
+```
+
+### A2UI primary realignment
+
+`src/lib/a2ui-theme.css`'s `--primary` is now `#bec2ff` (lavender, matching
+CopilotKit brand) instead of the historical `#137fec` blue. Re-skinners who
+want a different brand colour should override `--primary` here — the rest
+of the MD3 ramp (`--p-*`) stays intact, so widgets keep their internal
+contrast.
+
 ---
 
 ## §2 — Re-brand the shell
 
-**File to edit:**
-- `src/components/BrandFrame.tsx` (header, logo slot, palette accents)
+**Files to edit:**
+- `src/components/BrandFrame.tsx` — header, logo slot, palette accents,
+  ambient blur backdrop, mode toggle.
+- `src/app/layout.tsx` — fonts (loaded via `next/font/google`).
+
+### What `BrandFrame` renders
+
+`BrandFrame` now wraps the app shell with two new pieces of chrome:
+
+- **`<BackgroundBlurCircles />`** — rendered as the frame's first child.
+  A fixed, full-viewport, `-z-10`, `pointer-events: none` ambient backdrop
+  with 6 blurred radial gradients in lavender / orange / yellow. Tinted by
+  the `--cpk-blur-*` vars in `src/app/globals.css` (see §1).
+- **`<ModeToggle />`** — a small button in the header (top-right) that
+  cycles **dark → light → system** via the existing `useTheme` hook.
 
 **Recipe:**
-1. Open `BrandFrame.tsx`. The component wraps the app header.
+1. Open `BrandFrame.tsx`. The component wraps the app header and renders
+   the blur backdrop + mode toggle.
 2. Swap the logo (`/copilotkit-logo-mark.svg` → your asset in `public/`),
-   change the product name, and adjust any inline accent colors.
-3. Hot reload picks it up.
+   change the product name, and adjust the `accentColor` prop (the
+   header's bottom border).
+3. **Re-tint the backdrop without editing components:** change the three
+   `--cpk-blur-lilac` / `--cpk-blur-orange` / `--cpk-blur-yellow` vars
+   in `src/app/globals.css`. `BackgroundBlurCircles` picks them up
+   automatically — no component edit needed.
+4. **Different fonts?** Edit `src/app/layout.tsx`. Fonts now load through
+   `next/font/google` (Plus Jakarta Sans + Spline Sans Mono by default).
+   Swap the imports there to your preferred Google fonts.
+5. Hot reload picks all of it up.
 
 **Don't touch:** `EnvelopeInspector.tsx` (this is judging chrome — it must
-stay visible). The chat affordances.
+stay visible). The chat affordances. The `ModeToggle` UX (it's load-bearing
+for judges who want to A/B your design in dark and light).
 
 ---
 

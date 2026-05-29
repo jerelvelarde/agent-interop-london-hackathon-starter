@@ -164,9 +164,24 @@ for judges who want to A/B your design in dark and light).
 1. Replace `db.csv` with your data (or skip CSV — return a Python literal).
 2. Edit the docstring on `query_data` so the agent knows when to call it
    with your domain's language.
-3. Edit the system prompt in `agent/main.py` to ground the agent in your
-   domain. Keep it 1-2 sentences.
+3. Edit the system prompt in `agent/src/domains/<active-domain>/prompts.py`
+   (the `SYSTEM_PROMPT` constant) to ground the agent in your domain. Keep
+   it 1-2 sentences. The default domain is `default`; if you set
+   `DOMAIN=shopping` in `.env` then edit the shopping prompts file instead.
 4. Restart the agent (`uv run --reload` handles this for you).
+
+> **Schema contract:** `db.csv` ships with the columns `date, category,
+> subcategory, amount, type, notes`. The default system prompt and the
+> Sales Dashboard suggestion chip reference these names. If you rename or
+> restructure the columns, also update:
+> - `agent/src/query.py`'s `query_data` docstring (the agent reads this
+>   when deciding what to call)
+> - any prompt or suggestion that references the old column names
+> - `agent/src/domains/<active-domain>/prompts.py`'s `SYSTEM_PROMPT` if it
+>   grounds the agent in specific fields
+>
+> Easier path: keep the column names, repurpose their meanings (e.g.
+> `category` becomes "Flights / Hotels" instead of "Revenue / Expenses").
 
 **For a deeper swap:** see §5 — `DOMAIN=<name>` in `.env` switches whole
 data-and-prompt bundles at boot.
@@ -179,24 +194,82 @@ This is the most substantial seam — budget an hour minimum.
 
 **Canonical example:** `agent/src/a2ui_fixed_schema.py:search_flights`
 
-**The 5-surface dance** (skip a step → widget won't render):
+**The widget dance** — 4 surfaces for base-primitive widgets, 5 surfaces
+when adding a custom component. Skip a step → widget won't render.
 
 1. **Catalog entry** — `agent/src/widgets/<name>.json` (the v0.9 component
-   schema). Use the [A2UI Composer](https://a2ui-composer.ag-ui.com/) to
-   author visually, then save the JSON here.
+   schema, wrapped with `id`/`name`/`description`/`catalogId`/`schema`).
+   Use the [A2UI Composer](https://a2ui-composer.ag-ui.com/) to author
+   visually, then save the JSON here. This file is consumed by
+   `pnpm validate-widget`.
+
+   > Note: `a2ui.load_schema()` (used inside the Python tool below)
+   > expects a **bare components array**, not the wrapped catalog entry.
+   > You'll create this as
+   > `agent/src/a2ui/schemas/<name>_schema.json` alongside the catalog
+   > wrapper — same `schema` array, just unwrapped. Look at
+   > `agent/src/widgets/flight_card.json` vs
+   > `agent/src/a2ui/schemas/flight_schema.json` to see the difference.
+   > See "Why three JSON files?" below.
 2. **Fixture** — `agent/src/widgets/<name>.fixture.json` (sample data the
    renderer will exercise during `pnpm test:widgets`).
-3. **Python tool** — Add a `@tool` function in `agent/src/a2ui_fixed_schema.py`
-   that returns `a2ui.render(operations=[create_surface, update_components,
-   update_data_model])`. Register it in `agent/main.py`'s `tools=[...]`.
-4. **TS schema declaration** — In `src/app/api/copilotkit/route.ts`, add
-   your widget to the `a2ui.schema` array so the runtime knows about it.
-5. **Prompt hint** — Add a line to the agent's system prompt that teaches
-   it *when* to call your tool. (Example from default prompt: *"Flights:
-   call search_flights to show flight cards."*)
+3. **Python tool** — Add a `@tool` function in
+   `agent/src/a2ui_fixed_schema.py` (or your own module) that returns
+   `a2ui.render(operations=[create_surface, update_components,
+   update_data_model])`. Register it by appending to the tool list in
+   `agent/src/domains/<active-domain>/tools.py` (the `default_tools` /
+   `shopping_tools` list — `agent/main.py` reads from there).
+4. **TS schema declaration** — _conditional._
+   - **If your widget uses only base v0.9 primitives** (Card, Column,
+     Row, Text, Image, Button — see `product_card`): **skip this step
+     entirely.** No TS changes needed. The base catalog ships with these
+     renderers already.
+   - **If your widget defines a new custom React component** (like
+     `FlightCard`):
+     (i) add a Zod schema entry to
+     `src/app/declarative-generative-ui/definitions.ts`;
+     (ii) add a React renderer to
+     `src/app/declarative-generative-ui/renderers.tsx`.
+5. **Prompt hint** — Add a line to
+   `agent/src/domains/<active-domain>/prompts.py`'s `SYSTEM_PROMPT` (the
+   `Tool guidance:` block) that teaches the agent *when* to call your
+   tool. (Example from default prompt: *"Flights: call search_flights to
+   show flight cards."*)
+6. **Offline fixture (insurance policy)** — add a
+   `bySurface[<surface-id>]` entry to `public/offline-envelopes.json`
+   containing your widget's 3 envelopes (`createSurface`,
+   `updateComponents`, `updateDataModel`). Without this, your widget
+   won't render under `OFFLINE=1` — and `OFFLINE=1` is the rate-limit
+   fallback you'll want at judging (see "If you get rate-limited"
+   below). The existing `flight-search-results` entry is the canonical
+   shape to copy.
 
 **Verify:** `pnpm validate-widget agent/src/widgets/<name>.json` (catches
-v0.9 envelope shape issues before runtime). Then `pnpm smoke`.
+v0.9 envelope shape issues before runtime). Then `pnpm smoke`. Then
+`OFFLINE=1 pnpm dev` and confirm your widget renders without the live
+agent.
+
+### Why three JSON files?
+
+A fixed-schema widget actually touches **three** JSON files, not two —
+each with a different consumer:
+
+1. `agent/src/widgets/<name>.json` — **catalog wrapper.** Has
+   `id`/`name`/`description`/`catalogId`/`pythonTool`/`schema` keys.
+   Consumed by `pnpm validate-widget` and the catalog tooling. This is
+   the file authoring tools (A2UI Composer, the create-a2ui-widget skill)
+   write to.
+2. `agent/src/widgets/<name>.fixture.json` — **fixture.** Sample data
+   bound to the catalog entry. Consumed by `pnpm test:widgets`.
+3. `agent/src/a2ui/schemas/<name>_schema.json` — **bare-array runtime
+   schema.** Just the components array from step 1, unwrapped.
+   Consumed by `a2ui.load_schema()` inside the Python tool, e.g.
+   `FLIGHT_SCHEMA = a2ui.load_schema(Path(__file__).parent / "a2ui" /
+   "schemas" / "flight_schema.json")`.
+
+The catalog wrapper and the bare-array runtime schema duplicate the same
+component tree on purpose: tooling wants the wrapper, the renderer wants
+the bare array. Keep them in sync.
 
 **Faster alternative — dynamic schema:** if you don't need predictability,
 skip steps 1–4. Describe the widget in the system prompt and let
@@ -216,8 +289,8 @@ first pass is wrong. Less reliable in front of judges, faster to iterate.
 
 **Recipe:**
 1. Copy `agent/src/domains/default/` to `agent/src/domains/<your-domain>/`.
-2. Replace `data/`, `prompt.txt` (system prompt), and any domain-specific
-   widget overrides.
+2. Replace `data/`, `prompts.py` (the `SYSTEM_PROMPT` constant), and any
+   domain-specific widget overrides.
 3. Set `DOMAIN=<your-domain>` in `.env`.
 4. Restart the agent.
 
@@ -288,9 +361,13 @@ the bug is in the envelope, not the React tree. Debug systematically:
    agent emit `createSurface`? `updateComponents`? `updateDataModel`? All
    three are required. Missing one means the agent never finished the
    handshake.
-2. **Check the schema declaration.** Did you add your widget to the
-   `a2ui.schema` array in `src/app/api/copilotkit/route.ts`? The runtime
-   filters unknown widgets silently.
+2. **Check the schema declaration.** _Only matters if your widget defines
+   a new custom React component_ (like `FlightCard`). Did you add it to
+   both `src/app/declarative-generative-ui/definitions.ts` (Zod schema)
+   and `src/app/declarative-generative-ui/renderers.tsx` (React
+   renderer)? Widgets built from base v0.9 primitives (Card, Column, Row,
+   Text, Image, Button) need no TS changes. The runtime filters unknown
+   custom components silently.
 3. **Validate the JSON.** `pnpm validate-widget agent/src/widgets/<name>.json`
    prints the failing field with a fix hint. The error format is meant to
    be pasted into your AI assistant's context.

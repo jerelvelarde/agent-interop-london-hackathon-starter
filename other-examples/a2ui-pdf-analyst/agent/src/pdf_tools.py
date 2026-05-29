@@ -2,14 +2,21 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 from typing import TypedDict
 
 from langchain.tools import tool
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 # We keep the extractor model cheap; this is structured JSON work, not chat.
-_EXTRACTOR = ChatOpenAI(model="gpt-5.5", temperature=0)
+# Gemini 3.5 Flash via the native Google Gen AI SDK — same provider as the
+# primary agents (see main.py / FROZEN.md "LLM provider").
+_EXTRACTOR = ChatGoogleGenerativeAI(
+    model=os.getenv("MODEL", "gemini-3.5-flash"),
+    google_api_key=os.getenv("GEMINI_API_KEY"),
+    temperature=0,
+)
 
 
 class Kpi(TypedDict):

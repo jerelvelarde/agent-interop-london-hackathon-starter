@@ -19,9 +19,11 @@ from fastapi.middleware.cors import CORSMiddleware
 load_dotenv()
 
 # Patch ag-ui-langgraph's multimodal converter so PDF text shipped via
-# CopilotChat attachments survives the trip to OpenAI. Must run BEFORE
-# the agent graphs are imported so the agents pick up the patched
-# converter at first message conversion.
+# CopilotChat attachments survives the trip to the model (Gemini via the
+# native Google Gen AI SDK; the break is provider-agnostic — see
+# src/multimodal_middleware.py). Must run BEFORE the agent graphs are
+# imported so the agents pick up the patched converter at first message
+# conversion.
 from src.multimodal_middleware import install as _install_doc_inlining  # noqa: E402
 
 _install_doc_inlining()

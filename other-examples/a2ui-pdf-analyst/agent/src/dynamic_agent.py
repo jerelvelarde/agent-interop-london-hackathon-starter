@@ -35,6 +35,7 @@ match.
 from __future__ import annotations
 
 import json
+import os
 from typing import Any
 
 from copilotkit import CopilotKitMiddleware, a2ui
@@ -42,11 +43,46 @@ from langchain.agents import create_agent
 from langchain.tools import ToolRuntime, tool
 from langchain_core.messages import SystemMessage
 from langchain_core.tools import tool as lc_tool
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.checkpoint.memory import MemorySaver
+from pydantic import BaseModel, ConfigDict, Field
 
 from src.catalog import CATALOG_ID, CATALOG_PROMPT
 from src.pdf_tools import query_pdf
+
+
+# ── Gemini typed-array fix ────────────────────────────────────────────────
+# Gemini's function-declaration validator REQUIRES every array parameter to
+# declare a typed `items` schema. A bare `list[dict]` compiles to an untyped
+# array and 400s with:
+#     parameters.properties[components].items: missing field.
+# (Proven in the Phase-0 spike on gemini-3.5-flash via langchain-google-genai.)
+#
+# So `render_a2ui.components` must be `list[<TypedModel>]`, not `list[dict]`.
+# A2UI components are heterogeneous — each component type carries different
+# props — so we type the two fields the catalog guarantees on EVERY node
+# (`id` + `component`) and allow arbitrary extra props via
+# `extra="allow"`. That gives Gemini a concrete `items` object schema while
+# keeping the shim permissive enough to carry any catalog component the
+# secondary LLM emits. The same applies to the optional `data` model.
+class A2uiComponent(BaseModel):
+    """One node in a flat A2UI v0.9 component array.
+
+    Only `id` and `component` are universal across the catalog; every other
+    prop (text, children, data, columns, …) is component-specific and rides
+    along as an extra field.
+    """
+
+    model_config = ConfigDict(extra="allow")
+
+    id: str = Field(description='Unique within the surface. Exactly one node must be "root".')
+    component: str = Field(description="Catalog component type, e.g. Stack, Card, StatCard, LineChart.")
+
+
+class A2uiDataModel(BaseModel):
+    """Initial data model for the surface (values referenced by {path} bindings)."""
+
+    model_config = ConfigDict(extra="allow")
 
 
 # No-op shim. The secondary LLM is forced to call this tool so its output
@@ -56,8 +92,8 @@ from src.pdf_tools import query_pdf
 def render_a2ui(
     surfaceId: str,
     catalogId: str,
-    components: list[dict],
-    data: dict | None = None,
+    components: list[A2uiComponent],
+    data: A2uiDataModel | None = None,
 ) -> str:
     """Render a dynamic A2UI v0.9 surface.
 
@@ -71,7 +107,15 @@ def render_a2ui(
     return "rendered"
 
 
-_RENDER_MODEL = ChatOpenAI(model="gpt-5.5", temperature=0)
+# Secondary LLM — forced to call render_a2ui so its output is a structured
+# tool_call. Gemini 3.5 Flash via the native Google Gen AI SDK. Forced
+# tool_choice across multi-turn replay is proven viable on this SDK
+# (no thought_signature 400) — see FROZEN.md "LLM provider".
+_RENDER_MODEL = ChatGoogleGenerativeAI(
+    model=os.getenv("MODEL", "gemini-3.5-flash"),
+    google_api_key=os.getenv("GEMINI_API_KEY"),
+    temperature=0,
+)
 
 
 @tool()
@@ -224,7 +268,7 @@ above. Skip charts unless the user explicitly asked for data viz.
 
 def build_dynamic_agent():
     return create_agent(
-        model="openai:gpt-5.5",
+        model=_RENDER_MODEL,
         tools=[query_pdf, generate_a2ui],
         middleware=[CopilotKitMiddleware()],
         system_prompt=SYSTEM_PROMPT,

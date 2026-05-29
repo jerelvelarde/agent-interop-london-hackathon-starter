@@ -9,14 +9,21 @@ exposes. It builds a data URL like::
 
     data:text/plain;base64,<source.value>
 
-For images this works (OpenAI knows what `data:image/png;base64,...` is).
+For images this works (the model knows what `data:image/png;base64,...` is).
 For documents it doesn't:
 
   - `source.value` is our raw PDF text. NOT base64. so the data URL is
     malformed.
-  - Even if it were valid base64, OpenAI's `image_url` parser won't accept
-    a `text/plain` mime type. The request 400s and the agent run dies with
-    `INCOMPLETE_STREAM`.
+  - Even if it were valid base64, an `image_url` part with a `text/plain`
+    mime type is invalid. The request 400s and the agent run dies.
+
+This is PROVIDER-AGNOSTIC. The break is in AG-UI's message *conversion*
+layer (how the LangChain message is assembled), upstream of any specific
+chat model. It bites the native Google Gen AI SDK
+(`langchain-google-genai`, this app's provider — see FROZEN.md "LLM
+provider") exactly as it bit OpenAI: Gemini's image parser will not accept a
+`text/plain` "image" part either. So the patch is still required after the
+OpenAI → Gemini port; only the explanatory text changed, not the mechanism.
 
 ## The fix
 
@@ -25,6 +32,12 @@ We monkey-patch `convert_agui_multimodal_to_langchain` to intercept
 conversion runs. We inline them as plain `text` blocks (with a short
 ``[Document: <filename>]`` header) so the model sees normal text and the
 rest of the multimodal pipeline keeps working for real images.
+
+Because the rewrite emits a normal `text` block, the inlined PDF text also
+survives serialization across tool turns on the native SDK — the dynamic
+agent scans conversation history for the most-recent ``[Document: ...]``
+header (see dynamic_agent.py), and that header lives in plain message text,
+not in a provider-specific media block.
 
 Call ``install()`` once at agent startup. It's idempotent.
 """

@@ -3,68 +3,60 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // CUSTOMIZATION SEAM #2 — Re-brand the shell
 // See HACKATHON.md §2 for the full recipe.
-// Pattern to copy: this file — swap the logo, product name, and
-// accent colors. Use it as a thin header wrapper around the app
-// shell. The default props mirror the inherited demo so you can
-// drop it in without breaking anything.
+//
+// Pattern: this is a thin backdrop wrapper, NOT a header chrome.
+// The chat-column header lives in src/components/example-layout/
+// (canonical product-name + logo placement). BrandFrame's job is
+// to paint the lavender frosted-glass backdrop and provide the
+// relative-positioned container the rest of the app sits inside.
 //
 // Don't touch:
 //   - src/components/EnvelopeInspector.tsx (judging chrome)
-//   - chat affordances in src/app/page.tsx
+//   - chat affordances in src/app/(default)/page.tsx
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import type { ReactNode } from "react";
 import { BackgroundBlurCircles } from "./BackgroundBlurCircles";
-import { ModeToggle } from "./ModeToggle";
 
 export interface BrandFrameProps {
-  /** Product name shown in the header. Default: "CopilotKit". */
+  /** Reserved for callers that pass a productName; unused by the
+   *  default backdrop-only rendering. Kept for API stability. */
   productName?: string;
-  /** Path (in /public) or absolute URL of the logo mark. */
+  /** Reserved for callers that pass a logoSrc; unused by default. */
   logoSrc?: string;
-  /** Optional accent color (CSS color). Falls back to var(--border-default). */
+  /** Reserved; unused by default. */
   accentColor?: string;
-  /** The app content beneath the header. */
+  /** The app content rendered above the backdrop. */
   children?: ReactNode;
 }
 
 /**
- * BrandFrame — minimal header wrapper for the hackathon shell.
+ * BrandFrame — frosted-glass shell wrapper.
  *
- * Wraps the app in the signature CopilotKit frosted-glass backdrop
- * (BackgroundBlurCircles) and renders a lightweight header with the
- * product name, logo, and a ModeToggle in the trailing slot.
- *
- * Real hackathon teams can replace the contents while keeping the
- * shape — swap the logo, product name, or accent color via props.
- * Keep it shallow: the page layout (src/components/example-layout)
- * handles the chat / app split below this header.
+ * Paints `--surface-main` as the base, overlays six blurred radial
+ * gradients via `<BackgroundBlurCircles />`, and renders children
+ * above the backdrop at `zIndex: 1`. Mirrors the source repo's
+ * `ThemeShell` pattern — no header chrome; the chat column owns
+ * its own product header inside `<ExampleLayout>`.
  */
-export function BrandFrame({
-  productName = "CopilotKit",
-  logoSrc = "/copilotkit-logo-mark.svg",
-  accentColor,
-  children,
-}: BrandFrameProps) {
+export function BrandFrame({ children }: BrandFrameProps) {
   return (
-    <div className="relative flex flex-col h-full">
+    <div
+      className="relative overflow-hidden"
+      style={{
+        background: "var(--surface-main, #dedee9)",
+        minHeight: "100svh",
+        height: "100dvh",
+        width: "100%",
+      }}
+    >
       <BackgroundBlurCircles />
-      <header
-        className="relative z-10 flex items-center gap-2 px-6 py-4 border-b"
-        style={{
-          borderColor:
-            accentColor ?? "var(--border-default, var(--border, #dbdbe5))",
-        }}
+      <div
+        className="relative"
+        style={{ zIndex: 1, height: "100%", width: "100%" }}
       >
-        {logoSrc ? (
-          <img src={logoSrc} alt={productName} className="h-7" />
-        ) : null}
-        <span className="font-extrabold text-2xl">{productName}</span>
-        <div className="ml-auto">
-          <ModeToggle />
-        </div>
-      </header>
-      <div className="relative z-10 flex-1 min-h-0">{children}</div>
+        {children}
+      </div>
     </div>
   );
 }

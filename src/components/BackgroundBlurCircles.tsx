@@ -1,97 +1,109 @@
 "use client";
 
 /**
- * Six blurred radial gradients positioned across the viewport.
- * Renders as a fixed, full-viewport, pointer-events:none layer behind
- * everything else. Tints come from CSS vars defined in src/app/globals.css:
- *   --cpk-blur-lilac, --cpk-blur-orange, --cpk-blur-yellow
+ * Six large, heavily-blurred colored ellipses — the signature CopilotKit
+ * background effect. Coordinates and colors copied verbatim from the
+ * canonical implementation in cpk-project-management:
+ *   /Users/jerel-cpk/Projects/cpk-project-management/
+ *     cpk-pm-adk-dashboard/apps/app/src/components/theme-shell/background-blur.tsx
  *
- * No props by default. To re-tint, edit the CSS vars (Customization Seam #1).
- *
- * Visual reference: cpk-project-management/cpk-pm-adk-dashboard
- *   apps/app/src/components/theme-shell/background-blur.tsx
- * — coordinates and sizes scaled to viewport units so the effect works
- * across breakpoints. Six circles: 2 lilac, 2 orange, 2 yellow, spread
- * top / mid / bottom for an organic frosted-glass feel.
+ * Designed for a ~1920px viewport. Render inside a container with
+ * position:relative + overflow:hidden (see <BrandFrame>). All content
+ * must paint at zIndex >= 1 to sit above the backdrop.
  */
 export function BackgroundBlurCircles() {
   return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
-    >
-      {/* Circle 1 — top-left lilac */}
+    <>
       <div
-        className="absolute rounded-full"
+        aria-hidden
         style={{
-          top: "-10%",
-          left: "-5%",
-          width: "45vw",
-          height: "45vw",
-          background: "var(--cpk-blur-lilac, rgba(201, 201, 218, 0.6))",
-          filter: "blur(120px)",
+          position: "absolute",
+          width: 446,
+          height: 446,
+          left: 1040,
+          top: 11,
+          borderRadius: "50%",
+          background: "rgba(255, 172, 77, 0.2)",
+          filter: "blur(103px)",
+          zIndex: 0,
+          pointerEvents: "none",
         }}
       />
-      {/* Circle 2 — top-right orange */}
       <div
-        className="absolute rounded-full"
+        aria-hidden
         style={{
-          top: "-15%",
-          right: "-8%",
-          width: "35vw",
-          height: "35vw",
-          background: "var(--cpk-blur-orange, rgba(255, 172, 77, 0.2))",
-          filter: "blur(110px)",
+          position: "absolute",
+          width: 609,
+          height: 609,
+          left: 1339,
+          top: 625,
+          borderRadius: "50%",
+          background: "#C9C9DA",
+          filter: "blur(103px)",
+          zIndex: 0,
+          pointerEvents: "none",
         }}
       />
-      {/* Circle 3 — mid-left yellow */}
       <div
-        className="absolute rounded-full"
+        aria-hidden
         style={{
-          top: "35%",
-          left: "20%",
-          width: "30vw",
-          height: "30vw",
-          background: "var(--cpk-blur-yellow, rgba(255, 243, 136, 0.3))",
-          filter: "blur(100px)",
+          position: "absolute",
+          width: 609,
+          height: 609,
+          left: 670,
+          top: -365,
+          borderRadius: "50%",
+          background: "#C9C9DA",
+          filter: "blur(103px)",
+          zIndex: 0,
+          pointerEvents: "none",
         }}
       />
-      {/* Circle 4 — mid-right lilac */}
       <div
-        className="absolute rounded-full"
+        aria-hidden
         style={{
-          top: "45%",
-          right: "5%",
-          width: "40vw",
-          height: "40vw",
-          background: "var(--cpk-blur-lilac, rgba(243, 243, 252, 0.7))",
-          filter: "blur(130px)",
+          position: "absolute",
+          width: 609,
+          height: 609,
+          left: 508,
+          top: 702,
+          borderRadius: "50%",
+          background: "#F3F3FC",
+          filter: "blur(103px)",
+          zIndex: 0,
+          pointerEvents: "none",
         }}
       />
-      {/* Circle 5 — bottom-left orange */}
       <div
-        className="absolute rounded-full"
+        aria-hidden
         style={{
-          bottom: "-10%",
-          left: "10%",
-          width: "35vw",
-          height: "35vw",
-          background: "var(--cpk-blur-orange, rgba(255, 172, 77, 0.2))",
-          filter: "blur(110px)",
+          position: "absolute",
+          width: 446,
+          height: 446,
+          left: 128,
+          top: 331,
+          borderRadius: "50%",
+          background: "rgba(255, 243, 136, 0.3)",
+          filter: "blur(103px)",
+          zIndex: 0,
+          pointerEvents: "none",
         }}
       />
-      {/* Circle 6 — bottom-right yellow */}
       <div
-        className="absolute rounded-full"
+        aria-hidden
         style={{
-          bottom: "-15%",
-          right: "25%",
-          width: "30vw",
-          height: "30vw",
-          background: "var(--cpk-blur-yellow, rgba(255, 243, 136, 0.3))",
-          filter: "blur(120px)",
+          position: "absolute",
+          width: 446,
+          height: 446,
+          left: -205,
+          top: 803,
+          borderRadius: "50%",
+          background: "rgba(255, 172, 77, 0.2)",
+          filter: "blur(103px)",
+          zIndex: 0,
+          pointerEvents: "none",
         }}
       />
-    </div>
+    </>
   );
 }

@@ -3,6 +3,7 @@
 import "@copilotkit/react-core/v2/styles.css";
 
 import { CopilotKit } from "@copilotkit/react-core/v2";
+import { BrandFrame } from "@/components/BrandFrame";
 // A2UI catalog: definitions + renderers in ../declarative-generative-ui/
 import { demonstrationCatalog } from "../declarative-generative-ui/renderers";
 
@@ -15,6 +16,9 @@ import { demonstrationCatalog } from "../declarative-generative-ui/renderers";
  * sibling groups like `(legal)` can mount their own provider with a
  * different agent + catalog, avoiding the double-mount problem documented
  * in PLAN.md §5.
+ *
+ * `<BrandFrame>` provides the signature lavender backdrop (BackgroundBlurCircles)
+ * + product header + ModeToggle. See CUSTOMIZATION SEAM #2.
  */
 export default function DefaultGroupLayout({
   children,
@@ -28,7 +32,7 @@ export default function DefaultGroupLayout({
       openGenerativeUI={{}}
       useSingleEndpoint={false}
     >
-      {children}
+      <BrandFrame>{children}</BrandFrame>
     </CopilotKit>
   );
 }

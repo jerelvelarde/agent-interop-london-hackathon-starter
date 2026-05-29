@@ -11,7 +11,11 @@
  * guarded — odd or partial envelopes (deltas, hand-rolled fixtures, future
  * envelope kinds) must degrade to a sane label, never throw.
  */
-import type { A2UIEnvelope, A2UIEnvelopeKey, CapturedEnvelope } from "@/types/a2ui";
+import type {
+  A2UIEnvelope,
+  A2UIEnvelopeKey,
+  CapturedEnvelope,
+} from "@/types/a2ui";
 
 /** The shape returned per envelope: a headline `line` and optional `detail`. */
 export interface EnvelopeSummary {
@@ -35,7 +39,10 @@ function str(obj: Record<string, unknown> | null, key: string): string | null {
 }
 
 /** Pull the payload object for a given envelope key (e.g. `createSurface`). */
-function payloadFor(env: A2UIEnvelope, key: A2UIEnvelopeKey): Record<string, unknown> | null {
+function payloadFor(
+  env: A2UIEnvelope,
+  key: A2UIEnvelopeKey,
+): Record<string, unknown> | null {
   return asRecord(env?.[key]);
 }
 
@@ -79,9 +86,7 @@ function pickComponentRoot(
   // Flat wire shape: { components: [ { id, component, children }, ... ] }.
   const components = payload["components"];
   if (Array.isArray(components) && components.length > 0) {
-    const byId = components
-      .map(asRecord)
-      .find((c) => c && c["id"] === "root");
+    const byId = components.map(asRecord).find((c) => c && c["id"] === "root");
     return byId ?? asRecord(components[0]);
   }
 
@@ -134,8 +139,11 @@ function summarizeComponentRoot(
     // Flat-grammar children are string id-refs to sibling components
     // (e.g. ["hdr", "kpi-row"]). Those read as generic "components"; only
     // node-shaped children get a type-derived noun.
-    const allStringRefs = count > 0 && children.every((c) => typeof c === "string");
-    const label = allStringRefs ? `component${count === 1 ? "" : "s"}` : childLabel(rootType, count);
+    const allStringRefs =
+      count > 0 && children.every((c) => typeof c === "string");
+    const label = allStringRefs
+      ? `component${count === 1 ? "" : "s"}`
+      : childLabel(rootType, count);
     const line = rootType
       ? `${verb} ${rootType} → ${count} ${label}`
       : `${verb} components (${count} ${label})`;
@@ -198,13 +206,15 @@ function summarizeData(
         return { line: keys ? `${verb} ${keys}` : `${verb} data` };
       }
       // Root set to a non-object (array or scalar) — annotate shape.
-      if (Array.isArray(value)) return { line: `${verb} data (${value.length})` };
+      if (Array.isArray(value))
+        return { line: `${verb} data (${value.length})` };
       return { line: `${verb} data` };
     }
 
     // Non-root path: "Set <key> (<len>)" style.
     const key = lastPathSegment(path!) ?? path!;
-    if (Array.isArray(value)) return { line: `${verb} ${key} (${value.length})` };
+    if (Array.isArray(value))
+      return { line: `${verb} ${key} (${value.length})` };
     const record = asRecord(value);
     if (record) {
       const keys = describeKeys(record);
@@ -277,7 +287,8 @@ export function summarizeEnvelope(env: CapturedEnvelope): EnvelopeSummary {
 
     default: {
       // Unknown kind: prefer the literal kind string, then any surfaceId hint.
-      const label = typeof kind === "string" && kind !== "unknown" ? kind : "Envelope";
+      const label =
+        typeof kind === "string" && kind !== "unknown" ? kind : "Envelope";
       const surfaceId = env?.surfaceId ?? null;
       return {
         line: surfaceId ? `${label} "${surfaceId}"` : label,

@@ -93,7 +93,19 @@ export interface LegendStep {
  * create -> components -> bind data.
  */
 export const LIFECYCLE_LEGEND: LegendStep[] = [
-  { glyph: KIND_META.createSurface.glyph, label: "Create", kind: "createSurface" },
-  { glyph: KIND_META.updateComponents.glyph, label: "Components", kind: "updateComponents" },
-  { glyph: KIND_META.updateDataModel.glyph, label: "Bind data", kind: "updateDataModel" },
+  {
+    glyph: KIND_META.createSurface.glyph,
+    label: "Create",
+    kind: "createSurface",
+  },
+  {
+    glyph: KIND_META.updateComponents.glyph,
+    label: "Components",
+    kind: "updateComponents",
+  },
+  {
+    glyph: KIND_META.updateDataModel.glyph,
+    label: "Bind data",
+    kind: "updateDataModel",
+  },
 ];

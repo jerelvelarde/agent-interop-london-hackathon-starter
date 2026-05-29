@@ -503,8 +503,8 @@ export function EnvelopeInspector() {
                   lineHeight: 1.2,
                 }}
               >
-                {total} envelope{total === 1 ? "" : "s"} ·{" "}
-                {surfaceCount} surface{surfaceCount === 1 ? "" : "s"}
+                {total} envelope{total === 1 ? "" : "s"} · {surfaceCount}{" "}
+                surface{surfaceCount === 1 ? "" : "s"}
                 {isDemo ? " · demo" : ""}
               </span>
             </div>

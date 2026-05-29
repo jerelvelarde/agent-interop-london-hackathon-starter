@@ -204,11 +204,7 @@ export interface UseEnvelopeStreamResult {
 export function useEnvelopeStream(
   options: UseEnvelopeStreamOptions = {},
 ): UseEnvelopeStreamResult {
-  const {
-    maxEnvelopes = 200,
-    enableDemoFallback = true,
-    agentId,
-  } = options;
+  const { maxEnvelopes = 200, enableDemoFallback = true, agentId } = options;
 
   const { agent } = useAgent(agentId ? { agentId } : undefined);
   const [envelopes, setEnvelopes] = useState<CapturedEnvelope[]>([]);
@@ -222,8 +218,9 @@ export function useEnvelopeStream(
     if (!agent) return;
 
     function harvest() {
-      const messages = (agent as unknown as { messages?: ReadonlyArray<unknown> })
-        .messages;
+      const messages = (
+        agent as unknown as { messages?: ReadonlyArray<unknown> }
+      ).messages;
       if (!messages || !messages.length) return;
 
       const newCaptures: CapturedEnvelope[] = [];
@@ -283,9 +280,12 @@ export function useEnvelopeStream(
     // Subscribe to agent events. The AbstractAgent has a .subscribe() method
     // that takes an AgentSubscriber. We hook the activity events + general
     // events so we catch deltas as they arrive.
-    type SubFn = (sub: Record<string, (...args: unknown[]) => void>) => {
-      unsubscribe?: () => void;
-    } | (() => void) | void;
+    type SubFn = (sub: Record<string, (...args: unknown[]) => void>) =>
+      | {
+          unsubscribe?: () => void;
+        }
+      | (() => void)
+      | void;
     const subscribeFn = (agent as unknown as { subscribe?: SubFn }).subscribe;
     if (typeof subscribeFn !== "function") {
       // No subscribe API — fall back to polling messages every 250ms.
@@ -303,7 +303,11 @@ export function useEnvelopeStream(
     return () => {
       if (typeof result === "function") {
         result();
-      } else if (result && typeof (result as { unsubscribe?: () => void }).unsubscribe === "function") {
+      } else if (
+        result &&
+        typeof (result as { unsubscribe?: () => void }).unsubscribe ===
+          "function"
+      ) {
         (result as { unsubscribe: () => void }).unsubscribe();
       }
     };

@@ -104,7 +104,8 @@ function ActionButton({
 
 const demonstrationCatalogRenderers: CatalogRenderers<DemonstrationCatalogDefinitions> =
   {
-    Title: ({ props }) => {
+    Title: ({ props: rawProps }) => {
+      const props = rawProps as Record<string, any>;
       const Tag = (
         props.level === "h1" ? "h1" : props.level === "h3" ? "h3" : "h2"
       ) as keyof React.JSX.IntrinsicElements;
@@ -207,38 +208,41 @@ const demonstrationCatalogRenderers: CatalogRenderers<DemonstrationCatalogDefini
       );
     },
 
-    DashboardCard: ({ props, children }) => (
-      <div
-        style={{
-          background: c.card,
-          borderRadius: "12px",
-          border: `1px solid ${c.border}`,
-          padding: "20px",
-          boxShadow: c.shadow,
-          display: "flex",
-          flexDirection: "column",
-          gap: "12px",
-        }}
-      >
-        <div>
-          <div style={{ fontWeight: 600, fontSize: "0.9rem", color: c.cardFg }}>
-            {props.title}
-          </div>
-          {props.subtitle && (
-            <div
-              style={{
-                fontSize: "0.75rem",
-                color: c.muted,
-                marginTop: "2px",
-              }}
-            >
-              {props.subtitle}
+    DashboardCard: ({ props: rawProps, children }) => {
+      const props = rawProps as Record<string, any>;
+      return (
+        <div
+          style={{
+            background: c.card,
+            borderRadius: "12px",
+            border: `1px solid ${c.border}`,
+            padding: "20px",
+            boxShadow: c.shadow,
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
+          }}
+        >
+          <div>
+            <div style={{ fontWeight: 600, fontSize: "0.9rem", color: c.cardFg }}>
+              {props.title}
             </div>
-          )}
+            {props.subtitle && (
+              <div
+                style={{
+                  fontSize: "0.75rem",
+                  color: c.muted,
+                  marginTop: "2px",
+                }}
+              >
+                {props.subtitle}
+              </div>
+            )}
+          </div>
+          {props.child && children(props.child)}
         </div>
-        {props.child && children(props.child)}
-      </div>
-    ),
+      );
+    },
 
     Metric: ({ props: rawProps }) => {
       // The binder resolves path bindings to strings at runtime;
@@ -353,7 +357,8 @@ const demonstrationCatalogRenderers: CatalogRenderers<DemonstrationCatalogDefini
       );
     },
 
-    Badge: ({ props }) => {
+    Badge: ({ props: rawProps }) => {
+      const props = rawProps as Record<string, any>;
       const variants: Record<string, { bg: string; color: string }> = {
         success: { bg: "#dcfce7", color: "#166534" },
         warning: { bg: "#fef3c7", color: "#92400e" },

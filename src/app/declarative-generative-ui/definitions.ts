@@ -22,7 +22,7 @@ export const demonstrationCatalogDefinitions = {
   Title: {
     description: "A heading. Use for section titles and page headers.",
     props: z.object({
-      text: z.string(),
+      text: DynString,
       level: z.string().optional(),
     }),
   },
@@ -63,8 +63,8 @@ export const demonstrationCatalogDefinitions = {
     description:
       "A card container with title and optional subtitle. Has a 'child' slot for content (chart, metrics, etc). Use 'child' with a single component ID.",
     props: z.object({
-      title: z.string(),
-      subtitle: z.string().optional(),
+      title: DynString,
+      subtitle: DynString.optional(),
       child: z.string().optional(),
     }),
   },
@@ -108,7 +108,7 @@ export const demonstrationCatalogDefinitions = {
     description:
       "A small status badge/tag. Use for labels, statuses, categories.",
     props: z.object({
-      text: z.string(),
+      text: DynString,
       variant: z
         .enum(["success", "warning", "error", "info", "neutral"])
         .optional(),

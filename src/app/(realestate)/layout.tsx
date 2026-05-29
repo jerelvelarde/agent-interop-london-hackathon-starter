@@ -27,6 +27,9 @@ export default function RealestateGroupLayout({
     <CopilotKit
       runtimeUrl="/api/copilotkit"
       agent="realestate"
+      // Suppress the CopilotKit dev-overlay announcement popup. Magazine
+      // layout — the bubble overlaps the Chat nav button.
+      enableInspector={false}
       a2ui={{ catalog: realestateCatalog }}
       openGenerativeUI={{}}
       useSingleEndpoint={false}

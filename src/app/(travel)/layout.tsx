@@ -25,7 +25,8 @@ export default function TravelGroupLayout({
     <CopilotKit
       runtimeUrl="/api/copilotkit"
       agent="travel"
-      inspectorDefaultAnchor={{ horizontal: "right", vertical: "top" }}
+      // Suppress the CopilotKit dev-overlay announcement popup.
+      enableInspector={false}
       a2ui={{ catalog: travelCatalog }}
       openGenerativeUI={{}}
       useSingleEndpoint={false}

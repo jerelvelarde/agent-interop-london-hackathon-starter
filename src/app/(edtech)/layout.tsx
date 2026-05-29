@@ -25,6 +25,8 @@ export default function EdtechGroupLayout({
     <CopilotKit
       runtimeUrl="/api/copilotkit"
       agent="edtech"
+      // Suppress the CopilotKit dev-overlay announcement popup.
+      enableInspector={false}
       a2ui={{ catalog: edtechCatalog }}
       openGenerativeUI={{}}
       useSingleEndpoint={false}

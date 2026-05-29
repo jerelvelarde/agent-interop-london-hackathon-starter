@@ -25,6 +25,9 @@ export default function HealthcareGroupLayout({
     <CopilotKit
       runtimeUrl="/api/copilotkit"
       agent="healthcare"
+      // Suppress the CopilotKit dev-overlay announcement popup. The demo is
+      // the demo; no third-party "Big update" bubbles on a polished surface.
+      enableInspector={false}
       a2ui={{ catalog: healthcareCatalog }}
       openGenerativeUI={{}}
       useSingleEndpoint={false}

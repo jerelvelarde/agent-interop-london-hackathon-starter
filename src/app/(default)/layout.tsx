@@ -22,7 +22,12 @@ export default function DefaultGroupLayout({
     <CopilotKit
       runtimeUrl="/api/copilotkit"
       agent="default"
-      inspectorDefaultAnchor={{ horizontal: "right", vertical: "top" }}
+      // Suppress the @copilotkit/web-inspector dev-overlay + cdn.copilotkit.ai/
+      // announcements.json popup. The starter ships its own EnvelopeInspector
+      // for the "show the wire" affordance — the CopilotKit web-inspector is
+      // redundant here. (Default localhost behavior: shouldShowDevConsole
+      // returns true; setting `enableInspector={false}` overrides that.)
+      enableInspector={false}
       a2ui={{ catalog: demonstrationCatalog }}
       openGenerativeUI={{}}
       useSingleEndpoint={false}

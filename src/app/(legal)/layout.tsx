@@ -20,7 +20,8 @@ export default function LegalGroupLayout({
     <CopilotKit
       runtimeUrl="/api/copilotkit"
       agent="legal"
-      inspectorDefaultAnchor={{ horizontal: "right", vertical: "top" }}
+      // Suppress the CopilotKit dev-overlay announcement popup.
+      enableInspector={false}
       a2ui={{ catalog: legalPaperCatalog }}
       openGenerativeUI={{}}
       useSingleEndpoint={false}

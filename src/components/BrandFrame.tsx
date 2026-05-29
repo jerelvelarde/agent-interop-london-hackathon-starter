@@ -14,13 +14,15 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import type { ReactNode } from "react";
+import { BackgroundBlurCircles } from "./BackgroundBlurCircles";
+import { ModeToggle } from "./ModeToggle";
 
 export interface BrandFrameProps {
   /** Product name shown in the header. Default: "CopilotKit". */
   productName?: string;
   /** Path (in /public) or absolute URL of the logo mark. */
   logoSrc?: string;
-  /** Optional accent color (CSS color). Falls back to var(--primary). */
+  /** Optional accent color (CSS color). Falls back to var(--border-default). */
   accentColor?: string;
   /** The app content beneath the header. */
   children?: ReactNode;
@@ -29,10 +31,14 @@ export interface BrandFrameProps {
 /**
  * BrandFrame — minimal header wrapper for the hackathon shell.
  *
- * This is a stub. Real hackathon teams will replace the contents with
- * their own brand chrome (product name, logo, tagline, accent bar).
- * Keep it shallow — the page layout (src/components/example-layout)
- * handles the chat/app split below this header.
+ * Wraps the app in the signature CopilotKit frosted-glass backdrop
+ * (BackgroundBlurCircles) and renders a lightweight header with the
+ * product name, logo, and a ModeToggle in the trailing slot.
+ *
+ * Real hackathon teams can replace the contents while keeping the
+ * shape — swap the logo, product name, or accent color via props.
+ * Keep it shallow: the page layout (src/components/example-layout)
+ * handles the chat / app split below this header.
  */
 export function BrandFrame({
   productName = "CopilotKit",
@@ -40,22 +46,25 @@ export function BrandFrame({
   accentColor,
   children,
 }: BrandFrameProps) {
-  const accentStyle = accentColor
-    ? { borderColor: accentColor }
-    : { borderColor: "var(--primary, #137fec)" };
-
   return (
-    <div className="flex flex-col h-full">
+    <div className="relative flex flex-col h-full">
+      <BackgroundBlurCircles />
       <header
-        className="flex items-center gap-2 px-6 py-4 border-b-2"
-        style={accentStyle}
+        className="relative z-10 flex items-center gap-2 px-6 py-4 border-b"
+        style={{
+          borderColor:
+            accentColor ?? "var(--border-default, var(--border, #dbdbe5))",
+        }}
       >
         {logoSrc ? (
           <img src={logoSrc} alt={productName} className="h-7" />
         ) : null}
         <span className="font-extrabold text-2xl">{productName}</span>
+        <div className="ml-auto">
+          <ModeToggle />
+        </div>
       </header>
-      <div className="flex-1 min-h-0">{children}</div>
+      <div className="relative z-10 flex-1 min-h-0">{children}</div>
     </div>
   );
 }

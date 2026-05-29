@@ -1,6 +1,8 @@
 "use client";
 
 import "./globals.css";
+// Seam #1 override layer — loads AFTER globals.css so its brand tokens win.
+import "@/lib/a2ui-theme.css";
 
 import { Plus_Jakarta_Sans, Spline_Sans_Mono } from "next/font/google";
 import { ThemeProvider } from "@/hooks/use-theme";

@@ -57,7 +57,7 @@ PORT = int(os.getenv("PORT", "8124"))
 # a2a/compliance/check.ts validates exactly these three envelope
 # shapes against the v0.9 spec at https://a2ui.org/specification/v0.9-a2ui/.
 #
-# Canonical example (real LLM-driven): agent/src/a2ui_fixed_schema.py
+# Canonical example (real LLM-driven): agent/src/tools/risk_register.py
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SURFACE_ID = "a2a-sample-surface"
 CATALOG_ID = "copilotkit://app-dashboard-catalog"

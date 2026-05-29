@@ -74,12 +74,20 @@ function envelopeSourceLocation(env: CapturedEnvelope): {
   path: string;
   line: number;
 } {
-  // Demo envelopes always come from the inspector itself; real ones from the
-  // fixed-schema tool. Workstream E will produce a richer mapping; this is the
-  // honest first cut.
-  const isFlightSurface = env.surfaceId === "flight-search-results";
-  if (isFlightSurface) {
-    return { path: "agent/src/a2ui_fixed_schema.py", line: 38 };
+  // PortKit fixed-schema surfaces each live in their own tool file under
+  // agent/src/tools/. The dynamic-schema path is the fallback for anything
+  // we don't recognise. Hackers can extend this map as they add widgets.
+  const SURFACE_TO_TOOL: Record<string, string> = {
+    "project-dashboard": "agent/src/tools/project_dashboard.py",
+    "project-detail": "agent/src/tools/project_detail.py",
+    "sprint-board": "agent/src/tools/sprint_board.py",
+    "team-load": "agent/src/tools/team_load.py",
+    "risk-register": "agent/src/tools/risk_register.py",
+    "status-report-draft": "agent/src/tools/status_report.py",
+    "update-feed": "agent/src/tools/update_feed.py",
+  };
+  if (env.surfaceId && SURFACE_TO_TOOL[env.surfaceId]) {
+    return { path: SURFACE_TO_TOOL[env.surfaceId], line: 1 };
   }
   return { path: "agent/src/a2ui_dynamic_schema.py", line: 1 };
 }
@@ -549,9 +557,9 @@ function EmptyState() {
         No A2UI envelopes yet
       </div>
       <div style={{ maxWidth: 260, lineHeight: 1.5 }}>
-        Ask the chat to{" "}
+        Ask the chat{" "}
         <span style={{ fontFamily: "var(--font-code)" }}>
-          &quot;show me a flights dashboard&quot;
+          &quot;What&apos;s going on this week?&quot;
         </span>{" "}
         — every <code>createSurface</code>, <code>updateComponents</code>, and{" "}
         <code>updateDataModel</code> will appear here in order.

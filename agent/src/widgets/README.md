@@ -19,7 +19,7 @@ The starter ships exactly **one** fixture shape. The validator is the authority.
 | `catalogId` | yes | string | URI-ish, e.g. `copilotkit://app-dashboard-catalog`. |
 | `components` | yes | array | The v0.9 component tree (same shape as the catalog `.json`). |
 | `data` | yes | object | The data model the components bind to via `path`. |
-| `name` | no | string | Conventional fixture identifier, e.g. `flight_card_two_results`. |
+| `name` | no | string | Conventional fixture identifier, e.g. `risk_register_three_risks`. |
 | `description` | no | string | One sentence describing what the fixture demonstrates. |
 
 The canonical example to mirror is `agent/src/widgets/risk_register.fixture.json` (the simplest of the PortKit pair — one header label + one template-bound list). The legacy `envelopes: [...]` shape was retired in issue #16 — fixtures that still use it will fail validation with a teach-against-the-canonical hint.

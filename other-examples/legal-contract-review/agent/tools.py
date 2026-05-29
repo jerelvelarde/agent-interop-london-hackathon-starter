@@ -6,8 +6,8 @@ Tools for the Contract Review Copilot example.
   state so the rendered UI updates.
 
 Schema discovery follows the canonical fixed-schema pattern in
-agent/src/a2ui_fixed_schema.py:search_flights — load JSON once at import time,
-then return an a2ui.render(operations=[...]) envelope from the tool.
+agent/src/tools/risk_register.py:show_risk_register — load JSON once at import
+time, then return an a2ui.render(operations=[...]) envelope from the tool.
 """
 
 from __future__ import annotations

@@ -35,23 +35,21 @@ REQUEST = {
     "messages": [
         {
             "role": "user",
-            "content": "Search flights from SFO to JFK on 2026-06-15.",
+            "content": "Show me the open-risks register across all projects.",
         }
     ],
     "tools": [
         {
             "type": "function",
             "function": {
-                "name": "search_flights",
-                "description": "Search for flights between two cities on a date",
+                "name": "show_risk_register",
+                "description": "Show open risks across the org, optionally scoped to one project.",
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "origin": {"type": "string"},
-                        "destination": {"type": "string"},
-                        "date": {"type": "string"},
+                        "project_id": {"type": "string"},
                     },
-                    "required": ["origin", "destination", "date"],
+                    "required": [],
                 },
             },
         }

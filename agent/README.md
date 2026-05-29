@@ -28,9 +28,9 @@ uv run --reload langgraph dev
 ## Customization seams in this directory
 
 - `main.py` system prompt — first line of "make it about my domain"
-- `main.py` `tools=[...]` — register new widget tools here
+- `src/domains/<active>/tools.py` — register new widget tools here
 - `src/query.py` — Seam #3 (swap demo data)
-- `src/a2ui_fixed_schema.py` — Seam #4 (add a widget)
+- `src/tools/risk_register.py` — Seam #4 canonical example (add a widget)
 
 ## What you probably should NOT touch
 

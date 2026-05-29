@@ -6,9 +6,9 @@ loads the matching `tools.py` + `prompts.py`.
 
 ```
 agent/src/domains/
-├── default/         # Inherited base demo (flights + dashboards + todos).
+├── default/         # PortKit demo (project ops dashboards + risks + status).
 │   ├── prompts.py   # SYSTEM_PROMPT
-│   └── tools.py     # default_tools = [query_data, *todo_tools, generate_a2ui, search_flights]
+│   └── tools.py     # default_tools = [query_data, show_project_dashboard, show_project_detail, …]
 └── shopping/        # Canonical second domain. Demonstrates both A2UI paths.
     ├── prompts.py
     ├── tools.py     # shopping_tools = [search_products, query_orders]

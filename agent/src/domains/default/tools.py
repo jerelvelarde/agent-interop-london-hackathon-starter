@@ -1,5 +1,4 @@
-"""
-Tool bundle for the default domain (flights + dashboards + todos).
+"""Default-domain tool bundle (PortKit — Project Operations).
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # CUSTOMIZATION SEAM #5 — Switch domain (default branch)
@@ -10,8 +9,21 @@ Tool bundle for the default domain (flights + dashboards + todos).
 """
 
 from src.query import query_data
-from src.todos import todo_tools
-from src.a2ui_dynamic_schema import generate_a2ui
-from src.a2ui_fixed_schema import search_flights
+from src.tools.project_dashboard import show_project_dashboard
+from src.tools.project_detail import show_project_detail
+from src.tools.sprint_board import show_sprint_board
+from src.tools.team_load import show_team_load
+from src.tools.risk_register import show_risk_register
+from src.tools.status_report import draft_status_report
+from src.tools.update_feed import show_update_feed
 
-default_tools = [query_data, *todo_tools, generate_a2ui, search_flights]
+default_tools = [
+    query_data,
+    show_project_dashboard,
+    show_project_detail,
+    show_sprint_board,
+    show_team_load,
+    show_risk_register,
+    draft_status_report,
+    show_update_feed,
+]

@@ -1,4 +1,4 @@
-"""Tool: drill into one project (milestones + sprint kanban + risks)."""
+"""Tool: drill into one project (milestones + open risks)."""
 
 from __future__ import annotations
 
@@ -36,8 +36,7 @@ _STATUS_BUCKETS = ("todo", "inProgress", "inReview", "done")
 
 @tool
 def show_project_detail(project_id: str) -> str:
-    """Drill into one project: milestones, sprint kanban (this project),
-    and open risks.
+    """Drill into one project: milestones and open risks.
 
     Use for: "status of Atlas", "how is Orion going", "drill into Lyra",
     any project-scoped state question. The project_id MUST come from

@@ -18,7 +18,7 @@
     "verify-pins": "./scripts/verify-pins.sh",
     "explain": "tsx scripts/explain.ts",
     "new-widget": "./scripts/new-widget.sh",
-    "new-example": "tsx scripts/new-example.ts",
+    "new-example": "./scripts/new-example.sh",
     "theme:reset": "tsx scripts/theme-reset.ts",
     "test:widgets": "tsx scripts/test-widgets.ts",
     "check-a2a": "tsx a2a/compliance/check.ts"

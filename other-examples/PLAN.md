@@ -29,7 +29,7 @@ found that:
       in `agent/langgraph.json` with a `_note` field.
 - [x] **3.** Add a smoke check that boots each example's graph (in
       `scripts/smoke.ts`) so we catch broken examples in CI.
-- [ ] **4.** Build `pnpm new-example <name>` as a real scaffolder from
+- [x] **4.** Build `pnpm new-example <name>` as a real scaffolder from
       `legal-contract-review/` (mirrors the existing `pnpm new-widget`
       script). The README already advertises it.
 - [ ] **5.** Lift shared helpers to `other-examples/_shared/` so a new

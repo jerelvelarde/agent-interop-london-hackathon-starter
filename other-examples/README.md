@@ -33,7 +33,7 @@ other-examples/<example-id>/
 
 ## How to add another
 
-1. **`pnpm new-example <name>`.** Scaffolds the sub-repo layout above (README, EXAMPLE.json, catalog/, agent/) under `other-examples/<name>/` so you don't hand-author the skeleton. The scaffold is intentionally thin — fill it in by copying from `legal-contract-review/` (the canonical content-complete example).
+1. **`pnpm new-example <name>`.** Copies the canonical `legal-contract-review/` sub-repo to `other-examples/<name>/` and rewrites every identifying string (id, display name, `catalogId`, `graphId`, Python package name) for the new example. The scaffolded `catalog/`, `agent/`, and `schemas/` content is still legal-domain content (clauses, redlines, margin notes) — rewrite `agent/tools.py`, `agent/graph.py`'s system prompt, and the Zod schemas in `catalog/definitions.ts` for your own domain before the example demonstrates anything new. The script enforces a kebab/snake name regex and refuses to overwrite an existing folder; run `pnpm validate-widget --examples` and `pnpm smoke` after rewriting.
 2. **Honesty about portability.** The folder is content, not a complete repo. Document the host requirements (pinned deps, route shim, route-group layout, langgraph entry) in your example's README so a hacker who forks isn't surprised.
 3. **Add an entry to the index table above** and to the gallery — the gallery enumerates `other-examples/*/EXAMPLE.json`.
 

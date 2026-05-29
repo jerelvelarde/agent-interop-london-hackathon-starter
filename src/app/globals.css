@@ -67,7 +67,8 @@
   --surface-background: #dbdbe5;
 
   /* Translucent glass layers (canonical) — frosted sidebar/chat panel that
-     lets the blur circles show through. Use white-50 for glass surfaces. */
+     lets the blur circles + lavender page show through. */
+  --white-30: rgba(255, 255, 255, 0.3); /* cooler chat-panel glass */
   --white-50: rgba(255, 255, 255, 0.5);
   --white-70: rgba(255, 255, 255, 0.7);
   --white-65: rgba(255, 255, 255, 0.65);

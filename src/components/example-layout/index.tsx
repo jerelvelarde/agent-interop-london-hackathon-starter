@@ -36,7 +36,7 @@ export function ExampleLayout({ chatContent, appContent }: ExampleLayoutProps) {
 
       {/* Chat Content */}
       <div
-        className={`max-h-full flex flex-col bg-[var(--white-50)] backdrop-blur-md border-r-2 border-[var(--border-default)] shadow-[var(--elevation-sm)] ${
+        className={`max-h-full flex flex-col bg-[var(--white-30)] backdrop-blur-md border-r-2 border-[var(--border-default)] shadow-[var(--elevation-sm)] ${
           mode === "app"
             ? "w-1/3 px-6 max-lg:hidden" // Hide on mobile in app mode
             : "flex-1 max-lg:px-4"

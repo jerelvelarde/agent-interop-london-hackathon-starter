@@ -1,5 +1,14 @@
 # A2UI PDF Analyst
 
+> **Self-contained mini-app.** This example runs as its **own app** — its own
+> `pnpm dev` (web on :3000, agent on :8123), on **Gemini**. It is **not**
+> mounted into the hackathon-starter host Next app, and it is not (yet)
+> promoted to the main demo. It's vendored here as a reference module; see
+> [`VENDOR_SOURCE.md`](./VENDOR_SOURCE.md) for upstream provenance. The
+> host gallery links to a static overview page at
+> `/other-examples/a2ui-pdf-analyst`; to actually run it, follow the steps
+> below from inside this folder.
+
 Chat with your PDF and watch the agent build the UI for each answer. Powered by **A2UI v0.9 (Agent-to-UI)** — the open protocol that lets an agent describe a surface as structured component operations your frontend renders against its own design system. Same chat input, two rendering strategies, one shared 21-component catalog.
 
 https://github.com/user-attachments/assets/c053d2e8-1d40-43cb-8c5a-8e5c121b851f
@@ -17,19 +26,23 @@ All three routes share the same brand tokens (`src/a2ui/theme.css`), the same Re
 - Node.js 20+ and [pnpm](https://pnpm.io/) (npm works too)
 - Python 3.12
 - [uv](https://docs.astral.sh/uv/) for the Python agent
-- An OpenAI API key
+- A Google **Gemini API key** ([AI Studio](https://aistudio.google.com/apikey))
 
 ## Run locally
 
+This folder is vendored inside the hackathon starter. Run it standalone from
+right here — no separate clone needed:
+
 ```bash
-git clone https://github.com/CopilotKit/CopilotKit.git
-cd CopilotKit/examples/showcases/a2ui-pdf-analyst
-cp agent/.env.example agent/.env    # then put your OPENAI_API_KEY in agent/.env
+cd other-examples/a2ui-pdf-analyst
+cp agent/.env.example agent/.env    # then put your GEMINI_API_KEY in agent/.env
 pnpm install                         # installs Next.js + runs `uv sync` for the agent
 pnpm dev                             # boots web on :3000, agent on :8123
 ```
 
 Open <http://localhost:3000>. `npm install && npm run dev` works identically.
+This mini-app has its own dev server and ports; it does not share the host
+starter's runtime.
 
 ## Environment variables
 
@@ -37,7 +50,7 @@ Open <http://localhost:3000>. `npm install && npm run dev` works identically.
 
 | Variable         | Required | Notes                                                                                 |
 | ---------------- | -------- | ------------------------------------------------------------------------------------- |
-| `OPENAI_API_KEY` | yes      | used by the main agent and by the secondary LLMs inside `query_pdf` / `generate_a2ui` |
+| `GEMINI_API_KEY` | yes      | used by the main agent and by the secondary LLMs inside `query_pdf` / `generate_a2ui` |
 
 ## Architecture
 
@@ -82,13 +95,13 @@ a2ui-pdf-analyst/
         ├── fixed_agent.py    → render_dashboard backend tool
         ├── dynamic_agent.py  → query_pdf + generate_a2ui tools
         ├── pdf_tools.py      → query_pdf: PDF text → structured JSON answer
-        ├── multimodal_middleware.py → ag-ui-langgraph patch so PDF text survives the trip to OpenAI
+        ├── multimodal_middleware.py → ag-ui-langgraph patch so PDF text survives the trip to the model
         └── a2ui/schemas/dashboard.json → the fixed dashboard layout (Stack / Grid / charts / table)
 ```
 
 ## How it works
 
-**PDF attachment** — CopilotKit's multimodal attachment support lets the user attach a PDF directly in the chat input. The frontend extracts the full text client-side via `pdfjs-dist` and inlines it into the user message under a `[Document: <filename>]` header. `multimodal_middleware.py` patches `ag-ui-langgraph` so this text block survives serialization and arrives intact at OpenAI. The agent scans every message in the conversation history for the most recent `[Document: ...]` header — attach once, ask many questions.
+**PDF attachment** — CopilotKit's multimodal attachment support lets the user attach a PDF directly in the chat input. The frontend extracts the full text client-side via `pdfjs-dist` and inlines it into the user message under a `[Document: <filename>]` header. `multimodal_middleware.py` patches `ag-ui-langgraph` so this text block survives serialization and arrives intact at the model. The agent scans every message in the conversation history for the most recent `[Document: ...]` header — attach once, ask many questions.
 
 **Fixed schema (`/fixed`)** — `agent/src/a2ui/schemas/dashboard.json` is a static A2UI component tree the agent never touches. The `render_dashboard` tool takes typed arguments (KPIs, trend, share, rows, scope chips), packages them as A2UI `update_data_model` ops, and the existing tree picks them up via `{path}` bindings. One LLM pass, one tool call, surface streams in.
 
@@ -134,5 +147,5 @@ On `/fixed` after attaching a PDF:
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | Frontend       | Next.js 16 · React 19 · Tailwind v4 · TypeScript · `@copilotkit/react-core/v2` · `@copilotkit/a2ui-renderer` · `pdfjs-dist` · Recharts |
 | Runtime bridge | `@copilotkit/runtime/v2` · `@ag-ui/client` (HttpAgent)                                                                                 |
-| Backend        | Python 3.12 · FastAPI · `ag-ui-langgraph` · `copilotkit` (Python SDK) · `langchain` agents + LangGraph · `langchain-openai`            |
-| Model          | `gpt-5.5` for both the main agent and the secondary LLMs                                                                               |
+| Backend        | Python 3.12 · FastAPI · `ag-ui-langgraph` · `copilotkit` (Python SDK) · `langchain` agents + LangGraph · `langchain-google-genai`      |
+| Model          | Gemini (via the native Google Gen AI SDK) for both the main agent and the secondary LLMs                                               |

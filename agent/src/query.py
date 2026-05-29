@@ -12,8 +12,9 @@ import csv
 #   (b) Replace this whole file with a Python literal / API call /
 #       SQL connector. Update the docstring on query_data so the
 #       agent knows when to call it with your domain's language.
-# After swapping, edit the system prompt in agent/main.py so the agent
-# is grounded in your domain.
+# After swapping, edit the system prompt in
+# agent/src/domains/<active-domain>/prompts.py (SYSTEM_PROMPT) so the
+# agent is grounded in your domain.
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 # Read data at module load time to avoid file I/O issues in

@@ -88,9 +88,11 @@ def _find_non_serializable(obj: Any, path: str = "$") -> str | None:
 #   1. Catalog entry — agent/src/widgets/<name>.json
 #   2. Fixture       — agent/src/widgets/<name>.fixture.json
 #   3. Python tool   — this file (a new @tool below) + register in
-#                      agent/main.py's tools=[...]
+#                      agent/src/domains/<active-domain>/tools.py
+#                      (default_tools list — main.py loads it per DOMAIN env)
 #   4. TS schema     — src/app/api/copilotkit/route.ts a2ui.schema array
-#   5. Prompt hint   — agent/main.py system_prompt (teach the agent WHEN)
+#   5. Prompt hint   — agent/src/domains/<active-domain>/prompts.py
+#                      SYSTEM_PROMPT (teach the agent WHEN to call it)
 #
 # After editing: pnpm validate-widget agent/src/widgets/<name>.json
 # Then: pnpm smoke

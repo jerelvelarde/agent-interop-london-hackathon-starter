@@ -164,8 +164,10 @@ for judges who want to A/B your design in dark and light).
 1. Replace `db.csv` with your data (or skip CSV — return a Python literal).
 2. Edit the docstring on `query_data` so the agent knows when to call it
    with your domain's language.
-3. Edit the system prompt in `agent/main.py` to ground the agent in your
-   domain. Keep it 1-2 sentences.
+3. Edit the system prompt in `agent/src/domains/<active-domain>/prompts.py`
+   (the `SYSTEM_PROMPT` constant) to ground the agent in your domain. Keep
+   it 1-2 sentences. `agent/main.py` reads `DOMAIN` from `.env` and loads
+   the matching prompts module.
 4. Restart the agent (`uv run --reload` handles this for you).
 
 **For a deeper swap:** see §5 — `DOMAIN=<name>` in `.env` switches whole
@@ -188,12 +190,16 @@ This is the most substantial seam — budget an hour minimum.
    renderer will exercise during `pnpm test:widgets`).
 3. **Python tool** — Add a `@tool` function in `agent/src/a2ui_fixed_schema.py`
    that returns `a2ui.render(operations=[create_surface, update_components,
-   update_data_model])`. Register it in `agent/main.py`'s `tools=[...]`.
+   update_data_model])`. Register it in
+   `agent/src/domains/<active-domain>/tools.py` (the `default_tools` /
+   `shopping_tools` / etc. list — `agent/main.py` reads `DOMAIN` from `.env`
+   and loads the matching tool bundle).
 4. **TS schema declaration** — In `src/app/api/copilotkit/route.ts`, add
    your widget to the `a2ui.schema` array so the runtime knows about it.
-5. **Prompt hint** — Add a line to the agent's system prompt that teaches
-   it *when* to call your tool. (Example from default prompt: *"Flights:
-   call search_flights to show flight cards."*)
+5. **Prompt hint** — Add a line to the agent's system prompt
+   (`agent/src/domains/<active-domain>/prompts.py`, the `SYSTEM_PROMPT`
+   constant) that teaches it *when* to call your tool. (Example from default
+   prompt: *"Flights: call search_flights to show flight cards."*)
 
 **Verify:** `pnpm validate-widget agent/src/widgets/<name>.json` (catches
 v0.9 envelope shape issues before runtime). Then `pnpm smoke`.
@@ -216,7 +222,7 @@ first pass is wrong. Less reliable in front of judges, faster to iterate.
 
 **Recipe:**
 1. Copy `agent/src/domains/default/` to `agent/src/domains/<your-domain>/`.
-2. Replace `data/`, `prompt.txt` (system prompt), and any domain-specific
+2. Replace `data/`, `prompts.py` (system prompt), and any domain-specific
    widget overrides.
 3. Set `DOMAIN=<your-domain>` in `.env`.
 4. Restart the agent.

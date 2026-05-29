@@ -1,7 +1,8 @@
 "use client";
 
+import { BrandFrame } from "@/components/BrandFrame";
 import { ExampleLayout } from "@/components/example-layout";
-import { ExampleCanvas } from "@/components/example-canvas";
+import { SurfaceCanvas } from "@/components/surface-canvas";
 import { EnvelopeInspector } from "@/components/EnvelopeInspector";
 import { useGenerativeUIExamples, useExampleSuggestions } from "@/hooks";
 
@@ -26,7 +27,7 @@ export default function HomePage() {
   useExampleSuggestions();
 
   return (
-    <>
+    <BrandFrame>
       <div className="h-full w-full flex flex-row">
         {/* Left + center: existing chat + app-mode canvas */}
         <div className="flex-1 min-w-0 h-full">
@@ -37,7 +38,7 @@ export default function HomePage() {
                 input={{ disclaimer: () => null, className: "pb-6" }}
               />
             }
-            appContent={<ExampleCanvas />}
+            appContent={<SurfaceCanvas />}
           />
         </div>
 
@@ -61,6 +62,6 @@ export default function HomePage() {
         Built for the Generative UI Hackathon. Sponsored by Google DeepMind
         &middot; CopilotKit &middot; A2A Net.
       </p>
-    </>
+    </BrandFrame>
   );
 }

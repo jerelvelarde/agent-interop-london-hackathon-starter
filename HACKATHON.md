@@ -21,15 +21,15 @@ A suggested time budget. Ignore it if you have a better plan — but if
 you're stuck, this is a known-good path that has produced a demoable
 result in past dry runs.
 
-| Hour | Goal | Seams you touch |
-|---|---|---|
-| **0:00–0:30** Boot | `pnpm install`, `pnpm doctor`, `pnpm dev`. Send a test chat. Confirm the inspector shows envelopes. | — |
-| **0:30–1:30** Re-skin | Pick a domain. Re-theme + re-brand. Land a logo and palette. | §1, §2 |
-| **1:30–2:30** Swap data | Replace `query.py` data with your domain's data. Tweak the system prompt. | §3, (optional §5) |
-| **2:30–3:30** Widget pass | Pick ONE custom widget your demo needs. Copy `risk_register` and adapt. | §4 |
-| **3:30–4:15** Polish | Empty-state copy. Suggestion chips. Make the inspector look intentional. | §1, §2 |
-| **4:15–4:45** Rehearse | Run the canned demo three times. Test `OFFLINE=1`. Run `pnpm smoke`. | — |
-| **4:45–5:00** Submit | Push to GitHub. Fill out `SUBMITTING.md`. | — |
+| Hour                      | Goal                                                                                                | Seams you touch   |
+| ------------------------- | --------------------------------------------------------------------------------------------------- | ----------------- |
+| **0:00–0:30** Boot        | `pnpm install`, `pnpm doctor`, `pnpm dev`. Send a test chat. Confirm the inspector shows envelopes. | —                 |
+| **0:30–1:30** Re-skin     | Pick a domain. Re-theme + re-brand. Land a logo and palette.                                        | §1, §2            |
+| **1:30–2:30** Swap data   | Replace `query.py` data with your domain's data. Tweak the system prompt.                           | §3, (optional §5) |
+| **2:30–3:30** Widget pass | Pick ONE custom widget your demo needs. Copy `risk_register` and adapt.                             | §4                |
+| **3:30–4:15** Polish      | Empty-state copy. Suggestion chips. Make the inspector look intentional.                            | §1, §2            |
+| **4:15–4:45** Rehearse    | Run the canned demo three times. Test `OFFLINE=1`. Run `pnpm smoke`.                                | —                 |
+| **4:45–5:00** Submit      | Push to GitHub. Fill out `SUBMITTING.md`.                                                           | —                 |
 
 If you're behind at the 3:30 mark: **drop the custom widget**, double down
 on data + branding, and call the dynamic-schema path from the system prompt
@@ -40,10 +40,12 @@ to generate ad-hoc UI. Better a polished re-skin than a half-shipped widget.
 ## §1 — Re-theme
 
 **Files to edit:**
+
 - `src/app/globals.css` — semantic token families (surface, text, border,
   radius, elevation, blur backdrop tints). Both light + dark mode defined.
-- `src/lib/a2ui-theme.css` — the MD3 colour ramp consumed by the A2UI
-  renderer (`--primary`, `--p-*`, `--s-*`, `--t-*`, `--n-*`).
+- `src/lib/a2ui-theme.css` — the brand-override layer. Imported AFTER
+  `globals.css` (in `layout.tsx`), so the brand tokens set here WIN:
+  the `--cpk-*` accents, `--primary`, `--accent`, `--ring`, `--background`.
 - `src/hooks/use-theme.tsx` — dark/light/system toggle (see §2 for the UI).
 
 > **Quick note on the chat framework workarounds.** `src/app/globals.css`
@@ -56,11 +58,12 @@ to generate ad-hoc UI. Better a polished re-skin than a half-shipped widget.
 > — and you can't, because it's [FROZEN](FROZEN.md).
 
 **Recipe:**
-1. Open `src/lib/a2ui-theme.css`. Look for the `--primary`, `--background-*`,
-   and the `--p-*` (primary) / `--s-*` (secondary) / `--t-*` (tertiary)
-   colour ramps.
-2. Replace the values to match your brand. Tailwind 4 picks up the
-   variables automatically — no rebuild needed.
+
+1. Open `src/lib/a2ui-theme.css`. It holds the brand levers most re-skins
+   touch: the `--cpk-*` accent palette, `--primary` (ink), `--accent`,
+   `--ring` (focus), and `--background` (page).
+2. Replace the values to match your brand. Because this file loads after
+   `globals.css`, your overrides win. Tailwind 4 picks them up — no rebuild.
 3. Refresh the browser. The whole app and every A2UI envelope inherits
    the new tokens.
 
@@ -71,9 +74,9 @@ files. Push back if they want to restructure components.
 
 ### Semantic tokens in `globals.css`
 
-These give you more memorable levers than the full `--n-*`/`--p-*`/`--s-*`/`--t-*`
-ramp in `a2ui-theme.css`. Reach for them when you're styling new components or
-tweaking the shell:
+`globals.css` holds the full default token system. Reach for these when
+you're styling new components or tweaking the shell (override any of them
+from `a2ui-theme.css`, which loads last):
 
 - **Surface family** — `--surface-main`, `--surface-container`,
   `--surface-background`. Use for any container background. Both light and
@@ -106,19 +109,19 @@ Example — a card matching the new system:
 </div>
 ```
 
-### A2UI primary realignment
+### Primary & accent
 
-`src/lib/a2ui-theme.css`'s `--primary` is now `#bec2ff` (lavender, matching
-CopilotKit brand) instead of the historical `#137fec` blue. Re-skinners who
-want a different brand colour should override `--primary` here — the rest
-of the MD3 ramp (`--p-*`) stays intact, so widgets keep their internal
-contrast.
+`--primary` is `#010507` (near-black ink — buttons, badges, selected
+states) for the canonical CopilotKit look; the lavender `#bec2ff` is the
+`--ring` (focus) and feeds `--accent`. Override `--primary` in
+`a2ui-theme.css` if your brand wants a coloured primary.
 
 ---
 
 ## §2 — Re-brand the shell
 
 **Files to edit:**
+
 - `src/components/BrandFrame.tsx` — header, logo slot, palette accents,
   ambient blur backdrop, mode toggle.
 - `src/app/layout.tsx` — fonts (loaded via `next/font/google`).
@@ -135,6 +138,7 @@ contrast.
   cycles **dark → light → system** via the existing `useTheme` hook.
 
 **Recipe:**
+
 1. Open `BrandFrame.tsx`. The component wraps the app header and renders
    the blur backdrop + mode toggle.
 2. Swap the logo (`/copilotkit-logo-mark.svg` → your asset in `public/`),
@@ -158,6 +162,7 @@ for judges who want to A/B your design in dark and light).
 ## §3 — Swap demo data
 
 **Files to edit:**
+
 - `data/projectops.json` — the canonical PortKit dataset (people, projects,
   sprints, tasks, risks, updates). One file at the repo root.
 - `agent/src/query.py` — loads `data/projectops.json` at import time and
@@ -165,6 +170,7 @@ for judges who want to A/B your design in dark and light).
   the loader at a different file without editing code.
 
 **Recipe (one-line swap):**
+
 1. Replace `data/projectops.json` with your domain's data. Keep the same
    top-level entity keys (or extend them and update the prompt). The whole
    file is hot-reloaded on agent restart.
@@ -201,11 +207,11 @@ write anything; it's about 90 lines and demonstrates every piece.
    Keys: `surfaceId`, `catalogId`, `components`, `data`.
 3. **Python tool** — Create `agent/src/tools/<name>.py` with a `@tool`
    function that returns `a2ui.render(operations=[create_surface,
-   update_components, update_data_model])`. Then register it in
+update_components, update_data_model])`. Then register it in
    `agent/src/domains/default/tools.py`'s `default_tools` list. Pattern
    to copy verbatim: `agent/src/tools/risk_register.py`.
 4. **Prompt hint** — Add a line to `agent/src/domains/default/prompts.py`'s
-   `TOOL_RULES` constant that teaches the agent *when* to call your tool.
+   `TOOL_RULES` constant that teaches the agent _when_ to call your tool.
    (Example from default prompt:
    `- "risks / what could go wrong" -> show_risk_register(project_id?)`.)
 
@@ -249,6 +255,7 @@ first pass is wrong. Less reliable in front of judges, faster to iterate.
 ## §5 — Switch domain
 
 **Files involved:**
+
 - `.env` → set `DOMAIN=<name>` (default: `default`)
 - `agent/src/domains/<name>/` — data, prompt, optional widget subset
 
@@ -256,6 +263,7 @@ first pass is wrong. Less reliable in front of judges, faster to iterate.
 — Workstream E lands this; reference it).
 
 **Recipe:**
+
 1. Copy `agent/src/domains/default/` to `agent/src/domains/<your-domain>/`.
 2. Replace `data/`, `prompt.txt` (system prompt), and any domain-specific
    widget overrides.
@@ -279,11 +287,13 @@ whole agent personality needs to change.
 ## §6 — BYO A2A agent (Track 1 interop)
 
 **Where it lives:**
+
 - `src/app/api/copilotkit/route.ts` — the A2A middleware wiring (touched by
   Workstream B; do not edit by hand)
 - `a2a/` — toy subagent + compliance checker
 
 **Recipe (in order — don't skip the check):**
+
 1. `pnpm check-a2a <your-partner-url>` — validates that the partner agent
    emits A2UI v0.9-compliant envelopes. If this fails, you'll spend the
    rest of the day debugging the partner instead of building.
@@ -336,7 +346,7 @@ the bug is in the envelope, not the React tree. Debug systematically:
 3. **Validate the JSON.** `pnpm validate-widget agent/src/widgets/<name>.json`
    prints the failing field with a fix hint. The error format is meant to
    be pasted into your AI assistant's context.
-4. **Check the prompt hint.** Did you tell the agent *when* to call your
+4. **Check the prompt hint.** Did you tell the agent _when_ to call your
    tool? Add a line to `agent/src/domains/default/prompts.py`'s
    `TOOL_RULES` constant pointing at your new tool with a use-case anchor.
 5. **`/debug` page.** Shows last 20 envelopes per surface, orchestrator
@@ -369,7 +379,7 @@ demo — judges remember broken demos more than missing features.
 
 > The scripts D delivers (`pnpm doctor`, `pnpm smoke`, `pnpm verify-pins`,
 > `pnpm test:widgets`, `pnpm validate-widget`, `pnpm new-widget`, `pnpm
-> check-a2a`, `pnpm explain`) are landed by Workstream D in parallel with
+check-a2a`, `pnpm explain`) are landed by Workstream D in parallel with
 > this doc. If a script isn't yet wired when you read this, check
 > `package.json` for the canonical name.
 

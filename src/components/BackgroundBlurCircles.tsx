@@ -28,7 +28,7 @@ export function BackgroundBlurCircles() {
           left: "-5%",
           width: "45vw",
           height: "45vw",
-          background: "var(--cpk-blur-lilac, rgba(201, 201, 218, 0.6))",
+          background: "var(--cpk-blur-grey, rgba(201, 201, 218, 0.45))",
           filter: "blur(120px)",
         }}
       />
@@ -64,7 +64,7 @@ export function BackgroundBlurCircles() {
           right: "5%",
           width: "40vw",
           height: "40vw",
-          background: "var(--cpk-blur-lilac, rgba(243, 243, 252, 0.7))",
+          background: "var(--cpk-blur-offwhite, rgba(243, 243, 252, 0.55))",
           filter: "blur(130px)",
         }}
       />

@@ -1,8 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFrontendTool } from "@copilotkit/react-core/v2";
+import { useLatestSurface } from "@/lib/surface-bus";
 import "./example-layout.css";
 
 interface ExampleLayoutProps {
@@ -12,6 +13,13 @@ interface ExampleLayoutProps {
 
 export function ExampleLayout({ chatContent, appContent }: ExampleLayoutProps) {
   const [mode, setMode] = useState<"chat" | "app">("chat");
+  const surface = useLatestSurface();
+
+  // Mirror-to-canvas (Phase 4): when the agent emits an A2UI surface, open the
+  // canvas pane so it renders full-size beside the chat.
+  useEffect(() => {
+    if (surface) setMode("app");
+  }, [surface]);
 
   useFrontendTool({
     name: "enableAppMode",
@@ -36,21 +44,14 @@ export function ExampleLayout({ chatContent, appContent }: ExampleLayoutProps) {
 
       {/* Chat Content */}
       <div
-        className={`max-h-full flex flex-col bg-[var(--surface-container)] backdrop-blur-md border-r border-[var(--border-default)] shadow-[var(--elevation-sm)] ${
+        className={`max-h-full flex flex-col bg-[var(--white-30)] backdrop-blur-md border-r-2 border-[var(--border-default)] shadow-[var(--elevation-sm)] ${
           mode === "app"
             ? "w-1/3 px-6 max-lg:hidden" // Hide on mobile in app mode
             : "flex-1 max-lg:px-4"
         }`}
       >
-        <div className="shrink-0 pt-6 pl-6 pb-2 max-lg:pl-4 max-lg:pt-4 flex gap-1.5 items-center align-center">
-          <span className="font-extrabold text-2xl pb-1.5">CopilotKit</span>
-          <img
-            src="/copilotkit-logo-mark.svg"
-            alt="CopilotKit"
-            className="h-7"
-          />
-        </div>
-        <div className="chat-scroll flex-1 min-h-0 overflow-y-auto">
+        {/* App header lives in BrandFrame (Seam #2); the chat panel is just chat. */}
+        <div className="chat-scroll flex-1 min-h-0 overflow-y-auto pt-6 max-lg:pt-4">
           {chatContent}
         </div>
       </div>

@@ -59,7 +59,7 @@ export function BrandFrame({
         {logoSrc ? (
           <img src={logoSrc} alt={productName} className="h-7" />
         ) : null}
-        <span className="font-extrabold text-2xl">{productName}</span>
+        <span className="font-light text-lg">{productName}</span>
         <div className="ml-auto">
           <ModeToggle />
         </div>

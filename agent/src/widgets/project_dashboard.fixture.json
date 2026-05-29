@@ -124,7 +124,7 @@
     {
       "id": "projects-row",
       "component": "Row",
-      "gap": 16,
+      "gap": 24,
       "children": {
         "componentId": "project-card",
         "path": "/projects"

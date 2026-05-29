@@ -3,10 +3,16 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // CUSTOMIZATION SEAM #2 — Re-brand the shell
 // See HACKATHON.md §2 for the full recipe.
-// Pattern to copy: this file — swap the logo, product name, and
-// accent colors. Use it as a thin header wrapper around the app
-// shell. The default props mirror the inherited demo so you can
-// drop it in without breaking anything.
+//
+// This file is LOAD-BEARING: it is mounted at the top of every
+// (default) and (legal) page. The visible brand wordmark, logo,
+// ambient blur backdrop, and theme mode toggle all render from
+// here. Editing the `productName` default or the props at the
+// call sites changes what the user actually sees.
+//
+// Edit this file to swap the logo, product name, and accent
+// color. Default props mirror the inherited demo so you can drop
+// new values in without breaking anything.
 //
 // Don't touch:
 //   - src/components/EnvelopeInspector.tsx (judging chrome)

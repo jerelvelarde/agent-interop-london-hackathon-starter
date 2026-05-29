@@ -8,8 +8,12 @@
  *
  * If `OFFLINE=1` (or no envelopes have been observed and `enableDemoFallback`
  * is true), we seed with a small set of canned envelopes so the inspector
- * renders something out of the box during a cold demo. See public/offline-envelopes.json
- * (owned by workstream E) for the canonical fallback set.
+ * renders something out of the box during a cold demo. These mirror the
+ * canonical PortKit `project-dashboard` surface (see
+ * agent/src/tools/project_dashboard.py + its fixture), so the cold-start
+ * "wire" matches what the chat demo actually renders. See
+ * public/offline-envelopes.json (owned by workstream E) for the full
+ * canonical fallback set.
  */
 "use client";
 
@@ -25,63 +29,140 @@ import {
   inferEnvelopeKind,
 } from "@/types/a2ui";
 
-/** Built-in demo envelopes — used when no real envelopes have streamed yet. */
+/**
+ * Built-in demo envelopes — used when no real envelopes have streamed yet.
+ *
+ * These mirror the canonical PortKit `project-dashboard` surface (the default
+ * opening demo) so the inspector's cold-start "wire" matches what the chat
+ * demo actually renders. The grammar matches the real envelopes emitted by
+ * agent/src/tools/project_dashboard.py:
+ *   createSurface → updateComponents (flat component array, path bindings) →
+ *   updateDataModel ({ path: "/", value }). Trimmed to a few KPIs + two
+ *   projects so it reads coherently in the JSON inspector.
+ */
 const DEMO_ENVELOPES: A2UIEnvelope[] = [
   {
     version: "v0.9",
     createSurface: {
-      surfaceId: "flight-search-results",
+      surfaceId: "project-dashboard",
       catalogId: "copilotkit://app-dashboard-catalog",
     },
   },
   {
     version: "v0.9",
     updateComponents: {
-      surfaceId: "flight-search-results",
-      root: {
-        id: "root",
-        type: "Row",
-        properties: {
+      surfaceId: "project-dashboard",
+      components: [
+        {
+          id: "root",
+          component: "Column",
           gap: 16,
-          children: [
-            { id: "card-1", basePath: "$.flights[0]" },
-            { id: "card-2", basePath: "$.flights[1]" },
-          ],
+          children: ["hdr", "kpi-row", "projects-row"],
         },
-      },
+        {
+          id: "hdr",
+          component: "Title",
+          text: { path: "weekLabel" },
+          level: "h1",
+        },
+        {
+          id: "kpi-row",
+          component: "Row",
+          gap: 16,
+          children: ["kpi-active", "kpi-risk", "kpi-tasks"],
+        },
+        {
+          id: "kpi-active",
+          component: "DashboardCard",
+          title: "Active Projects",
+          child: "kpi-active-m",
+        },
+        {
+          id: "kpi-active-m",
+          component: "Metric",
+          label: "Projects",
+          value: { path: "kpi/activeProjects" },
+        },
+        {
+          id: "kpi-risk",
+          component: "DashboardCard",
+          title: "At Risk",
+          child: "kpi-risk-m",
+        },
+        {
+          id: "kpi-risk-m",
+          component: "Metric",
+          label: "Risk",
+          value: { path: "kpi/atRisk" },
+        },
+        {
+          id: "kpi-tasks",
+          component: "DashboardCard",
+          title: "Open Tasks",
+          child: "kpi-tasks-m",
+        },
+        {
+          id: "kpi-tasks-m",
+          component: "Metric",
+          label: "Tasks",
+          value: { path: "kpi/openTasks" },
+        },
+        {
+          id: "projects-row",
+          component: "Row",
+          gap: 24,
+          children: { componentId: "project-card", path: "/projects" },
+        },
+        {
+          id: "project-card",
+          component: "ProjectCard",
+          name: { path: "name" },
+          status: { path: "status" },
+          ownerName: { path: "ownerName" },
+          sprintLabel: { path: "sprintLabel" },
+          percentComplete: { path: "percentComplete" },
+          doneCount: { path: "taskCounts/done" },
+          inProgressCount: { path: "taskCounts/inProgress" },
+          action: {
+            event: {
+              name: "open_project",
+              context: { projectId: { path: "id" } },
+            },
+          },
+        },
+      ],
     },
   },
   {
     version: "v0.9",
     updateDataModel: {
-      surfaceId: "flight-search-results",
-      data: {
-        flights: [
+      surfaceId: "project-dashboard",
+      path: "/",
+      value: {
+        weekLabel: "Project Operations · Week of May 25",
+        kpi: {
+          activeProjects: "3",
+          atRisk: "1",
+          openTasks: "30",
+        },
+        projects: [
           {
-            id: "f1",
-            airline: "United Airlines",
-            flightNumber: "UA 102",
-            origin: "SFO",
-            destination: "JFK",
-            date: "Tue, Mar 18",
-            departureTime: "8:15 AM",
-            arrivalTime: "4:40 PM",
-            duration: "5h 25m",
-            status: "On Time",
-            price: "$289",
+            id: "proj_atlas",
+            name: "Atlas: Enterprise Onboarding",
+            status: "On Track",
+            ownerName: "Lena Ortiz",
+            sprintLabel: "Sprint 22",
+            percentComplete: 64,
+            taskCounts: { inProgress: 5, done: 12 },
           },
           {
-            id: "f2",
-            airline: "Delta",
-            flightNumber: "DL 244",
-            origin: "SFO",
-            destination: "JFK",
-            date: "Tue, Mar 18",
-            departureTime: "10:05 AM",
-            arrivalTime: "6:25 PM",
-            duration: "5h 20m",
-            status: "Delayed",
-            price: "$312",
+            id: "proj_orion",
+            name: "Orion: Self-Serve Billing",
+            status: "At Risk",
+            ownerName: "Mateo Reyes",
+            sprintLabel: "Sprint 22",
+            percentComplete: 41,
+            taskCounts: { inProgress: 3, done: 8 },
           },
         ],
       },

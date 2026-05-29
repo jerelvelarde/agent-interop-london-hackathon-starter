@@ -2,7 +2,7 @@
 
 import { BrandFrame } from "@/components/BrandFrame";
 import { ExampleLayout } from "@/components/example-layout";
-import { ExampleCanvas } from "@/components/example-canvas";
+import { SurfaceCanvas } from "@/components/surface-canvas";
 import { EnvelopeInspector } from "@/components/EnvelopeInspector";
 import { useGenerativeUIExamples, useExampleSuggestions } from "@/hooks";
 
@@ -38,7 +38,7 @@ export default function HomePage() {
                 input={{ disclaimer: () => null, className: "pb-6" }}
               />
             }
-            appContent={<ExampleCanvas />}
+            appContent={<SurfaceCanvas />}
           />
         </div>
 

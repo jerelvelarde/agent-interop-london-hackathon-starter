@@ -1,8 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFrontendTool } from "@copilotkit/react-core/v2";
+import { useLatestSurface } from "@/lib/surface-bus";
 import "./example-layout.css";
 
 interface ExampleLayoutProps {
@@ -12,6 +13,13 @@ interface ExampleLayoutProps {
 
 export function ExampleLayout({ chatContent, appContent }: ExampleLayoutProps) {
   const [mode, setMode] = useState<"chat" | "app">("chat");
+  const surface = useLatestSurface();
+
+  // Mirror-to-canvas (Phase 4): when the agent emits an A2UI surface, open the
+  // canvas pane so it renders full-size beside the chat.
+  useEffect(() => {
+    if (surface) setMode("app");
+  }, [surface]);
 
   useFrontendTool({
     name: "enableAppMode",

@@ -5,6 +5,7 @@ import "@copilotkit/react-core/v2/styles.css";
 import { CopilotKit } from "@copilotkit/react-core/v2";
 // A2UI catalog: definitions + renderers in ../declarative-generative-ui/
 import { demonstrationCatalog } from "../declarative-generative-ui/renderers";
+import { A2UI_MIRRORERS } from "@/lib/mirror-renderer";
 
 /**
  * (default) route group layout.
@@ -24,6 +25,7 @@ export default function DefaultGroupLayout({
       agent="default"
       inspectorDefaultAnchor={{ horizontal: "right", vertical: "top" }}
       a2ui={{ catalog: demonstrationCatalog }}
+      renderActivityMessages={A2UI_MIRRORERS}
       openGenerativeUI={{}}
       useSingleEndpoint={false}
     >

@@ -405,7 +405,8 @@ function validateFile(filePath: string): boolean {
  *   - name: required non-empty string (human-readable)
  *   - description: required non-empty string
  *   - route: required string starting with "/other-examples/"
- *   - catalogId: required URI-ish string starting with "copilotkit://"
+ *   - catalogId: optional URI-ish string; when present must start with
+ *       "copilotkit://" (a non-mounted, self-contained example may omit it)
  *   - tags: required string array (may be empty)
  *   - status: required string (free-form, conventional values: "wip", "ready")
  *   - graphId: optional string (set when the example ships a LangGraph)
@@ -446,16 +447,22 @@ function validateExampleEntry(
       fix: `Change the route prefix to "/other-examples/${typeof obj.id === "string" ? obj.id : "<id>"}".`,
     });
   }
-  if (typeof obj.catalogId !== "string" || obj.catalogId.length === 0) {
-    errors.push({
-      message: "EXAMPLE.json missing 'catalogId'.",
-      fix: `Add a "catalogId" field starting with "copilotkit://", e.g. "copilotkit://legal-paper-catalog".`,
-    });
-  } else if (!obj.catalogId.startsWith("copilotkit://")) {
-    errors.push({
-      message: `'catalogId' ("${obj.catalogId}") must start with "copilotkit://" for in-repo examples.`,
-      fix: `Use a "copilotkit://" scheme so the renderer routes to the in-repo catalog.`,
-    });
+  // Optional — a non-mounted, self-contained example (its own catalog,
+  // own web+agent stack) legitimately ships no catalogId. Only type-check
+  // and prefix-check it when present. Matches the gallery's own
+  // ExampleManifest interface (src/app/other-examples/page.tsx: catalogId?).
+  if ("catalogId" in obj) {
+    if (typeof obj.catalogId !== "string" || obj.catalogId.length === 0) {
+      errors.push({
+        message: "'catalogId' must be a non-empty string when present.",
+        fix: `Either remove the field or set it to a "copilotkit://" URI, e.g. "copilotkit://legal-paper-catalog".`,
+      });
+    } else if (!obj.catalogId.startsWith("copilotkit://")) {
+      errors.push({
+        message: `'catalogId' ("${obj.catalogId}") must start with "copilotkit://" for in-repo examples.`,
+        fix: `Use a "copilotkit://" scheme so the renderer routes to the in-repo catalog.`,
+      });
+    }
   }
   if (!Array.isArray(obj.tags)) {
     errors.push({

@@ -45,64 +45,48 @@ from langchain_core.messages import SystemMessage
 from langchain_core.tools import tool as lc_tool
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.checkpoint.memory import MemorySaver
-from pydantic import BaseModel, ConfigDict, Field
 
 from src.catalog import CATALOG_ID, CATALOG_PROMPT
 from src.pdf_tools import query_pdf
 
 
-# ── Gemini typed-array fix ────────────────────────────────────────────────
-# Gemini's function-declaration validator REQUIRES every array parameter to
-# declare a typed `items` schema. A bare `list[dict]` compiles to an untyped
-# array and 400s with:
-#     parameters.properties[components].items: missing field.
-# (Proven in the Phase-0 spike on gemini-3.5-flash via langchain-google-genai.)
+# ── Gemini prop-stripping fix ─────────────────────────────────────────────
+# The first cut typed `render_a2ui.components` as `list[A2uiComponent]` with
+# `ConfigDict(extra="allow")`, hoping Gemini would pass arbitrary catalog
+# props (text, children, data, columns, …) through the open model. It does
+# NOT: `langchain-google-genai`'s tool-call args parser strips every key the
+# declared schema doesn't name, so the server only ever saw bare
+# `{id, component}` nodes — no children, no data, no text. The root Stack
+# then had no children and the canvas rendered blank.
 #
-# So `render_a2ui.components` must be `list[<TypedModel>]`, not `list[dict]`.
-# A2UI components are heterogeneous — each component type carries different
-# props — so we type the two fields the catalog guarantees on EVERY node
-# (`id` + `component`) and allow arbitrary extra props via
-# `extra="allow"`. That gives Gemini a concrete `items` object schema while
-# keeping the shim permissive enough to carry any catalog component the
-# secondary LLM emits. The same applies to the optional `data` model.
-class A2uiComponent(BaseModel):
-    """One node in a flat A2UI v0.9 component array.
-
-    Only `id` and `component` are universal across the catalog; every other
-    prop (text, children, data, columns, …) is component-specific and rides
-    along as an extra field.
-    """
-
-    model_config = ConfigDict(extra="allow")
-
-    id: str = Field(description='Unique within the surface. Exactly one node must be "root".')
-    component: str = Field(description="Catalog component type, e.g. Stack, Card, StatCard, LineChart.")
-
-
-class A2uiDataModel(BaseModel):
-    """Initial data model for the surface (values referenced by {path} bindings)."""
-
-    model_config = ConfigDict(extra="allow")
-
-
-# No-op shim. The secondary LLM is forced to call this tool so its output
-# is a structured tool_call (surfaceId / catalogId / components / data)
-# instead of free-form prose we'd have to JSON-parse and validate.
+# Fix: declare the surface as SCALAR STRING params the schema can't strip —
+# `components_json` (a JSON array string) and `data_json` (a JSON object
+# string) — and parse them server-side. A scalar string param is proven to
+# survive forced `tool_choice` on gemini-3.5-flash (Phase-0 spike), so the
+# full component tree (with every prop) round-trips intact.
 @lc_tool
 def render_a2ui(
     surfaceId: str,
     catalogId: str,
-    components: list[A2uiComponent],
-    data: A2uiDataModel | None = None,
+    components_json: str,
+    data_json: str = "{}",
 ) -> str:
     """Render a dynamic A2UI v0.9 surface.
 
     Args:
         surfaceId: Unique surface identifier (kebab-case).
         catalogId: The catalog ID. Use the one provided in context.
-        components: A2UI v0.9 flat component array; root component MUST
-            have id="root".
-        data: Optional initial data model for the surface.
+        components_json: The FULL A2UI v0.9 flat component array, serialized
+            as a JSON array string. Each node is an object with its real
+            catalog props inline (id, component, plus text/children/data/
+            columns/value/etc. for that component type). Exactly one node
+            MUST have id="root". Example:
+            '[{"id":"root","component":"Stack","children":["c1"]},
+              {"id":"c1","component":"StatCard","label":"Revenue",
+               "value":"$94,930M","delta":"+6.1%"}]'
+        data_json: Optional initial data model, serialized as a JSON object
+            string. Use "{}" (the default) when all data is inlined into the
+            components.
     """
     return "rendered"
 
@@ -151,7 +135,17 @@ def generate_a2ui(runtime: ToolRuntime[Any]) -> str:
         "Inline all data (use plain values, not {{path}} bindings, unless a "
         "property explicitly accepts a path). The user's request is in the "
         "most recent messages. Honor the words they used (chart type, "
-        "comparison, etc.)."
+        "comparison, etc.).\n\n"
+        "Call render_a2ui exactly once. Pass the COMPLETE component tree as "
+        "a JSON array STRING in `components_json` — every node is an object "
+        "carrying its real catalog props inline (id, component, plus "
+        "text/children/data/columns/value/label/items/etc. for that "
+        "component type). Exactly one node has id=\"root\" and every other "
+        "node must be reachable from it via a parent's children/child. Put "
+        "chart `data` arrays inline on the chart node. Only use `data_json` "
+        "(a JSON object string) if you bind a property via {path}; otherwise "
+        "pass \"{}\". Emit STRICT JSON in both string params (double-quoted "
+        "keys, no trailing commas, no comments)."
     )
 
     model_with_tool = _RENDER_MODEL.bind_tools(
@@ -167,8 +161,24 @@ def generate_a2ui(runtime: ToolRuntime[Any]) -> str:
     args = response.tool_calls[0]["args"]
     surface_id = args.get("surfaceId", "dynamic-surface")
     catalog_id = args.get("catalogId", CATALOG_ID)
-    components = args.get("components", [])
-    data = args.get("data", {})
+
+    # The component tree + data model ride in as JSON STRING params (scalar
+    # params survive Gemini's tool-arg parser; typed object/array params get
+    # their undeclared keys stripped). Parse them here. Degrade gracefully on
+    # malformed JSON so a bad turn renders an empty surface instead of
+    # crashing the agent loop.
+    components_json = args.get("components_json", "[]")
+    data_json = args.get("data_json", "{}")
+    try:
+        components = json.loads(components_json) if components_json else []
+    except (json.JSONDecodeError, TypeError) as exc:
+        print(f"[dynamic_agent] failed to parse components_json: {exc}")
+        components = []
+    try:
+        data = json.loads(data_json) if data_json else {}
+    except (json.JSONDecodeError, TypeError) as exc:
+        print(f"[dynamic_agent] failed to parse data_json: {exc}")
+        data = {}
 
     ops = [
         a2ui.create_surface(surface_id, catalog_id=catalog_id),

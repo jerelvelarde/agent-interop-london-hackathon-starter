@@ -3,10 +3,10 @@
 Proves the two failure modes the port had to clear, on gemini-3.5-flash via
 langchain-google-genai:
 
-  1. Typed-array schema acceptance — the forced `render_a2ui` shim declares
-     its `components` array with a typed item model (A2uiComponent), so
-     Gemini's function-declaration validator must NOT 400 with
-     "parameters.properties[components].items: missing field".
+  1. Forced structured output survives — the forced `render_a2ui` shim takes
+     scalar string params (`components_json` / `data_json`), so Gemini's
+     tool-arg parser must NOT strip the surface payload and the call must
+     come back with a non-empty `components_json`.
 
   2. No thought_signature 400 across a multi-turn tool replay — a prior tool
      turn followed by a forced `tool_choice` call must return cleanly. The
@@ -14,8 +14,9 @@ langchain-google-genai:
      does not.
 
 Run from agent/:
-    uv run --env-file /Users/jerel-cpk/Projects/london-a2ui-hackathon/.env \
-        python smoke_gemini_port.py
+    uv run --env-file ../../.env python smoke_gemini_port.py
+
+(Or point --env-file at agent/.env if you keep a local copy there.)
 
 This talks to the live Gemini API (needs GEMINI_API_KEY). It does NOT boot
 the web/agent HTTP stack — that's a separate post-merge step.
@@ -36,7 +37,7 @@ def _fail(label: str, err: Exception) -> None:
     msg = str(err)
     print(f"[SMOKE] {label}: FAIL\n{type(err).__name__}: {msg}")
     if "items" in msg and "missing field" in msg:
-        print("[SMOKE]   -> TYPED-ARRAY REGRESSION: array param lost its item schema.")
+        print("[SMOKE]   -> ARRAY-SCHEMA REGRESSION: a param lost its item schema.")
     if "thought_signature" in msg:
         print("[SMOKE]   -> THOUGHT-SIGNATURE 400: multi-turn replay broke.")
     sys.exit(1)
@@ -57,7 +58,7 @@ def main() -> None:
         "Design a tiny A2UI surface. Inline all data."
     )
 
-    # --- Check 1: single forced call (typed-array schema must be accepted) ---
+    # --- Check 1: single forced call (scalar JSON-string params survive) ---
     try:
         r1 = model_with_tool.invoke([
             SystemMessage(content=sys_prompt),
@@ -70,10 +71,16 @@ def main() -> None:
         print("[SMOKE] check-1: FAIL — no tool_calls (forced choice produced none).")
         sys.exit(1)
     args = r1.tool_calls[0]["args"]
-    comps = args.get("components", [])
+    comps_json = args.get("components_json", "")
+    if not comps_json or comps_json.strip() in ("", "[]"):
+        print(
+            "[SMOKE] check-1: FAIL — components_json empty "
+            f"({comps_json!r}); the surface payload was stripped or omitted."
+        )
+        sys.exit(1)
     print(
         f"[SMOKE] check-1: PASS — render_a2ui called; "
-        f"surfaceId={args.get('surfaceId')!r} components={len(comps)}"
+        f"surfaceId={args.get('surfaceId')!r} components_json={len(comps_json)} chars"
     )
 
     # --- Check 2: multi-turn tool replay (prior tool turn -> forced call) ---
@@ -92,7 +99,7 @@ def main() -> None:
                     "args": {
                         "surfaceId": "prev",
                         "catalogId": CATALOG_ID,
-                        "components": [{"id": "root", "component": "Text", "text": "prior"}],
+                        "components_json": '[{"id": "root", "component": "Text", "text": "prior"}]',
                     },
                 }],
             ),
@@ -108,7 +115,7 @@ def main() -> None:
     args2 = r2.tool_calls[0]["args"]
     print(
         f"[SMOKE] check-2: PASS — replay forced render_a2ui clean; "
-        f"components={len(args2.get('components', []))} "
+        f"components_json={len(args2.get('components_json', ''))} chars "
         f"(no thought_signature 400, no items-missing 400)"
     )
 

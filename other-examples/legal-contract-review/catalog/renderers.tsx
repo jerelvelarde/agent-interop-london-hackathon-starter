@@ -42,6 +42,32 @@ function asText(value: unknown): string {
   }
 }
 
+/**
+ * Render helper for a single child slot. Accepts either a literal
+ * ComponentId string or a binder-resolved `{ id, basePath }` reference
+ * (what a `{ componentId, path }` template binding becomes after the
+ * GenericBinder runs). Returns `null` for anything unrecognized so a
+ * stale binding does not crash the surface.
+ */
+function renderChildRef(
+  ref: unknown,
+  children: (id: string, basePath?: string) => React.ReactNode,
+): React.ReactNode {
+  if (typeof ref === "string") {
+    return children(ref);
+  }
+  if (
+    ref &&
+    typeof ref === "object" &&
+    "id" in (ref as object) &&
+    typeof (ref as { id: unknown }).id === "string"
+  ) {
+    const r = ref as { id: string; basePath?: string };
+    return children(r.id, r.basePath);
+  }
+  return null;
+}
+
 const SEVERITY_LABELS: Record<string, string> = {
   low: "Low risk",
   medium: "Medium risk",
@@ -64,6 +90,12 @@ export const legalPaperCatalogRenderers: CatalogRenderers<LegalPaperCatalogDefin
       const title = asText(props.title);
       const effective = asText(props.effectiveDate);
       const parties = Array.isArray(props.parties) ? props.parties : [];
+      const verdictChildId =
+        typeof props.verdictChild === "string" ? props.verdictChild : null;
+      const renderChild = children as unknown as (
+        id: string,
+        basePath?: string,
+      ) => React.ReactNode;
 
       return (
         <div data-catalog-style="legal-paper">
@@ -90,6 +122,12 @@ export const legalPaperCatalogRenderers: CatalogRenderers<LegalPaperCatalogDefin
               )}
             </header>
 
+            {verdictChildId && (
+              <div className="lp-verdict-slot">
+                {renderChild(verdictChildId)}
+              </div>
+            )}
+
             <div className="lp-body">
               {items.map((item: unknown, i: number) => {
                 if (typeof item === "string") {
@@ -107,10 +145,7 @@ export const legalPaperCatalogRenderers: CatalogRenderers<LegalPaperCatalogDefin
                   const ref = item as { id: string; basePath?: string };
                   return (
                     <React.Fragment key={`${ref.id}-${i}`}>
-                      {(children as unknown as (
-                        id: string,
-                        basePath?: string,
-                      ) => React.ReactNode)(ref.id, ref.basePath)}
+                      {renderChild(ref.id, ref.basePath)}
                     </React.Fragment>
                   );
                 }
@@ -141,10 +176,18 @@ export const legalPaperCatalogRenderers: CatalogRenderers<LegalPaperCatalogDefin
       const heading = asText(props.heading);
       const body = asText(props.body);
       const risk = props.risk;
-      const redlines = Array.isArray(props.redlineChildren)
-        ? props.redlineChildren
+      // redlineChildren resolves to either a literal string[] (catalog
+      // declared an array of ComponentIds) or an array of `{ id, basePath }`
+      // refs (template binding expanded by the GenericBinder). Anything
+      // else (unresolved binding, missing prop) renders nothing.
+      const redlines: unknown[] = Array.isArray(props.redlineChildren)
+        ? (props.redlineChildren as unknown[])
         : [];
       const showBadge = risk && risk !== "none";
+      const renderChild = children as unknown as (
+        id: string,
+        basePath?: string,
+      ) => React.ReactNode;
 
       return (
         <section className="lp-clause" data-clause-number={number}>
@@ -169,21 +212,31 @@ export const legalPaperCatalogRenderers: CatalogRenderers<LegalPaperCatalogDefin
             {body && <p className="lp-clause-body">{body}</p>}
             {redlines.length > 0 && (
               <div className="lp-clause-redlines">
-                {redlines.map((id, i) => (
-                  <React.Fragment key={`${id}-${i}`}>
-                    {children(id)}
-                  </React.Fragment>
-                ))}
+                {redlines.map((ref, i) => {
+                  const key =
+                    typeof ref === "string"
+                      ? `${ref}-${i}`
+                      : ref &&
+                          typeof ref === "object" &&
+                          "id" in (ref as object)
+                        ? `${(ref as { id: string }).id}-${i}`
+                        : `redline-${i}`;
+                  return (
+                    <React.Fragment key={key}>
+                      {renderChildRef(ref, renderChild)}
+                    </React.Fragment>
+                  );
+                })}
               </div>
             )}
           </div>
 
-          {props.marginChild && (
+          {props.marginChild != null && renderChildRef(props.marginChild, renderChild) && (
             <aside
               className="lp-clause-margin"
               aria-label={`Annotation for clause ${number || "section"}`}
             >
-              {children(props.marginChild)}
+              {renderChildRef(props.marginChild, renderChild)}
             </aside>
           )}
         </section>

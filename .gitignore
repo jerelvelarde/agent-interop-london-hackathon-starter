@@ -46,6 +46,9 @@ next-env.d.ts
 # LangGraph API
 .langgraph_api
 
+# Sub-repo agent runtime artifacts (SQLite DBs etc. — regenerated from seed modules)
+**/agent/.data/
+
 # Git worktrees
 .worktrees
 

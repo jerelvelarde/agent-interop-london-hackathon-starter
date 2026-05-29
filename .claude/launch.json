@@ -7,6 +7,20 @@
       "runtimeArgs": ["dev"],
       "port": 3000,
       "autoPort": true
+    },
+    {
+      "name": "legal-agent",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "@langchain/langgraph-cli",
+        "dev",
+        "--port",
+        "8124",
+        "--no-browser",
+        "--config",
+        "other-examples/legal-contract-review/agent/langgraph.json"
+      ],
+      "port": 8124
     }
   ]
 }

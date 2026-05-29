@@ -37,7 +37,7 @@ import "../../../../../other-examples/legal-contract-review/catalog/theme.css";
 
 const AGENT_ID = "legal";
 const AUTO_PROMPT =
-  "Please review the NDA from the sample documents. Call review_contract with document_name=\"nda\".";
+  "Open document 1 — the Master Supply Agreement with Apex Servos — for review. Use review_document(document_id=1) so I can see the risk-flag margin notes and the verdict.";
 
 /**
  * Auto-load the NDA on first mount via a synthetic user message.

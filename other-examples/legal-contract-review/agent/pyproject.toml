@@ -3,7 +3,22 @@ name = "legal-review-agent"
 version = "0.1.0"
 description = "LangGraph agent for the Contract Review Copilot example."
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+  "langchain==1.2.15",
+  "langgraph==1.1.6",
+  "langsmith==0.7.33",
+  "openai==1.109.1",
+  "fastapi>=0.115.5,<1.0.0",
+  "uvicorn>=0.29.0,<1.0.0",
+  "python-dotenv>=1.0.0,<2.0.0",
+  "langgraph-cli[inmem]==0.4.21",
+  "langchain-openai==1.1.9",
+  "copilotkit==0.1.87",
+  "langgraph-api==0.7.101",
+  "pip>=26.0.1",
+  "langchain-anthropic==1.4.1",
+  "langchain-google-genai==4.2.4",
+]
 
 # Explicit non-colliding package name. The directory on disk is `agent/` to
 # match the convention shared with the project-root `agent/`, but the Python

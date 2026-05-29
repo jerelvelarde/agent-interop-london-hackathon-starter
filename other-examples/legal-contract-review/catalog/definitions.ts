@@ -47,7 +47,7 @@ const ActionSchema = z
 export const legalPaperCatalogDefinitions = {
   LegalDocumentShell: {
     description:
-      "Root paper container for a legal document. Renders a warm off-white paper background with a hard-coded 'Demo only — not legal advice.' disclaimer strip at the top. Iterates `children` as the clause body. Apply at the root of any legal-paper surface.",
+      "Root paper container for a legal document. Renders a warm off-white paper background with a hard-coded 'Demo only — not legal advice.' disclaimer strip at the top. Slots an optional `verdictChild` (typically a Verdict component ID) above the clause body, then iterates `children` as the clause body. Apply at the root of any legal-paper surface.",
     props: z.object({
       title: DynString,
       // parties is not a template-bound child collection — it's a flat
@@ -56,6 +56,9 @@ export const legalPaperCatalogDefinitions = {
       // higher-order { path } if needed, but the renderer expects strings.
       parties: z.array(z.string()).optional(),
       effectiveDate: DynString.optional(),
+      // ComponentId for an optional Verdict mounted above the clause body.
+      // Single-slot child (literal componentId), so a plain string suffices.
+      verdictChild: z.string().optional(),
       // Same union as Row/Column in the dashboard catalog — required for
       // GenericBinder to treat this as a template-bound child collection.
       children: z.union([
@@ -85,10 +88,27 @@ export const legalPaperCatalogDefinitions = {
       // the redline round-trip per the plan's §4.2 anti-pattern callout.
       body: DynString,
       risk: z.enum(["none", "low", "medium", "high", "critical"]).optional(),
-      // ComponentId for an optional MarginNote rendered in the right margin.
-      marginChild: z.string().optional(),
-      // ComponentId list for Redline rows rendered under the body.
-      redlineChildren: z.array(z.string()).optional(),
+      // Either a literal MarginNote ComponentId OR a `{ componentId, path }`
+      // template binding. The GenericBinder resolves the template into the
+      // actual child reference at render time; the renderer handles both
+      // shapes defensively.
+      marginChild: z
+        .union([
+          z.string(),
+          z.object({ componentId: z.string(), path: z.string() }),
+        ])
+        .optional(),
+      // Either a literal ComponentId list OR a `{ componentId, path }`
+      // template binding. Same union as Row/Column children — required for
+      // GenericBinder to treat this as a template-bound child collection
+      // (so the agent can vary the redline count via `update_data_model`
+      // without resending `update_components`).
+      redlineChildren: z
+        .union([
+          z.array(z.string()),
+          z.object({ componentId: z.string(), path: z.string() }),
+        ])
+        .optional(),
     }),
   },
 

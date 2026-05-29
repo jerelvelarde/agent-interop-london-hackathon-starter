@@ -25,9 +25,8 @@ const defaultAgent = new LangGraphAgent({
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const legalAgent = new LangGraphAgent({
   deploymentUrl:
-    process.env.AGENT_URL ||
-    process.env.LANGGRAPH_DEPLOYMENT_URL ||
-    "http://localhost:8123",
+    process.env.LEGAL_AGENT_URL ||
+    "http://localhost:8124",
   graphId: "legal_review_agent",
   langsmithApiKey: process.env.LANGSMITH_API_KEY || "",
 });
@@ -80,15 +79,17 @@ const runtime = new CopilotRuntime({
   a2ui: {
     injectA2UITool: false,
   },
-  mcpApps: {
-    servers: [
-      {
-        type: "http",
-        url: process.env.MCP_SERVER_URL || "https://mcp.excalidraw.com",
-        serverId: "example_mcp_app",
-      },
-    ],
-  },
+  // mcpApps temporarily disabled while debugging legal agent tool-schema compat
+  // with Gemini's OpenAI endpoint. Re-enable by uncommenting:
+  // mcpApps: {
+  //   servers: [
+  //     {
+  //       type: "http",
+  //       url: process.env.MCP_SERVER_URL || "https://mcp.excalidraw.com",
+  //       serverId: "example_mcp_app",
+  //     },
+  //   ],
+  // },
 });
 
 const app = createCopilotEndpoint({

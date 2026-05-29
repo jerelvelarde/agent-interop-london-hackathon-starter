@@ -1,0 +1,10 @@
+{
+  "python_version": "3.12",
+  "dockerfile_lines": [],
+  "dependencies": ["."],
+  "package_manager": "uv",
+  "graphs": {
+    "legal_review_agent": "./graph.py:graph"
+  },
+  "env": "../../../.env"
+}

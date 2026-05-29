@@ -5,24 +5,11 @@ description = "LangGraph agent for the Contract Review Copilot example."
 requires-python = ">=3.12"
 dependencies = []
 
-# Explicit non-colliding package name. The directory on disk is `agent/` to
-# match the convention shared with the project-root `agent/`, but the Python
-# package it exports is `legal_review_agent` so the two never collide when
-# installed into the same environment.
-#
-# Why this matters: setuptools auto-discovery would pick `agent` from the
-# directory name, which would shadow (or be shadowed by) the project-root
-# `agent` package. See GitHub issue #15.
-#
-# The dance: setuptools is told there is one top-level package named
-# `legal_review_agent` whose source lives in this directory (".").
-#
-# Note: this package is currently only loaded via langgraph's path-based
-# loader from `agent/graph.py` (see graph.py's sys.path injection). The
-# package install path is here for environments that do
-# `pip install ./other-examples/legal-contract-review/agent`.
+# The Python package lives in the sibling `legal_review_agent/` directory
+# (dir name matches the import name), so setuptools auto-discovery picks
+# it up with no package-dir remapping. langgraph loads the graph via
+# `./legal_review_agent/graph.py:graph` (see langgraph.json), which keeps
+# Python's package machinery intact and removes the need for the earlier
+# `sys.path.insert(...)` workaround in graph.py. See audit item #6.
 [tool.setuptools]
 packages = ["legal_review_agent"]
-
-[tool.setuptools.package-dir]
-legal_review_agent = "."

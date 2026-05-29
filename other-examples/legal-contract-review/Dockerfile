@@ -15,8 +15,9 @@
 # What this Dockerfile does differently:
 #   - Bases off the same `langchain/langgraph-api` runtime the CLI uses.
 #   - Copies the project-root `agent/` (sample_agent) to /deps/sample_agent.
-#   - Copies this example's `agent/` (legal_review_agent) to
-#     /deps/legal_review_agent.
+#   - Copies this example's `agent/` (which contains the
+#     `legal_review_agent/` package) to /deps/legal_review_example so the
+#     image dir name doesn't collide with the Python import name.
 #   - Sets LANGSERVE_GRAPHS to a JSON object pointing each graph at its own
 #     directory by name — no name collision, no mis-route.
 #
@@ -45,17 +46,18 @@ ADD agent /deps/sample_agent
 RUN cd /deps/sample_agent && pip install --no-cache-dir -e .
 
 # ---- Second graph (legal_review_agent) -------------------------------------
-# The langgraph CLI would uniquify this to /deps/agent_1 and then mis-route
-# LANGSERVE_GRAPHS to /deps/agent. We sidestep both by giving the dir a
-# distinct name up front.
-ADD other-examples/legal-contract-review/agent /deps/legal_review_agent
-RUN cd /deps/legal_review_agent && pip install --no-cache-dir -e .
+# Copy the example's `agent/` dir (which contains the `legal_review_agent/`
+# package) to a uniquely-named image dir. The graph lives at
+# `legal_review_agent/graph.py:graph` relative to this dir — matches the
+# canonical entry in this example's own `agent/langgraph.json` (audit item #6).
+ADD other-examples/legal-contract-review/agent /deps/legal_review_example
+RUN cd /deps/legal_review_example && pip install --no-cache-dir -e .
 
 # Wire both graphs into LANGSERVE_GRAPHS. Each value is `<file>:<symbol>`
 # relative to the deps directory; langgraph-api joins these onto /deps/<dir>.
 #
-# Keep this in sync with agent/langgraph.json's "graphs" map.
-ENV LANGSERVE_GRAPHS='{"sample_agent": "/deps/sample_agent/main.py:graph", "legal_review_agent": "/deps/legal_review_agent/graph.py:graph"}'
+# Keep this in sync with this example's `agent/langgraph.json` "graphs" map.
+ENV LANGSERVE_GRAPHS='{"sample_agent": "/deps/sample_agent/main.py:graph", "legal_review_agent": "/deps/legal_review_example/legal_review_agent/graph.py:graph"}'
 
 # Standard langgraph-api port.
 EXPOSE 8000

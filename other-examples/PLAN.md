@@ -35,7 +35,7 @@ found that:
 - [ ] **5.** Lift shared helpers to `other-examples/_shared/` so a new
       example can `import` instead of copy-pasting the
       `update_data_model` wrap, the langgraph entry shim, etc.
-- [ ] **6.** Rename example agent dirs to match Python package names
+- [x] **6.** Rename example agent dirs to match Python package names
       (e.g. `legal-contract-review/agent/` → contains a package whose
       `__init__.py` matches the dir name) and drop the `sys.path` hack
       in `langgraph.json`.

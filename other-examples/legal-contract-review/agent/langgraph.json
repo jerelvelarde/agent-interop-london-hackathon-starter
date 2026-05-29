@@ -1,0 +1,11 @@
+{
+  "python_version": "3.12",
+  "dockerfile_lines": [],
+  "dependencies": ["."],
+  "package_manager": "uv",
+  "graphs": {
+    "legal_review_agent": "./legal_review_agent/graph.py:graph"
+  },
+  "env": "../../../.env",
+  "_note": "Standalone langgraph.json for the legal-contract-review example. The dir name `legal_review_agent/` matches the package name, so this entry uses canonical package-relative imports (`from .tools import ...` inside graph.py) — no sys.path hacks needed. See audit item #6. NOTE: this file is NOT used by the project-root `pnpm dev` flow today; the main `agent/langgraph.json` still owns dev-server graph registration. This file documents the canonical entry point and is used by the standalone Dockerfile (see ../Dockerfile)."
+}

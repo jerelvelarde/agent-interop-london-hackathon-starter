@@ -30,16 +30,22 @@ WIDGETS_DIR = Path(__file__).parent.parent / "src" / "widgets"
 
 
 def _resolve_path(data, path: str):
-    """Walk a dotted path against ``data``. Return (found, value)."""
+    """Walk a JSON Pointer-style ``a/b/c`` path against ``data``.
+
+    Matches the runtime semantics in `@a2ui/web_core` `DataModel.parsePath`
+    (split on "/"). Leading "/" denotes an absolute path; without it the
+    path is relative to ``data``.
+    """
     if path is None:
         return False, None
-    # Strip the leading "/" used for top-level array bindings.
     if path.startswith("/"):
         path = path[1:]
     if path == "":
         return True, data
     cur = data
-    for part in path.split("."):
+    for part in path.split("/"):
+        if not part:
+            continue
         if isinstance(cur, dict) and part in cur:
             cur = cur[part]
         else:

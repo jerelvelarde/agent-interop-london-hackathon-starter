@@ -4,61 +4,229 @@
   "surfaceId": "project-detail",
   "catalogId": "copilotkit://app-dashboard-catalog",
   "components": [
-    { "id": "root", "component": "Column", "gap": 16, "children": ["proj-title", "header-row", "milestones-hdr", "milestones-list", "tasks-hdr", "kanban-row", "risks-hdr", "risks-column"] },
-    { "id": "proj-title", "component": "Title", "text": { "path": "project.name" }, "level": "h1" },
-    { "id": "header-row", "component": "Row", "gap": 16, "children": ["status-card", "owner-card", "sprint-bar"] },
-    { "id": "status-card", "component": "DashboardCard", "title": "Status", "child": "status-metric" },
-    { "id": "status-metric", "component": "Metric", "label": "Status", "value": { "path": "project.status" } },
-    { "id": "owner-card", "component": "DashboardCard", "title": "Owner", "child": "owner-metric" },
-    { "id": "owner-metric", "component": "Metric", "label": "Owner", "value": { "path": "project.ownerName" } },
-    { "id": "sprint-bar", "component": "SprintTimelineBar",
-      "sprintName": { "path": "sprint.name" },
-      "startLabel": { "path": "sprint.startLabel" },
-      "endLabel": { "path": "sprint.endLabel" },
-      "percentComplete": { "path": "sprint.percentComplete" },
-      "daysRemainingLabel": { "path": "sprint.daysRemainingLabel" },
-      "status": { "path": "sprint.status" }
+    {
+      "id": "root",
+      "component": "Column",
+      "gap": 16,
+      "children": [
+        "proj-title",
+        "header-row",
+        "milestones-hdr",
+        "milestones-list",
+        "tasks-hdr",
+        "kanban-row",
+        "risks-hdr",
+        "risks-column"
+      ]
     },
-    { "id": "milestones-hdr", "component": "Title", "text": "Milestones", "level": "h2" },
-    { "id": "milestones-list", "component": "MilestoneList", "milestones": { "path": "project.milestones" } },
-    { "id": "tasks-hdr", "component": "Title", "text": "Sprint Tasks", "level": "h2" },
-    { "id": "kanban-row", "component": "Row", "gap": 12, "children": ["kc-todo", "kc-flight", "kc-review", "kc-done"] },
-    { "id": "kc-todo", "component": "KanbanColumn",
+    {
+      "id": "proj-title",
+      "component": "Title",
+      "text": {
+        "path": "project/name"
+      },
+      "level": "h1"
+    },
+    {
+      "id": "header-row",
+      "component": "Row",
+      "gap": 16,
+      "children": [
+        "status-card",
+        "owner-card",
+        "sprint-bar"
+      ]
+    },
+    {
+      "id": "status-card",
+      "component": "DashboardCard",
+      "title": "Status",
+      "child": "status-metric"
+    },
+    {
+      "id": "status-metric",
+      "component": "Metric",
+      "label": "Status",
+      "value": {
+        "path": "project/status"
+      }
+    },
+    {
+      "id": "owner-card",
+      "component": "DashboardCard",
+      "title": "Owner",
+      "child": "owner-metric"
+    },
+    {
+      "id": "owner-metric",
+      "component": "Metric",
+      "label": "Owner",
+      "value": {
+        "path": "project/ownerName"
+      }
+    },
+    {
+      "id": "sprint-bar",
+      "component": "SprintTimelineBar",
+      "sprintName": {
+        "path": "sprint/name"
+      },
+      "startLabel": {
+        "path": "sprint/startLabel"
+      },
+      "endLabel": {
+        "path": "sprint/endLabel"
+      },
+      "percentComplete": {
+        "path": "sprint/percentComplete"
+      },
+      "daysRemainingLabel": {
+        "path": "sprint/daysRemainingLabel"
+      },
+      "status": {
+        "path": "sprint/status"
+      }
+    },
+    {
+      "id": "milestones-hdr",
+      "component": "Title",
+      "text": "Milestones",
+      "level": "h2"
+    },
+    {
+      "id": "milestones-list",
+      "component": "MilestoneList",
+      "milestones": {
+        "path": "project/milestones"
+      }
+    },
+    {
+      "id": "tasks-hdr",
+      "component": "Title",
+      "text": "Sprint Tasks",
+      "level": "h2"
+    },
+    {
+      "id": "kanban-row",
+      "component": "Row",
+      "gap": 12,
+      "children": [
+        "kc-todo",
+        "kc-flight",
+        "kc-review",
+        "kc-done"
+      ]
+    },
+    {
+      "id": "kc-todo",
+      "component": "KanbanColumn",
       "statusLabel": "To Do",
-      "count": { "path": "tasks.todoCount" },
-      "children": { "componentId": "task-card", "path": "tasks.todo" }
+      "count": {
+        "path": "tasks/todoCount"
+      },
+      "children": {
+        "componentId": "task-card",
+        "path": "tasks/todo"
+      }
     },
-    { "id": "kc-flight", "component": "KanbanColumn",
+    {
+      "id": "kc-flight",
+      "component": "KanbanColumn",
       "statusLabel": "In Progress",
-      "count": { "path": "tasks.inProgressCount" },
-      "children": { "componentId": "task-card", "path": "tasks.inProgress" }
+      "count": {
+        "path": "tasks/inProgressCount"
+      },
+      "children": {
+        "componentId": "task-card",
+        "path": "tasks/inProgress"
+      }
     },
-    { "id": "kc-review", "component": "KanbanColumn",
+    {
+      "id": "kc-review",
+      "component": "KanbanColumn",
       "statusLabel": "In Review",
-      "count": { "path": "tasks.inReviewCount" },
-      "children": { "componentId": "task-card", "path": "tasks.inReview" }
+      "count": {
+        "path": "tasks/inReviewCount"
+      },
+      "children": {
+        "componentId": "task-card",
+        "path": "tasks/inReview"
+      }
     },
-    { "id": "kc-done", "component": "KanbanColumn",
+    {
+      "id": "kc-done",
+      "component": "KanbanColumn",
       "statusLabel": "Done",
-      "count": { "path": "tasks.doneCount" },
-      "children": { "componentId": "task-card", "path": "tasks.done" }
+      "count": {
+        "path": "tasks/doneCount"
+      },
+      "children": {
+        "componentId": "task-card",
+        "path": "tasks/done"
+      }
     },
-    { "id": "task-card", "component": "TaskCard",
-      "title": { "path": "title" },
-      "assigneeName": { "path": "assigneeName" },
-      "assigneeInitials": { "path": "assigneeInitials" },
-      "pointsLabel": { "path": "pointsLabel" },
-      "dueLabel": { "path": "dueLabel" },
-      "action": { "event": { "name": "open_task", "context": { "taskId": { "path": "id" } } } }
+    {
+      "id": "task-card",
+      "component": "TaskCard",
+      "title": {
+        "path": "title"
+      },
+      "assigneeName": {
+        "path": "assigneeName"
+      },
+      "assigneeInitials": {
+        "path": "assigneeInitials"
+      },
+      "pointsLabel": {
+        "path": "pointsLabel"
+      },
+      "dueLabel": {
+        "path": "dueLabel"
+      },
+      "action": {
+        "event": {
+          "name": "open_task",
+          "context": {
+            "taskId": {
+              "path": "id"
+            }
+          }
+        }
+      }
     },
-    { "id": "risks-hdr", "component": "Title", "text": "Open Risks", "level": "h2" },
-    { "id": "risks-column", "component": "Column", "gap": 12, "children": { "componentId": "risk-flag", "path": "risks" } },
-    { "id": "risk-flag", "component": "RiskFlag",
-      "severity": { "path": "severity" },
-      "title": { "path": "title" },
-      "ownerName": { "path": "ownerName" },
-      "projectLabel": { "path": "projectLabel" },
-      "mitigation": { "path": "mitigation" }
+    {
+      "id": "risks-hdr",
+      "component": "Title",
+      "text": "Open Risks",
+      "level": "h2"
+    },
+    {
+      "id": "risks-column",
+      "component": "Column",
+      "gap": 12,
+      "children": {
+        "componentId": "risk-flag",
+        "path": "risks"
+      }
+    },
+    {
+      "id": "risk-flag",
+      "component": "RiskFlag",
+      "severity": {
+        "path": "severity"
+      },
+      "title": {
+        "path": "title"
+      },
+      "ownerName": {
+        "path": "ownerName"
+      },
+      "projectLabel": {
+        "path": "projectLabel"
+      },
+      "mitigation": {
+        "path": "mitigation"
+      }
     }
   ],
   "data": {
@@ -68,38 +236,129 @@
       "ownerName": "Mateo Reyes",
       "percentComplete": 41,
       "milestones": [
-        { "title": "Stripe integration", "dueLabel": "May 15 (done)", "done": true },
-        { "title": "Invoice PDF template", "dueLabel": "May 29", "done": false },
-        { "title": "Tax-jar webhook", "dueLabel": "Jun 5", "done": false },
-        { "title": "Beta launch (10 customers)", "dueLabel": "Jun 12", "done": false }
+        {
+          "title": "Stripe integration",
+          "dueLabel": "May 15 (done)",
+          "done": true
+        },
+        {
+          "title": "Invoice PDF template",
+          "dueLabel": "May 29",
+          "done": false
+        },
+        {
+          "title": "Tax-jar webhook",
+          "dueLabel": "Jun 5",
+          "done": false
+        },
+        {
+          "title": "Beta launch (10 customers)",
+          "dueLabel": "Jun 12",
+          "done": false
+        }
       ]
     },
-    "sprint": { "name": "Sprint 22", "startLabel": "May 25", "endLabel": "Jun 5", "percentComplete": 65, "daysRemainingLabel": "9 days left", "status": "Active" },
+    "sprint": {
+      "name": "Sprint 22",
+      "startLabel": "May 25",
+      "endLabel": "Jun 5",
+      "percentComplete": 65,
+      "daysRemainingLabel": "9 days left",
+      "status": "Active"
+    },
     "tasks": {
       "todoCount": 9,
       "inProgressCount": 3,
       "inReviewCount": 1,
       "doneCount": 8,
       "todo": [
-        { "id": "t_005", "title": "Tax-jar webhook plumbing", "assigneeName": "Mateo Reyes", "assigneeInitials": "MR", "pointsLabel": "8 pts", "dueLabel": "Jun 5" },
-        { "id": "t_006", "title": "Refund flow UX", "assigneeName": "Aisha Khan", "assigneeInitials": "AK", "pointsLabel": "5 pts", "dueLabel": "Jun 5" },
-        { "id": "t_007", "title": "Stripe webhook retry logic", "assigneeName": "Chen Wei", "assigneeInitials": "CW", "pointsLabel": "3 pts", "dueLabel": "Jun 3" }
+        {
+          "id": "t_005",
+          "title": "Tax-jar webhook plumbing",
+          "assigneeName": "Mateo Reyes",
+          "assigneeInitials": "MR",
+          "pointsLabel": "8 pts",
+          "dueLabel": "Jun 5"
+        },
+        {
+          "id": "t_006",
+          "title": "Refund flow UX",
+          "assigneeName": "Aisha Khan",
+          "assigneeInitials": "AK",
+          "pointsLabel": "5 pts",
+          "dueLabel": "Jun 5"
+        },
+        {
+          "id": "t_007",
+          "title": "Stripe webhook retry logic",
+          "assigneeName": "Chen Wei",
+          "assigneeInitials": "CW",
+          "pointsLabel": "3 pts",
+          "dueLabel": "Jun 3"
+        }
       ],
       "inProgress": [
-        { "id": "t_004", "title": "Invoice PDF templating", "assigneeName": "Chen Wei", "assigneeInitials": "CW", "pointsLabel": "8 pts", "dueLabel": "May 29" },
-        { "id": "t_008", "title": "Tax-jar API integration", "assigneeName": "Mateo Reyes", "assigneeInitials": "MR", "pointsLabel": "5 pts", "dueLabel": "May 30" }
+        {
+          "id": "t_004",
+          "title": "Invoice PDF templating",
+          "assigneeName": "Chen Wei",
+          "assigneeInitials": "CW",
+          "pointsLabel": "8 pts",
+          "dueLabel": "May 29"
+        },
+        {
+          "id": "t_008",
+          "title": "Tax-jar API integration",
+          "assigneeName": "Mateo Reyes",
+          "assigneeInitials": "MR",
+          "pointsLabel": "5 pts",
+          "dueLabel": "May 30"
+        }
       ],
       "inReview": [
-        { "id": "t_009", "title": "Customer billing portal copy", "assigneeName": "Priya Singh", "assigneeInitials": "PS", "pointsLabel": "3 pts", "dueLabel": "May 28" }
+        {
+          "id": "t_009",
+          "title": "Customer billing portal copy",
+          "assigneeName": "Priya Singh",
+          "assigneeInitials": "PS",
+          "pointsLabel": "3 pts",
+          "dueLabel": "May 28"
+        }
       ],
       "done": [
-        { "id": "t_001", "title": "Stripe Connect onboarding", "assigneeName": "Mateo Reyes", "assigneeInitials": "MR", "pointsLabel": "5 pts", "dueLabel": "May 22" },
-        { "id": "t_002", "title": "Plan tier picker", "assigneeName": "Aisha Khan", "assigneeInitials": "AK", "pointsLabel": "3 pts", "dueLabel": "May 22" }
+        {
+          "id": "t_001",
+          "title": "Stripe Connect onboarding",
+          "assigneeName": "Mateo Reyes",
+          "assigneeInitials": "MR",
+          "pointsLabel": "5 pts",
+          "dueLabel": "May 22"
+        },
+        {
+          "id": "t_002",
+          "title": "Plan tier picker",
+          "assigneeName": "Aisha Khan",
+          "assigneeInitials": "AK",
+          "pointsLabel": "3 pts",
+          "dueLabel": "May 22"
+        }
       ]
     },
     "risks": [
-      { "severity": "high",   "title": "Tax-jar API rate limits", "ownerName": "Mateo Reyes", "projectLabel": "Orion", "mitigation": "Tier upgrade in flight; backup local computation as fallback." },
-      { "severity": "medium", "title": "PDF rendering perf on 100+ pages", "ownerName": "Chen Wei", "projectLabel": "Orion", "mitigation": "Streaming render; cap MVP at 50 pages." }
+      {
+        "severity": "high",
+        "title": "Tax-jar API rate limits",
+        "ownerName": "Mateo Reyes",
+        "projectLabel": "Orion",
+        "mitigation": "Tier upgrade in flight; backup local computation as fallback."
+      },
+      {
+        "severity": "medium",
+        "title": "PDF rendering perf on 100+ pages",
+        "ownerName": "Chen Wei",
+        "projectLabel": "Orion",
+        "mitigation": "Streaming render; cap MVP at 50 pages."
+      }
     ]
   }
 }

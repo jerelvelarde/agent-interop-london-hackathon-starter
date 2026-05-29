@@ -298,7 +298,8 @@ const demonstrationCatalogRenderers: CatalogRenderers<DemonstrationCatalogDefini
       );
     },
 
-    PieChart: ({ props }) => {
+    PieChart: ({ props: rawProps }) => {
+      const props = rawProps as Record<string, any>;
       const COLORS = [
         "#3b82f6",
         "#8b5cf6",
@@ -307,7 +308,7 @@ const demonstrationCatalogRenderers: CatalogRenderers<DemonstrationCatalogDefini
         "#10b981",
         "#6366f1",
       ];
-      const data = props.data ?? [];
+      const data: any[] = Array.isArray(props.data) ? props.data : [];
       return (
         <div style={{ width: "100%", height: 200 }}>
           <ResponsiveContainer>
@@ -336,8 +337,9 @@ const demonstrationCatalogRenderers: CatalogRenderers<DemonstrationCatalogDefini
       );
     },
 
-    BarChart: ({ props }) => {
-      const data = props.data ?? [];
+    BarChart: ({ props: rawProps }) => {
+      const props = rawProps as Record<string, any>;
+      const data: any[] = Array.isArray(props.data) ? props.data : [];
       return (
         <div style={{ width: "100%", height: 200 }}>
           <ResponsiveContainer>
@@ -384,9 +386,10 @@ const demonstrationCatalogRenderers: CatalogRenderers<DemonstrationCatalogDefini
       );
     },
 
-    DataTable: ({ props }) => {
-      const cols = props.columns ?? [];
-      const rows = props.rows ?? [];
+    DataTable: ({ props: rawProps }) => {
+      const props = rawProps as Record<string, any>;
+      const cols: any[] = Array.isArray(props.columns) ? props.columns : [];
+      const rows: any[] = Array.isArray(props.rows) ? props.rows : [];
       return (
         <div style={{ overflowX: "auto", width: "100%" }}>
           <table
@@ -979,8 +982,9 @@ const demonstrationCatalogRenderers: CatalogRenderers<DemonstrationCatalogDefini
       );
     },
 
-    MilestoneList: ({ props }) => {
-      const items = Array.isArray(props.milestones) ? props.milestones : [];
+    MilestoneList: ({ props: rawProps }) => {
+      const props = rawProps as Record<string, any>;
+      const items: any[] = Array.isArray(props.milestones) ? props.milestones : [];
       return (
         <div
           style={{

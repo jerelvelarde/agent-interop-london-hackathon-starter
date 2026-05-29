@@ -7,6 +7,9 @@
  *   2. `pnpm validate-widget --examples`— other-examples/EXAMPLE.json files (plan section 3.2)
  *   3. `pnpm validate-widget` over every JSON in agent/src/widgets/ (issues #2/#3)
  *   4. `pnpm test:widgets`              — fixture renderer pass (delegates to validator)
+ *   4a. `pnpm test:schemas`             — path-vs-data alignment (pytest, runtime
+ *                                         JSON-Pointer semantics — catches the bug
+ *                                         class described in TESTING.md layer 2)
  *   5. OFFLINE=1 envelope shape check   — assert public/offline-envelopes.json structure
  *      (validates BOTH byPrompt and bySurface indices land — plan section 6.6)
  *   6. agent registration probe         — python -c probe for each langgraph.json
@@ -187,6 +190,10 @@ const STEPS: Step[] = [
   {
     name: "test:widgets",
     run: async () => pnpmRun("test:widgets"),
+  },
+  {
+    name: "test:schemas (path-vs-data alignment + envelope shapes)",
+    run: async () => pnpmRun("test:schemas"),
   },
   {
     name: "OFFLINE=1 envelope shape check (byPrompt + bySurface)",

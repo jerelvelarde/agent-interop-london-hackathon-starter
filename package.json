@@ -21,6 +21,7 @@
     "new-example": "tsx scripts/new-example.ts",
     "theme:reset": "tsx scripts/theme-reset.ts",
     "test:widgets": "tsx scripts/test-widgets.ts",
+    "test:schemas": "cd agent && uv run python -m pytest tests/ -v",
     "check-a2a": "tsx a2a/compliance/check.ts"
   },
   "dependencies": {

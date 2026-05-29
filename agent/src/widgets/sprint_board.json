@@ -5,37 +5,113 @@
   "catalogId": "copilotkit://app-dashboard-catalog",
   "pythonTool": "agent/src/tools/sprint_board.py:show_sprint_board",
   "schema": [
-    { "id": "root", "component": "Column", "gap": 16, "children": ["sprint-title", "kanban-row"] },
-    { "id": "sprint-title", "component": "Title", "text": { "path": "sprint.headerLabel" }, "level": "h1" },
-    { "id": "kanban-row", "component": "Row", "gap": 12, "children": ["kc-todo", "kc-flight", "kc-review", "kc-done"] },
-    { "id": "kc-todo", "component": "KanbanColumn",
+    {
+      "id": "root",
+      "component": "Column",
+      "gap": 16,
+      "children": [
+        "sprint-title",
+        "kanban-row"
+      ]
+    },
+    {
+      "id": "sprint-title",
+      "component": "Title",
+      "text": {
+        "path": "sprint/headerLabel"
+      },
+      "level": "h1"
+    },
+    {
+      "id": "kanban-row",
+      "component": "Row",
+      "gap": 12,
+      "children": [
+        "kc-todo",
+        "kc-flight",
+        "kc-review",
+        "kc-done"
+      ]
+    },
+    {
+      "id": "kc-todo",
+      "component": "KanbanColumn",
       "statusLabel": "To Do",
-      "count": { "path": "tasks.todoCount" },
-      "children": { "componentId": "task-card", "path": "tasks.todo" }
+      "count": {
+        "path": "tasks/todoCount"
+      },
+      "children": {
+        "componentId": "task-card",
+        "path": "tasks/todo"
+      }
     },
-    { "id": "kc-flight", "component": "KanbanColumn",
+    {
+      "id": "kc-flight",
+      "component": "KanbanColumn",
       "statusLabel": "In Progress",
-      "count": { "path": "tasks.inProgressCount" },
-      "children": { "componentId": "task-card", "path": "tasks.inProgress" }
+      "count": {
+        "path": "tasks/inProgressCount"
+      },
+      "children": {
+        "componentId": "task-card",
+        "path": "tasks/inProgress"
+      }
     },
-    { "id": "kc-review", "component": "KanbanColumn",
+    {
+      "id": "kc-review",
+      "component": "KanbanColumn",
       "statusLabel": "In Review",
-      "count": { "path": "tasks.inReviewCount" },
-      "children": { "componentId": "task-card", "path": "tasks.inReview" }
+      "count": {
+        "path": "tasks/inReviewCount"
+      },
+      "children": {
+        "componentId": "task-card",
+        "path": "tasks/inReview"
+      }
     },
-    { "id": "kc-done", "component": "KanbanColumn",
+    {
+      "id": "kc-done",
+      "component": "KanbanColumn",
       "statusLabel": "Done",
-      "count": { "path": "tasks.doneCount" },
-      "children": { "componentId": "task-card", "path": "tasks.done" }
+      "count": {
+        "path": "tasks/doneCount"
+      },
+      "children": {
+        "componentId": "task-card",
+        "path": "tasks/done"
+      }
     },
-    { "id": "task-card", "component": "TaskCard",
-      "title": { "path": "title" },
-      "projectLabel": { "path": "projectLabel" },
-      "assigneeName": { "path": "assigneeName" },
-      "assigneeInitials": { "path": "assigneeInitials" },
-      "pointsLabel": { "path": "pointsLabel" },
-      "dueLabel": { "path": "dueLabel" },
-      "action": { "event": { "name": "open_task", "context": { "taskId": { "path": "id" } } } }
+    {
+      "id": "task-card",
+      "component": "TaskCard",
+      "title": {
+        "path": "title"
+      },
+      "projectLabel": {
+        "path": "projectLabel"
+      },
+      "assigneeName": {
+        "path": "assigneeName"
+      },
+      "assigneeInitials": {
+        "path": "assigneeInitials"
+      },
+      "pointsLabel": {
+        "path": "pointsLabel"
+      },
+      "dueLabel": {
+        "path": "dueLabel"
+      },
+      "action": {
+        "event": {
+          "name": "open_task",
+          "context": {
+            "taskId": {
+              "path": "id"
+            }
+          }
+        }
+      }
     }
   ]
 }

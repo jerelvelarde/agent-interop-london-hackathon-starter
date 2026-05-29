@@ -1,12 +1,47 @@
 [
-  { "id": "root", "component": "Column", "gap": 16, "children": ["risks-title", "risks-column"] },
-  { "id": "risks-title", "component": "Title", "text": { "path": "headerLabel" }, "level": "h1" },
-  { "id": "risks-column", "component": "Column", "gap": 12, "children": { "componentId": "risk-flag", "path": "/risks" } },
-  { "id": "risk-flag", "component": "RiskFlag",
-    "severity": { "path": "severity" },
-    "title": { "path": "title" },
-    "ownerName": { "path": "ownerName" },
-    "projectLabel": { "path": "projectLabel" },
-    "mitigation": { "path": "mitigation" }
+  {
+    "id": "root",
+    "component": "Column",
+    "gap": 16,
+    "children": [
+      "risks-title",
+      "risks-column"
+    ]
+  },
+  {
+    "id": "risks-title",
+    "component": "Title",
+    "text": {
+      "path": "headerLabel"
+    },
+    "level": "h1"
+  },
+  {
+    "id": "risks-column",
+    "component": "Column",
+    "gap": 12,
+    "children": {
+      "componentId": "risk-flag",
+      "path": "/risks"
+    }
+  },
+  {
+    "id": "risk-flag",
+    "component": "RiskFlag",
+    "severity": {
+      "path": "severity"
+    },
+    "title": {
+      "path": "title"
+    },
+    "ownerName": {
+      "path": "ownerName"
+    },
+    "projectLabel": {
+      "path": "projectLabel"
+    },
+    "mitigation": {
+      "path": "mitigation"
+    }
   }
 ]

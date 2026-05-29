@@ -18,6 +18,14 @@ import { z } from "zod";
  */
 const DynString = z.union([z.string(), z.object({ path: z.string() })]);
 
+// Same shape for numbers and arrays. The binder's behavior scraper only
+// classifies a field as DYNAMIC (path-resolvable) when its Zod type is a
+// ZodUnion containing { path: string }. Bare z.number() / z.array(...) get
+// classified STATIC, so the raw { path } object passes through to the renderer.
+const DynNumber = z.union([z.number(), z.object({ path: z.string() })]);
+const DynArray = <T extends z.ZodTypeAny>(item: T) =>
+  z.union([z.array(item), z.object({ path: z.string() })]);
+
 export const demonstrationCatalogDefinitions = {
   Title: {
     description: "A heading. Use for section titles and page headers.",
@@ -84,7 +92,7 @@ export const demonstrationCatalogDefinitions = {
     description:
       "A pie/donut chart. Provide data as array of {label, value, color} objects.",
     props: z.object({
-      data: z.array(
+      data: DynArray(
         z.object({
           label: z.string(),
           value: z.number(),
@@ -99,7 +107,7 @@ export const demonstrationCatalogDefinitions = {
     description:
       "A bar chart. Provide data as array of {label, value} objects.",
     props: z.object({
-      data: z.array(z.object({ label: z.string(), value: z.number() })),
+      data: DynArray(z.object({ label: z.string(), value: z.number() })),
       color: z.string().optional(),
     }),
   },
@@ -119,7 +127,7 @@ export const demonstrationCatalogDefinitions = {
     description: "A data table with columns and rows.",
     props: z.object({
       columns: z.array(z.object({ key: z.string(), label: z.string() })),
-      rows: z.array(z.record(z.any())),
+      rows: DynArray(z.record(z.any())),
     }),
   },
 
@@ -186,11 +194,11 @@ export const demonstrationCatalogDefinitions = {
       status: DynString,
       ownerName: DynString,
       sprintLabel: DynString,
-      percentComplete: z.number(),
-      todoCount: z.number(),
-      inProgressCount: z.number(),
-      inReviewCount: z.number(),
-      doneCount: z.number(),
+      percentComplete: DynNumber,
+      todoCount: DynNumber,
+      inProgressCount: DynNumber,
+      inReviewCount: DynNumber,
+      doneCount: DynNumber,
       action: z
         .union([
           z.object({
@@ -220,10 +228,10 @@ export const demonstrationCatalogDefinitions = {
 
   KanbanColumn: {
     description:
-      "A kanban status bucket. Header shows status label + count. 'children' template-binds to a filtered task list: pass { componentId: 'task-card', path: 'tasks.todo' } etc.",
+      "A kanban status bucket. Header shows status label + count. 'children' template-binds to a filtered task list: pass { componentId: 'task-card', path: 'tasks/todo' } etc.",
     props: z.object({
       statusLabel: DynString,
-      count: z.number(),
+      count: DynNumber,
       children: z.union([
         z.array(z.string()),
         z.object({ componentId: z.string(), path: z.string() }),
@@ -238,7 +246,7 @@ export const demonstrationCatalogDefinitions = {
       sprintName: DynString,
       startLabel: DynString,
       endLabel: DynString,
-      percentComplete: z.number(),
+      percentComplete: DynNumber,
       daysRemainingLabel: DynString,
       status: DynString,
     }),
@@ -248,7 +256,7 @@ export const demonstrationCatalogDefinitions = {
     description:
       "A milestone checklist. Each item has a title, due label, and done flag.",
     props: z.object({
-      milestones: z.array(
+      milestones: DynArray(
         z.object({
           title: z.string(),
           dueLabel: z.string(),

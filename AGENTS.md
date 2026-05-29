@@ -49,8 +49,10 @@ starter their own. Search for `CUSTOMIZATION SEAM` to find each one in code.
 2. **Re-brand the shell** → `src/components/BrandFrame.tsx` (header, logo, palette accents)
 3. **Swap demo data** → `agent/src/query.py` (or `agent/src/domains/<active>/data/`)
 4. **Add an A2UI widget (fixed schema)** → copy
-   `agent/src/a2ui_fixed_schema.py:search_flights`, declare in
-   `src/app/api/copilotkit/route.ts` schema array, register in `agent/main.py`
+   `agent/src/tools/risk_register.py:show_risk_register` (one helper, one
+   tree, one template binding — simplest canonical), register in
+   `agent/src/domains/default/tools.py`, and add a hint to
+   `agent/src/domains/default/prompts.py`'s `TOOL_RULES`.
 5. **Switch domain** → set `DOMAIN=<name>` in `.env`; canonical stub at
    `agent/src/domains/shopping`
 6. **BYO A2A agent** → set `A2A_AGENT_URL`; run `pnpm check-a2a <url>` first.
@@ -62,9 +64,16 @@ starter their own. Search for `CUSTOMIZATION SEAM` to find each one in code.
 
 When the hacker asks for a new something, grep-find and copy the canonical:
 
-- **Fixed-schema A2UI widget:** `agent/src/a2ui_fixed_schema.py:search_flights`
-  (returns `a2ui.render(operations=[...])` with `create_surface` →
-  `update_components` → `update_data_model`)
+- **Fixed-schema A2UI widget (minimal):**
+  `agent/src/tools/risk_register.py:show_risk_register` — one helper, one
+  component tree, one template binding. Read this first when adding a
+  widget. Pair it with `agent/src/widgets/risk_register.json` (catalog
+  entry) and `agent/src/widgets/risk_register.fixture.json` (offline data).
+- **Fixed-schema A2UI widget (showcase):**
+  `agent/src/tools/project_dashboard.py:show_project_dashboard` — the
+  opening-demo surface with 4 KPIs, a sprint timeline, and 3 ProjectCards.
+  Heavier `_build_data` if you want to see what filtering + enrichment
+  looks like at scale.
 - **Dynamic-schema A2UI:** `agent/src/a2ui_dynamic_schema.py:generate_a2ui`
   (secondary LLM produces the component tree on demand)
 - **A2UI envelope (raw JSON):** `agent/src/widgets/*.fixture.json`
@@ -81,7 +90,7 @@ When the hacker asks for a new something, grep-find and copy the canonical:
 | `pnpm validate-widget <path>` | Validate a widget JSON against A2UI v0.9 |
 | `pnpm check-a2a <url>` | Validate a partner A2A endpoint |
 | `pnpm explain <topic>` | Print the right HACKATHON.md section (`themes`, `widgets`, `a2a`, `data`, `branding`, `domain`) |
-| `pnpm new-widget <name>` | Scaffold from `search_flights` template |
+| `pnpm new-widget <name>` | Scaffold from `risk_register` template |
 | `pnpm theme:reset` | Revert theme to defaults |
 | `pnpm verify-pins` | Fail if lockfiles drifted from `FROZEN.md` |
 
@@ -90,9 +99,11 @@ When the hacker asks for a new something, grep-find and copy the canonical:
 When the hacker says:
 
 - **"add a widget"** → follow `HACKATHON.md` §4 (prefer fixed-schema for
-  demo predictability). Copy `search_flights`. Run the **5-surface dance**:
-  catalog entry + fixture + Python tool + TS schema declaration + prompt
-  hint. Run `pnpm validate-widget` then `pnpm smoke` before declaring done.
+  demo predictability). Copy `risk_register`. Run the **4-surface dance**:
+  catalog entry + fixture + Python tool (registered in
+  `agent/src/domains/default/tools.py`) + prompt hint (in
+  `agent/src/domains/default/prompts.py`'s `TOOL_RULES`). Run
+  `pnpm validate-widget` then `pnpm smoke` before declaring done.
 - **"theme it for X"** → only edit `src/lib/a2ui-theme.css` and
   `src/hooks/use-theme.tsx`. Don't restructure components. Don't bump deps.
 - **"re-brand it"** → edit `src/components/BrandFrame.tsx`. Don't touch the
@@ -126,7 +137,7 @@ Follow them when the hacker types them in chat. Skills live at:
 Useful grep starting points:
 - `grep -r "CUSTOMIZATION SEAM" .` — find all seams in two seconds
 - `grep -r "Pattern to copy" .` — find canonical examples
-- `agent/src/a2ui_fixed_schema.py` — read this top-to-bottom before adding a widget
+- `agent/src/tools/risk_register.py` — read this top-to-bottom before adding a widget
 
 ## Gemini CLI users
 
@@ -135,7 +146,7 @@ Useful grep starting points:
 
 Useful one-liners:
 - `gemini -p "explain seam #4 from HACKATHON.md"` — see the recipe
-- `gemini -p "add a recipe-card widget patterned after search_flights"`
+- `gemini -p "add a recipe-card widget patterned after risk_register"`
 
 ## Cursor / Windsurf / Codex users
 

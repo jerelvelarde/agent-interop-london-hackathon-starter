@@ -26,7 +26,7 @@ result in past dry runs.
 | **0:00–0:30** Boot | `pnpm install`, `pnpm doctor`, `pnpm dev`. Send a test chat. Confirm the inspector shows envelopes. | — |
 | **0:30–1:30** Re-skin | Pick a domain. Re-theme + re-brand. Land a logo and palette. | §1, §2 |
 | **1:30–2:30** Swap data | Replace `query.py` data with your domain's data. Tweak the system prompt. | §3, (optional §5) |
-| **2:30–3:30** Widget pass | Pick ONE custom widget your demo needs. Copy `search_flights` and adapt. | §4 |
+| **2:30–3:30** Widget pass | Pick ONE custom widget your demo needs. Copy `risk_register` and adapt. | §4 |
 | **3:30–4:15** Polish | Empty-state copy. Suggestion chips. Make the inspector look intentional. | §1, §2 |
 | **4:15–4:45** Rehearse | Run the canned demo three times. Test `OFFLINE=1`. Run `pnpm smoke`. | — |
 | **4:45–5:00** Submit | Push to GitHub. Fill out `SUBMITTING.md`. | — |
@@ -157,15 +157,22 @@ for judges who want to A/B your design in dark and light).
 
 ## §3 — Swap demo data
 
-**File to edit:**
-- `agent/src/query.py` (canonical example: reads `db.csv` and returns rows)
+**Files to edit:**
+- `data/projectops.json` — the canonical PortKit dataset (people, projects,
+  sprints, tasks, risks, updates). One file at the repo root.
+- `agent/src/query.py` — loads `data/projectops.json` at import time and
+  exposes the `query_data` tool. Override `DATA_PATH=` in `.env` to point
+  the loader at a different file without editing code.
 
-**Recipe:**
-1. Replace `db.csv` with your data (or skip CSV — return a Python literal).
-2. Edit the docstring on `query_data` so the agent knows when to call it
-   with your domain's language.
-3. Edit the system prompt in `agent/main.py` to ground the agent in your
-   domain. Keep it 1-2 sentences.
+**Recipe (one-line swap):**
+1. Replace `data/projectops.json` with your domain's data. Keep the same
+   top-level entity keys (or extend them and update the prompt). The whole
+   file is hot-reloaded on agent restart.
+2. Edit the docstring on `query_data` in `agent/src/query.py` so the agent
+   knows when to call it with your domain's language.
+3. Edit `agent/src/domains/default/prompts.py`'s `DATASET_NOTES` constant
+   to name your entities, and `DOMAIN_BRIEF` to ground the agent in your
+   product/team. Both are 2-3 line constants designed to be forked.
 4. Restart the agent (`uv run --reload` handles this for you).
 
 **For a deeper swap:** see §5 — `DOMAIN=<name>` in `.env` switches whole
@@ -177,29 +184,63 @@ data-and-prompt bundles at boot.
 
 This is the most substantial seam — budget an hour minimum.
 
-**Canonical example:** `agent/src/a2ui_fixed_schema.py:search_flights`
+**Canonical example (minimal):**
+`agent/src/tools/risk_register.py:show_risk_register` — one helper, one
+component tree, one template binding. Read this top-to-bottom before you
+write anything; it's about 90 lines and demonstrates every piece.
 
-**The 5-surface dance** (skip a step → widget won't render):
+**The 4-surface dance** (skip a step → widget won't render):
 
 1. **Catalog entry** — `agent/src/widgets/<name>.json` (the v0.9 component
-   schema). Use the [A2UI Composer](https://a2ui-composer.ag-ui.com/) to
-   author visually, then save the JSON here.
+   schema, with metadata: `id`, `name`, `catalogId`, `pythonTool`, and a
+   `schema` array). Use the
+   [A2UI Composer](https://a2ui-composer.ag-ui.com/) to author the
+   component tree visually, then save it under `schema:` in the JSON.
 2. **Fixture** — `agent/src/widgets/<name>.fixture.json` (sample data the
-   renderer will exercise during `pnpm test:widgets`).
-3. **Python tool** — Add a `@tool` function in `agent/src/a2ui_fixed_schema.py`
-   that returns `a2ui.render(operations=[create_surface, update_components,
-   update_data_model])`. Register it in `agent/main.py`'s `tools=[...]`.
-4. **TS schema declaration** — In `src/app/api/copilotkit/route.ts`, add
-   your widget to the `a2ui.schema` array so the runtime knows about it.
-5. **Prompt hint** — Add a line to the agent's system prompt that teaches
-   it *when* to call your tool. (Example from default prompt: *"Flights:
-   call search_flights to show flight cards."*)
+   renderer will exercise during `pnpm test:widgets` and `OFFLINE=1`).
+   Keys: `surfaceId`, `catalogId`, `components`, `data`.
+3. **Python tool** — Create `agent/src/tools/<name>.py` with a `@tool`
+   function that returns `a2ui.render(operations=[create_surface,
+   update_components, update_data_model])`. Then register it in
+   `agent/src/domains/default/tools.py`'s `default_tools` list. Pattern
+   to copy verbatim: `agent/src/tools/risk_register.py`.
+4. **Prompt hint** — Add a line to `agent/src/domains/default/prompts.py`'s
+   `TOOL_RULES` constant that teaches the agent *when* to call your tool.
+   (Example from default prompt:
+   `- "risks / what could go wrong" -> show_risk_register(project_id?)`.)
 
 **Verify:** `pnpm validate-widget agent/src/widgets/<name>.json` (catches
 v0.9 envelope shape issues before runtime). Then `pnpm smoke`.
 
+> **Why not 5 surfaces?** Earlier drafts of this guide listed a fifth step
+> ("TS schema declaration in `src/app/api/copilotkit/route.ts`"). That
+> array doesn't exist in this starter — the runtime is configured with
+> `a2ui: { injectA2UITool: false }`, so widgets register entirely on the
+> agent side. If you're following an older recipe that mentions five
+> surfaces, you can skip the route.ts step.
+
+### Renaming for your domain
+
+The catalog ships 9 named primitives mapped to React renderers. When you
+re-skin for a new domain you'll usually keep most of them and rename one
+or two. The full list:
+
+`ProjectCard`, `TaskCard`, `KanbanColumn`, `SprintTimelineBar`,
+`MilestoneList`, `PersonAvatar`, `RiskFlag`, `UpdateFeedItem`, `Paragraph`.
+
+Find every place a name appears with:
+
+```bash
+grep -lE 'ProjectCard|TaskCard|KanbanColumn|SprintTimelineBar|MilestoneList|PersonAvatar|RiskFlag|UpdateFeedItem' src/ agent/
+```
+
+If you rename a primitive, update its renderer in
+`src/app/declarative-generative-ui/renderers.tsx`, its definition entry in
+`src/app/declarative-generative-ui/definitions.ts`, every widget JSON that
+references it, and every fixture under `agent/src/widgets/*.fixture.json`.
+
 **Faster alternative — dynamic schema:** if you don't need predictability,
-skip steps 1–4. Describe the widget in the system prompt and let
+skip steps 1–3. Describe the widget in the system prompt and let
 `generate_a2ui` produce it on demand. Tweak the Composer JSON if the LLM's
 first pass is wrong. Less reliable in front of judges, faster to iterate.
 
@@ -288,21 +329,22 @@ the bug is in the envelope, not the React tree. Debug systematically:
    agent emit `createSurface`? `updateComponents`? `updateDataModel`? All
    three are required. Missing one means the agent never finished the
    handshake.
-2. **Check the schema declaration.** Did you add your widget to the
-   `a2ui.schema` array in `src/app/api/copilotkit/route.ts`? The runtime
-   filters unknown widgets silently.
+2. **Check the tool registration.** Did you add the tool to
+   `agent/src/domains/default/tools.py`'s `default_tools` list? An
+   unregistered tool can't be called by the agent — there's no schema
+   array in `route.ts`, registration is entirely on the agent side.
 3. **Validate the JSON.** `pnpm validate-widget agent/src/widgets/<name>.json`
    prints the failing field with a fix hint. The error format is meant to
    be pasted into your AI assistant's context.
 4. **Check the prompt hint.** Did you tell the agent *when* to call your
-   tool? The default prompt has a "Tool guidance" section — add a line for
-   your new tool.
+   tool? Add a line to `agent/src/domains/default/prompts.py`'s
+   `TOOL_RULES` constant pointing at your new tool with a use-case anchor.
 5. **`/debug` page.** Shows last 20 envelopes per surface, orchestrator
    state, A2A subagent health, latency. Open `http://localhost:3000/debug`.
 6. **Hard reload.** Tailwind 4 in dev mode caches aggressively. `Cmd+Shift+R`.
 
 When all else fails: paste the failing envelope JSON into your AI assistant
-with the canonical example (`agent/src/a2ui_fixed_schema.py:search_flights`)
+with the canonical example (`agent/src/tools/risk_register.py:show_risk_register`)
 and ask "what's different about the envelope shape." It's almost always a
 missing required field.
 

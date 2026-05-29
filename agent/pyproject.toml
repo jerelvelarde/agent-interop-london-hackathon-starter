@@ -20,3 +20,8 @@ dependencies = [
   "langchain-google-genai==4.2.4",
 ]
 
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]
+

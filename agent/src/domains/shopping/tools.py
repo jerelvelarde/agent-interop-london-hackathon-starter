@@ -2,13 +2,13 @@
 Shopping domain — Python tools.
 
 Two tools that mirror the canonical default-domain pair:
-- search_products: fixed-schema A2UI (mirror of agent/src/a2ui_fixed_schema.py:search_flights).
+- search_products: fixed-schema A2UI (mirror of agent/src/tools/risk_register.py:show_risk_register).
 - query_orders: data tool the dynamic-schema path can call when building dashboards
   (mirror of agent/src/query.py:query_data).
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # CUSTOMIZATION SEAM #5 — Switch domain (shopping branch)
-# Pattern this file mirrors: agent/src/a2ui_fixed_schema.py + agent/src/query.py.
+# Pattern this file mirrors: agent/src/tools/risk_register.py + agent/src/query.py.
 # See HACKATHON.md §5 for the recipe to add a third domain.
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """

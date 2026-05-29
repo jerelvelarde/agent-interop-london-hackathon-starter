@@ -1,0 +1,19 @@
+{
+  "id": "risk-register",
+  "name": "RiskRegister",
+  "description": "Cross-project open-risk register. Shows every open risk with severity, owner, project, and mitigation. Use for risk review meetings.",
+  "catalogId": "copilotkit://app-dashboard-catalog",
+  "pythonTool": "agent/src/tools/risk_register.py:show_risk_register",
+  "schema": [
+    { "id": "root", "component": "Column", "gap": 16, "children": ["risks-title", "risks-column"] },
+    { "id": "risks-title", "component": "Title", "text": { "path": "headerLabel" }, "level": "h1" },
+    { "id": "risks-column", "component": "Column", "gap": 12, "children": { "componentId": "risk-flag", "path": "/risks" } },
+    { "id": "risk-flag", "component": "RiskFlag",
+      "severity": { "path": "severity" },
+      "title": { "path": "title" },
+      "ownerName": { "path": "ownerName" },
+      "projectLabel": { "path": "projectLabel" },
+      "mitigation": { "path": "mitigation" }
+    }
+  ]
+}

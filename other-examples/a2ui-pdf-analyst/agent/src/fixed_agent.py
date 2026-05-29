@@ -9,12 +9,14 @@ user action back to the agent, which re-renders with the new scope.
 """
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import TypedDict
 
 from copilotkit import CopilotKitMiddleware, a2ui
 from langchain.agents import create_agent
 from langchain.tools import tool
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.checkpoint.memory import MemorySaver
 
 from src.catalog import CATALOG_ID, CATALOG_PROMPT
@@ -24,6 +26,12 @@ DASHBOARD_SCHEMA = a2ui.load_schema(SCHEMA_DIR / "dashboard.json")
 SURFACE = "pdf-dashboard"
 
 
+# NOTE (Gemini typed-array fix): every list parameter on render_dashboard
+# below is typed as `list[<TypedDict>]`, NOT `list[dict]`. Gemini's
+# function-declaration validator rejects untyped arrays with
+# "parameters.properties[X].items: missing field". A TypedDict compiles to a
+# concrete object schema, so these arrays carry the `items` Gemini requires.
+# Keep them typed — do not loosen to `list[dict]`.
 class Kpi(TypedDict):
     label: str
     value: str
@@ -175,9 +183,19 @@ more than two suggestions.
 """
 
 
+# Gemini 3.5 Flash via the native Google Gen AI SDK — same provider as the
+# dynamic agent and the PDF extractor (see FROZEN.md "LLM provider"). The
+# native SDK replays Gemini's thought_signature across tool turns, which the
+# OpenAI-compat path does not.
+_MODEL = ChatGoogleGenerativeAI(
+    model=os.getenv("MODEL", "gemini-3.5-flash"),
+    google_api_key=os.getenv("GEMINI_API_KEY"),
+)
+
+
 def build_fixed_agent():
     return create_agent(
-        model="openai:gpt-5.5",
+        model=_MODEL,
         tools=[render_dashboard],
         # CopilotKitMiddleware forwards frontend tools + agent context (e.g.
         # useAgentContext payloads) to the LLM.

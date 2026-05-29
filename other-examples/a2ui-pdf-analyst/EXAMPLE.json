@@ -1,0 +1,8 @@
+{
+  "id": "a2ui-pdf-analyst",
+  "name": "A2UI PDF Analyst",
+  "description": "Chat with your PDF and watch the agent build the UI for each answer. A self-contained mini-app that runs on its own (web :3000 + agent :8123) on Gemini — not mounted into this host app.",
+  "route": "/other-examples/a2ui-pdf-analyst",
+  "tags": ["pdf", "dynamic-ui", "recharts", "gemini"],
+  "status": "wip"
+}

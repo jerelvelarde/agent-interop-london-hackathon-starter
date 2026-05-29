@@ -30,6 +30,7 @@ other-examples/<example-id>/
 | Example                                              | Status | Catalog                              | What it shows                                                                          |
 | ---------------------------------------------------- | ------ | ------------------------------------ | -------------------------------------------------------------------------------------- |
 | [legal-contract-review/](./legal-contract-review/)   | wip    | `copilotkit://legal-paper-catalog`   | Paper-styled contract review with margin notes + redlines on a second registered catalog. |
+| [a2ui-pdf-analyst/](./a2ui-pdf-analyst/)             | wip    | self-contained mini-app (Gemini)     | Chat-with-your-PDF; the agent builds the answer UI (fixed + dynamic schema, Recharts). Runs as its own app (web :3000 + agent :8123), not mounted into the host. |
 
 ## How to add another
 

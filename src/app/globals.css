@@ -1,12 +1,15 @@
-/* CopilotKit brand fonts */
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300..800&family=Spline+Sans+Mono:wght@400;500;600&display=swap");
+/* CopilotKit brand fonts (Plus Jakarta Sans + Spline Sans Mono) load via
+   next/font/google in src/app/layout.tsx and are exposed as
+   --font-body-loader / --font-code-loader. No @import url() here: Tailwind v4
+   rejects it and next/font avoids the flash of unstyled text. */
 
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #ffffff;
+  /* Page background — canonical CopilotKit lavender-gray (was #ffffff). */
+  --background: #dedee9;
   --foreground: #010507;
 
   /* Semantic tokens — CopilotKit brand */
@@ -31,15 +34,19 @@
   --chart-tooltip-border: #dbdbe5;
   --chart-axis: #57575b;
 
-  --radius: 0.75rem;
+  --radius: 0.5rem; /* 8px — canonical card/sidebar radius (was 0.75rem/12px) */
 
   /* Override CopilotKit font */
   --cpk-default-font-family: var(--font-body);
 
-  /* Fonts */
-  --font-body: "Plus Jakarta Sans", "DM Sans", "Segoe UI", sans-serif;
+  /* Fonts — next/font handles (set on <html> in layout.tsx) come first;
+     literal family names remain as graceful fallbacks. */
+  --font-body:
+    var(--font-body-loader), "Plus Jakarta Sans", "DM Sans", "Segoe UI",
+    sans-serif;
   --font-code:
-    "Spline Sans Mono", "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
+    var(--font-code-loader), "Spline Sans Mono", "SFMono-Regular", Menlo,
+    Monaco, Consolas, monospace;
 
   /* Brand accent colors */
   --cpk-mint-400: #85ecce;
@@ -58,6 +65,12 @@
   --surface-main: #dedee9;
   --surface-container: #ffffff;
   --surface-background: #dbdbe5;
+
+  /* Translucent glass layers (canonical) — frosted sidebar/chat panel that
+     lets the blur circles show through. Use white-50 for glass surfaces. */
+  --white-50: rgba(255, 255, 255, 0.5);
+  --white-70: rgba(255, 255, 255, 0.7);
+  --white-65: rgba(255, 255, 255, 0.65);
 
   /* Text (B1) */
   --text-primary: #010507;
@@ -81,10 +94,13 @@
   --elevation-lg: 0px 10px 15px rgba(1, 5, 7, 0.08);
   --elevation-xl: 0px 20px 25px rgba(1, 5, 7, 0.08);
 
-  /* Blur backdrop tints (B1) — consumed by BackgroundBlurCircles */
-  --cpk-blur-lilac: rgba(190, 194, 255, 0.55);
-  --cpk-blur-orange: rgba(255, 172, 77, 0.45);
-  --cpk-blur-yellow: rgba(255, 243, 136, 0.55);
+  /* Blur backdrop tints — consumed by BackgroundBlurCircles. Canonical washes:
+     softer alphas, neutral grey/off-white dominate, subtle warm orange/yellow. */
+  --cpk-blur-lilac: rgba(190, 194, 255, 0.3);
+  --cpk-blur-orange: rgba(255, 172, 77, 0.2);
+  --cpk-blur-yellow: rgba(255, 243, 136, 0.3);
+  --cpk-blur-grey: rgba(201, 201, 218, 0.45);
+  --cpk-blur-offwhite: rgba(243, 243, 252, 0.55);
 }
 
 :root.dark,

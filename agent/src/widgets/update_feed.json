@@ -1,0 +1,20 @@
+{
+  "id": "update-feed",
+  "name": "UpdateFeed",
+  "description": "Chronological feed of recent updates across projects (status changes, mentions, comments). Use for catching up after time away.",
+  "catalogId": "copilotkit://app-dashboard-catalog",
+  "pythonTool": "agent/src/tools/update_feed.py:show_update_feed",
+  "schema": [
+    { "id": "root", "component": "Column", "gap": 16, "children": ["feed-title", "feed"] },
+    { "id": "feed-title", "component": "Title", "text": "Recent Updates", "level": "h1" },
+    { "id": "feed", "component": "Column", "gap": 12, "children": { "componentId": "update-item", "path": "/updates" } },
+    { "id": "update-item", "component": "UpdateFeedItem",
+      "authorName": { "path": "authorName" },
+      "authorInitials": { "path": "authorInitials" },
+      "projectLabel": { "path": "projectLabel" },
+      "timeLabel": { "path": "timeLabel" },
+      "kind": { "path": "kind" },
+      "summary": { "path": "summary" }
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "name": "update_feed_default",
+  "description": "Chronological feed of 3 recent updates across Atlas, Orion, and Lyra (status change, comment, mention).",
+  "surfaceId": "update-feed",
+  "catalogId": "copilotkit://app-dashboard-catalog",
+  "components": [
+    { "id": "root", "component": "Column", "gap": 16, "children": ["feed-title", "feed"] },
+    { "id": "feed-title", "component": "Title", "text": "Recent Updates", "level": "h1" },
+    { "id": "feed", "component": "Column", "gap": 12, "children": { "componentId": "update-item", "path": "/updates" } },
+    { "id": "update-item", "component": "UpdateFeedItem",
+      "authorName": { "path": "authorName" },
+      "authorInitials": { "path": "authorInitials" },
+      "projectLabel": { "path": "projectLabel" },
+      "timeLabel": { "path": "timeLabel" },
+      "kind": { "path": "kind" },
+      "summary": { "path": "summary" }
+    }
+  ],
+  "data": {
+    "updates": [
+      { "authorName": "Mateo Reyes", "authorInitials": "MR", "projectLabel": "Orion", "timeLabel": "12 min ago",  "kind": "status_change", "summary": "Marked Tax-jar webhook plumbing as In Progress." },
+      { "authorName": "Lena Ortiz",  "authorInitials": "LO", "projectLabel": "Atlas", "timeLabel": "1 hour ago",  "kind": "comment",       "summary": "Replied on SSO admin console: 'Pushing review to Wed, blocked on IdP cert.'" },
+      { "authorName": "Aisha Khan",  "authorInitials": "AK", "projectLabel": "Lyra",  "timeLabel": "3 hours ago", "kind": "mention",       "summary": "Mentioned you on Suggestion ranker v2: 'Need a call on ranking weights.'" }
+    ]
+  }
+}

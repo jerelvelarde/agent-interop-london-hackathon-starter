@@ -1,10 +1,16 @@
 """
-scripts/load-test-gemini.py — A7 done-criterion for Workstream A.
+scripts/load-test-gemini.py — load test against the OpenAI-compat Gemini path.
 
 Fires N concurrent tool-calling requests at Gemini via the OpenAI-compat
 endpoint. Reports HTTP status distribution, latency percentiles, and any
-retry-after headers. Helps us anticipate the free-tier rate-limit cliff
-the hackathon will face at ~tens-of-teams concurrency.
+retry-after headers. Helps anticipate the free-tier rate-limit cliff
+at ~tens-of-teams concurrency.
+
+NOTE: This script intentionally exercises the **OpenAI-compat fallback
+path** (langchain-openai → generativelanguage.googleapis.com/v1beta/openai/
+on `gemini-2.5-flash`) rather than the current default (native Google Gen
+AI SDK on `gemini-3.5-flash`). See FROZEN.md § "If you get rate-limited"
+for why 2.5 + OpenAI-compat is the documented fallback.
 
 Usage:  GEMINI_API_KEY=... uv run --with httpx scripts/load-test-gemini.py [N]
 Default N is 30.
@@ -29,23 +35,21 @@ REQUEST = {
     "messages": [
         {
             "role": "user",
-            "content": "Search flights from SFO to JFK on 2026-06-15.",
+            "content": "Show me the open-risks register across all projects.",
         }
     ],
     "tools": [
         {
             "type": "function",
             "function": {
-                "name": "search_flights",
-                "description": "Search for flights between two cities on a date",
+                "name": "show_risk_register",
+                "description": "Show open risks across the org, optionally scoped to one project.",
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "origin": {"type": "string"},
-                        "destination": {"type": "string"},
-                        "date": {"type": "string"},
+                        "project_id": {"type": "string"},
                     },
-                    "required": ["origin", "destination", "date"],
+                    "required": [],
                 },
             },
         }

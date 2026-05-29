@@ -1,0 +1,26 @@
+{
+  "name": "risk_register_default",
+  "description": "Cross-project open-risk register: 3 risks spanning Orion and Atlas with severity + owner + mitigation.",
+  "surfaceId": "risk-register",
+  "catalogId": "copilotkit://app-dashboard-catalog",
+  "components": [
+    { "id": "root", "component": "Column", "gap": 16, "children": ["risks-title", "risks-column"] },
+    { "id": "risks-title", "component": "Title", "text": { "path": "headerLabel" }, "level": "h1" },
+    { "id": "risks-column", "component": "Column", "gap": 12, "children": { "componentId": "risk-flag", "path": "/risks" } },
+    { "id": "risk-flag", "component": "RiskFlag",
+      "severity": { "path": "severity" },
+      "title": { "path": "title" },
+      "ownerName": { "path": "ownerName" },
+      "projectLabel": { "path": "projectLabel" },
+      "mitigation": { "path": "mitigation" }
+    }
+  ],
+  "data": {
+    "headerLabel": "Open Risks · 3",
+    "risks": [
+      { "severity": "high",   "title": "Tax-jar API rate limits",            "ownerName": "Mateo Reyes", "projectLabel": "Orion", "mitigation": "Tier upgrade in flight; backup local computation as fallback." },
+      { "severity": "medium", "title": "PDF rendering perf on 100+ pages",   "ownerName": "Chen Wei",    "projectLabel": "Orion", "mitigation": "Streaming render; cap MVP at 50 pages." },
+      { "severity": "medium", "title": "SAML metadata churn from IdP vendors", "ownerName": "Amir Patel", "projectLabel": "Atlas", "mitigation": "Contract tests against top 5 IdPs; alert on schema drift." }
+    ]
+  }
+}

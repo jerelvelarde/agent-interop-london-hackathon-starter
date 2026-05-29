@@ -48,7 +48,7 @@ const TOPIC_TO_SEAM: Record<string, { seam: number; title: string; summary: stri
     seam: 4,
     title: "Add an A2UI widget",
     summary:
-      "Copy agent/src/a2ui_fixed_schema.py:search_flights as the template. Five surfaces to touch — see HACKATHON.md §4 or `.claude/skills/create-a2ui-widget`.",
+      "Copy agent/src/tools/risk_register.py:show_risk_register as the template (canonical minimal example). Five surfaces to touch — see HACKATHON.md §4 or `.claude/skills/create-a2ui-widget`.",
   },
   domain: {
     seam: 5,

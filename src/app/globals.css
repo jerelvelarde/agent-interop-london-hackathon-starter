@@ -53,6 +53,38 @@
     #85ecce 45.673%,
     #ffac4d 100%
   );
+
+  /* Surfaces (B1) — lifted from cpk-project-management */
+  --surface-main: #dedee9;
+  --surface-container: #ffffff;
+  --surface-background: #dbdbe5;
+
+  /* Text (B1) */
+  --text-primary: #010507;
+  --text-secondary: #57575b;
+  --text-disabled: #838389;
+
+  /* Borders (B1) */
+  --border-container: #dbdbe5;
+  --border-default: #ffffff;
+
+  /* Radius scale (B1) */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  /* Elevation (B1) */
+  --elevation-sm: 0px 1px 3px rgba(1, 5, 7, 0.08);
+  --elevation-md: 0px 4px 6px rgba(1, 5, 7, 0.08);
+  --elevation-lg: 0px 10px 15px rgba(1, 5, 7, 0.08);
+  --elevation-xl: 0px 20px 25px rgba(1, 5, 7, 0.08);
+
+  /* Blur backdrop tints (B1) — consumed by BackgroundBlurCircles */
+  --cpk-blur-lilac: rgba(190, 194, 255, 0.55);
+  --cpk-blur-orange: rgba(255, 172, 77, 0.45);
+  --cpk-blur-yellow: rgba(255, 243, 136, 0.55);
 }
 
 :root.dark,
@@ -79,6 +111,26 @@
   --chart-tooltip-bg: #191a1e;
   --chart-tooltip-border: #303136;
   --chart-axis: #adadb2;
+
+  /* Surfaces (B1) — dark */
+  --surface-main: #1b1c20;
+  --surface-container: rgba(25, 26, 30, 0.7);
+  --surface-background: #101114;
+
+  /* Text (B1) — dark */
+  --text-primary: #ffffff;
+  --text-secondary: #adadb2;
+  --text-disabled: #6b6b70;
+
+  /* Borders (B1) — dark */
+  --border-container: #303136;
+  --border-default: rgba(255, 255, 255, 0.08);
+
+  /* Elevation (B1) — dark (deeper shadow for dark backgrounds) */
+  --elevation-sm: 0px 1px 3px rgba(0, 0, 0, 0.4);
+  --elevation-md: 0px 4px 6px rgba(0, 0, 0, 0.4);
+  --elevation-lg: 0px 10px 15px rgba(0, 0, 0, 0.4);
+  --elevation-xl: 0px 20px 25px rgba(0, 0, 0, 0.4);
 }
 
 body {
@@ -107,4 +159,60 @@ html {
 [data-copilotkit] button[data-slot="suggestion-pill"].opengenui-highlight {
   border-color: var(--cpk-mint-400);
   background: color-mix(in srgb, var(--cpk-mint-400) 15%, var(--background));
+}
+
+/* ─── CopilotKit chat framework workarounds (FROZEN at 1.56.5) ───
+ *
+ * Targets the chat DOM shipped by @copilotkit/react-core/dist/v2.
+ * Verified selectors in the bundled output:
+ *   - Outer chat:    [data-testid="copilot-chat"]  + .copilotKitChat
+ *   - Input overlay: [data-testid="copilot-input-overlay"]   (pointer-events:none parent)
+ *   - Input pill:    [data-testid="copilot-chat-input"] + .copilotKitInput
+ *   - Sidebar:       [data-testid="copilot-sidebar"]  + .copilotKitSidebar  + [data-copilot-sidebar]
+ *   - Popup:         [data-testid="copilot-popup"]    + .copilotKitPopup    + [data-copilot-popup]
+ *   - Sidebar inner: [data-sidebar-chat]   Popup inner: [data-popup-chat]
+ * The Disclaimer renders as a sibling of the input pill inside the input
+ * overlay with no stable hook of its own — we reach it via the overlay.
+ */
+
+/* (1) Disclaimer slot interactive content unclickable.
+ *     The input overlay sets cpk:pointer-events-none on its parent and
+ *     only re-enables it on the input pill wrapper, leaving the
+ *     disclaimer (and any interactive children) unclickable. Re-enable
+ *     pointer events on every direct child of the input overlay so the
+ *     disclaimer (and any custom slots rendered alongside it) work. */
+[data-copilotkit] [data-testid="copilot-input-overlay"] > * {
+  pointer-events: auto;
+}
+[data-copilotkit] [data-testid="copilot-input-overlay"] > *:not(:first-child),
+[data-copilotkit] [data-testid="copilot-chat-input"] ~ * {
+  position: relative;
+  z-index: 1;
+}
+
+/* (2) No default cushion below chat input.
+ *     The input pill butts the bottom edge of its container in popup
+ *     and sidebar variants. Add a 12px cushion at the pill wrapper
+ *     level so the layout breathes regardless of disclaimer presence. */
+[data-copilotkit] [data-testid="copilot-chat-input"],
+[data-copilotkit] .copilotKitInput {
+  margin-bottom: 12px;
+}
+
+/* (3) Opaque background on every internal chat element.
+ *     CopilotKit's Sidebar (aside) and Popup (div) wrappers paint a
+ *     solid bg-background, and that token is inherited downwards
+ *     because nothing else specifies a background. Force the inner
+ *     chat container and its descendants to transparent so the frosted
+ *     backdrop (BackgroundBlurCircles, B2) can show through.
+ *     We deliberately leave the outer .copilotKitSidebar / .copilotKitPopup
+ *     wrappers alone — they are the chat "frame" and should keep their
+ *     own background; only the chat-content surface is clarified. */
+[data-copilotkit] [data-sidebar-chat],
+[data-copilotkit] [data-popup-chat],
+[data-copilotkit] [data-testid="copilot-chat"],
+[data-copilotkit] .copilotKitChat,
+[data-copilotkit] [data-testid="copilot-chat"] > *,
+[data-copilotkit] .copilotKitChat > * {
+  background: transparent;
 }

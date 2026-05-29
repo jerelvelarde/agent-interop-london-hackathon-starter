@@ -61,7 +61,7 @@ export A2A_INSTRUCTIONS="Always check the research agent before answering."
 
 The compliance checker (`pnpm check-a2a <url>`) verifies that an A2A subagent emits **A2UI v0.9 envelopes** in its responses. Three envelope kinds are recognized; each has its own required fields.
 
-> See `agent/src/a2ui_fixed_schema.py:search_flights` for the canonical example and <https://a2ui.org/specification/v0.9-a2ui/> for the full spec.
+> See `agent/src/tools/risk_register.py:show_risk_register` for the canonical example and <https://a2ui.org/specification/v0.9-a2ui/> for the full spec.
 
 ### Common to all envelopes
 
@@ -144,7 +144,7 @@ If `check-a2a` complains, follow the teaching message it prints — the validato
 - Probe by hand: `curl http://localhost:8124/.well-known/agent.json`.
 
 **`check-a2a` says "agent responded but no A2UI v0.9 envelopes were found"**
-- Your subagent is reachable and A2A-compliant but isn't emitting A2UI envelopes. Check the canonical example: `agent/src/a2ui_fixed_schema.py:search_flights`.
+- Your subagent is reachable and A2A-compliant but isn't emitting A2UI envelopes. Check the canonical example: `agent/src/tools/risk_register.py:show_risk_register`.
 
 **`check-a2a` flags missing fields**
 - The validator output lists each issue with the field name and the canonical example to copy. Fix the indicated field and re-run.
@@ -156,5 +156,5 @@ If `check-a2a` complains, follow the teaching message it prints — the validato
 ## Related files
 
 - `src/app/api/copilotkit/[[...slug]]/route.ts` — the seam where the middleware wires up
-- `agent/src/a2ui_fixed_schema.py` — canonical A2UI v0.9 envelope-emitting tool
+- `agent/src/tools/risk_register.py` — canonical A2UI v0.9 envelope-emitting tool
 - <https://a2ui.org/specification/v0.9-a2ui/> — the v0.9 envelope spec

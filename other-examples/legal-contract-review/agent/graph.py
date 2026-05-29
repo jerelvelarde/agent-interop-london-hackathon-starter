@@ -1,10 +1,11 @@
 """
 LangGraph entry point for the Contract Review Copilot example.
 
-Mirrors agent/main.py's provider seam: Gemini 2.5 Flash via Google's
-OpenAI-compatible endpoint. Gemini 3.x is a known trap (thought-signature
-replay across tool turns); do NOT change the model line without instruction.
-See FROZEN.md and agent/main.py:23 for the full note.
+Mirrors agent/main.py's provider seam: Gemini 3.5 Flash via the native
+Google Gen AI SDK (langchain-google-genai). The native SDK handles
+thought-signature replay across tool turns, which langchain-openai's
+OpenAI-compat path does not — see FROZEN.md for the history. Do NOT
+change the model line without instruction.
 
 Import note (langgraph dev workaround):
     langgraph CLI loads graphs via `importlib.util.spec_from_file_location`
@@ -21,7 +22,7 @@ from pathlib import Path
 
 from copilotkit import CopilotKitMiddleware
 from langchain.agents import create_agent
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 _HERE = Path(__file__).resolve().parent
 if str(_HERE) not in sys.path:
@@ -30,14 +31,9 @@ if str(_HERE) not in sys.path:
 from tools import review_contract, apply_redline  # noqa: E402  (sys.path tweak above)
 
 
-model = ChatOpenAI(
-    model=os.getenv("MODEL", "gemini-2.5-flash"),
-    api_key=os.getenv("GEMINI_API_KEY"),
-    base_url=os.getenv(
-        "MODEL_BASE_URL",
-        "https://generativelanguage.googleapis.com/v1beta/openai/",
-    ),
-    model_kwargs={"parallel_tool_calls": False},
+model = ChatGoogleGenerativeAI(
+    model=os.getenv("MODEL", "gemini-3.5-flash"),
+    google_api_key=os.getenv("GEMINI_API_KEY"),
 )
 
 

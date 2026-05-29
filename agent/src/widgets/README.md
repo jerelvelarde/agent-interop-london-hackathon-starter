@@ -19,22 +19,23 @@ The starter ships exactly **one** fixture shape. The validator is the authority.
 | `catalogId` | yes | string | URI-ish, e.g. `copilotkit://app-dashboard-catalog`. |
 | `components` | yes | array | The v0.9 component tree (same shape as the catalog `.json`). |
 | `data` | yes | object | The data model the components bind to via `path`. |
-| `name` | no | string | Conventional fixture identifier, e.g. `flight_card_two_results`. |
+| `name` | no | string | Conventional fixture identifier, e.g. `risk_register_three_risks`. |
 | `description` | no | string | One sentence describing what the fixture demonstrates. |
 
-The canonical example to mirror is `agent/src/widgets/flight_card.fixture.json`. The legacy `envelopes: [...]` shape was retired in issue #16 — fixtures that still use it will fail validation with a teach-against-the-canonical hint.
+The canonical example to mirror is `agent/src/widgets/risk_register.fixture.json` (the simplest of the PortKit pair — one header label + one template-bound list). The legacy `envelopes: [...]` shape was retired in issue #16 — fixtures that still use it will fail validation with a teach-against-the-canonical hint.
 
 ## Add a new widget
 
-1. Copy the closest existing pair (`flight_card.*` for branded catalog, `product_card.*` for base v0.9 catalog).
+1. Copy the closest existing pair (`risk_register.*` for the minimal branded catalog reference, `project_dashboard.*` for a heavier showcase, `product_card.*` for the base v0.9 catalog path).
 2. Edit the `schema` array — that's the A2UI component tree.
 3. Build a matching fixture by replacing only the `data` payload (keep `surfaceId`, `catalogId`, and the `components` array consistent with the catalog).
-4. Wire a Python tool that returns the same envelopes (template: `agent/src/a2ui_fixed_schema.py:search_flights`).
+4. Wire a Python tool that returns the same envelopes (template: `agent/src/tools/risk_register.py:show_risk_register`).
 5. Run `pnpm validate-widget agent/src/widgets/<name>.json` and `pnpm validate-widget agent/src/widgets/<name>.fixture.json`.
 
 ## Canonical pairs
 
-- **`flight_card.*`** — branded `FlightCard` from `copilotkit://app-dashboard-catalog`. Fixed-schema canonical example. Backed by `search_flights`.
+- **`risk_register.*`** — branded `RiskFlag` items from `copilotkit://app-dashboard-catalog`. **The minimal fixed-schema canonical example** — one header label and one template-bound list. Backed by `show_risk_register` in `agent/src/tools/risk_register.py`. Read this first.
+- **`project_dashboard.*`** — KPIs + sprint timeline + a row of `ProjectCard`s from `copilotkit://app-dashboard-catalog`. Heavier example showing nested data shapes and multiple top-level sections. Backed by `show_project_dashboard`.
 - **`product_card.*`** — composed from the base v0.9 catalog (`Card`, `Column`, `Row`, `Image`, `Text`, `Button`). Shopping domain. Backed by `search_products`.
 - **`legal/contract_review.*`** — domain-specific Paper catalog (`LegalDocumentShell`, `Clause`, `Redline`, etc.) for the contract-review demo.
 

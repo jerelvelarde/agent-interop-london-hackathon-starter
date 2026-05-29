@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scripts/new-widget.sh — Scaffold a new A2UI widget from the search_flights template.
+# scripts/new-widget.sh — Scaffold a new A2UI widget from the risk_register template.
 #
 # Bare-bones equivalent of the .claude/skills/create-a2ui-widget skill (which
 # walks an AI assistant + the hacker through the full five-surface dance). This
@@ -55,7 +55,7 @@ if [[ -e "$FIXTURE_PATH" ]]; then
   exit 1
 fi
 
-# Catalog schema — mirrors the shape of agent/src/a2ui/schemas/flight_schema.json
+# Catalog schema — mirrors the shape of agent/src/widgets/risk_register.json
 cat > "$CATALOG_PATH" <<JSON
 [
   {
@@ -101,7 +101,7 @@ cat > "$FIXTURE_PATH" <<JSON
   "data": {
     "items": [
       { "title": "Example ${PASCAL_NAME} 1", "subtitle": "Replace me with real data" },
-      { "title": "Example ${PASCAL_NAME} 2", "subtitle": "From a Python tool in a2ui_fixed_schema.py" }
+      { "title": "Example ${PASCAL_NAME} 2", "subtitle": "From a Python tool in agent/src/tools/" }
     ]
   }
 }
@@ -122,9 +122,9 @@ echo -e "  ${DIM}1. (done) Catalog schema → ${NAME}.json${RESET}"
 echo -e "  ${DIM}2. (done) Fixture       → ${NAME}.fixture.json${RESET}"
 echo -e "  ${DIM}3. Add a Python tool that emits a createSurface for catalogId${RESET}"
 echo -e "     ${DIM}\"copilotkit://app-dashboard-catalog\" + this schema.${RESET}"
-echo -e "     ${DIM}Copy agent/src/a2ui_fixed_schema.py:search_flights as the template.${RESET}"
-echo -e "  ${DIM}4. Register the tool in agent/main.py tools=[...].${RESET}"
-echo -e "  ${DIM}5. Add a prompt hint in the active system prompt that teaches the agent WHEN to call it.${RESET}"
+echo -e "     ${DIM}Copy agent/src/tools/risk_register.py as the template (canonical minimal example).${RESET}"
+echo -e "  ${DIM}4. Register the tool in agent/src/domains/default/tools.py default_tools=[...].${RESET}"
+echo -e "  ${DIM}5. Add a prompt hint in agent/src/domains/default/prompts.py that teaches the agent WHEN to call it.${RESET}"
 echo
 echo -e "${BOLD}Verify with:${RESET}"
 echo -e "  ${DIM}pnpm validate-widget agent/src/widgets/${NAME}.json${RESET}"

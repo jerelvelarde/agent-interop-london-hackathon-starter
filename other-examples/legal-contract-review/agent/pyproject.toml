@@ -18,9 +18,9 @@ dependencies = []
 # `legal_review_agent` whose source lives in this directory (".").
 #
 # Note: this package is currently only loaded via langgraph's path-based
-# loader from `agent/graph.py` (see graph.py's sys.path injection — see
-# PLAN.md §6.1). The package install path is here for environments that
-# do `pip install ./other-examples/legal-contract-review/agent`.
+# loader from `agent/graph.py` (see graph.py's sys.path injection). The
+# package install path is here for environments that do
+# `pip install ./other-examples/legal-contract-review/agent`.
 [tool.setuptools]
 packages = ["legal_review_agent"]
 

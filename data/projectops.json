@@ -1,0 +1,55 @@
+{
+  "people": [
+    { "id": "p_amir",   "name": "Amir Patel",   "role": "Engineering",  "avatarUrl": "https://api.dicebear.com/8.x/notionists/svg?seed=amir" },
+    { "id": "p_lena",   "name": "Lena Ortiz",   "role": "Product",      "avatarUrl": "https://api.dicebear.com/8.x/notionists/svg?seed=lena" },
+    { "id": "p_jordan", "name": "Jordan Smith", "role": "Design",       "avatarUrl": "https://api.dicebear.com/8.x/notionists/svg?seed=jordan" },
+    { "id": "p_priya",  "name": "Priya Iyer",   "role": "Engineering",  "avatarUrl": "https://api.dicebear.com/8.x/notionists/svg?seed=priya" },
+    { "id": "p_mateo",  "name": "Mateo Reyes",  "role": "Engineering",  "avatarUrl": "https://api.dicebear.com/8.x/notionists/svg?seed=mateo" },
+    { "id": "p_chen",   "name": "Chen Wei",     "role": "Engineering",  "avatarUrl": "https://api.dicebear.com/8.x/notionists/svg?seed=chen" },
+    { "id": "p_aisha",  "name": "Aisha Khan",   "role": "Data Science", "avatarUrl": "https://api.dicebear.com/8.x/notionists/svg?seed=aisha" }
+  ],
+  "projects": [
+    { "id": "proj_atlas", "name": "Atlas: Enterprise Onboarding", "status": "On Track", "ownerId": "p_lena",  "percentComplete": 64, "sprintId": "sprint_w22", "taskCounts": { "todo": 4, "inProgress": 5, "inReview": 3, "done": 12 }, "milestones": [
+      { "id": "m_atlas_1", "title": "Discovery + scoping",         "due": "2026-04-30", "done": true },
+      { "id": "m_atlas_2", "title": "SSO + provisioning",          "due": "2026-05-22", "done": true },
+      { "id": "m_atlas_3", "title": "Bulk import UX",              "due": "2026-06-05", "done": false },
+      { "id": "m_atlas_4", "title": "Beta with 3 design partners", "due": "2026-06-19", "done": false },
+      { "id": "m_atlas_5", "title": "GA launch",                   "due": "2026-07-03", "done": false }
+    ] },
+    { "id": "proj_orion", "name": "Orion: Self-Serve Billing", "status": "At Risk", "ownerId": "p_mateo", "percentComplete": 41, "sprintId": "sprint_w22", "taskCounts": { "todo": 9, "inProgress": 3, "inReview": 1, "done": 8 }, "milestones": [
+      { "id": "m_orion_1", "title": "Stripe integration",    "due": "2026-05-15", "done": true },
+      { "id": "m_orion_2", "title": "Invoice PDF",           "due": "2026-05-29", "done": false },
+      { "id": "m_orion_3", "title": "Refund / credit flows", "due": "2026-06-12", "done": false },
+      { "id": "m_orion_4", "title": "Tax-jar integration",   "due": "2026-06-26", "done": false }
+    ] },
+    { "id": "proj_lyra", "name": "Lyra: AI Suggestions", "status": "On Track", "ownerId": "p_aisha", "percentComplete": 28, "sprintId": "sprint_w22", "taskCounts": { "todo": 7, "inProgress": 2, "inReview": 0, "done": 4 }, "milestones": [
+      { "id": "m_lyra_1", "title": "Inference cost research", "due": "2026-05-20", "done": true },
+      { "id": "m_lyra_2", "title": "Suggestion ranking v1",   "due": "2026-06-10", "done": false },
+      { "id": "m_lyra_3", "title": "A/B test infra",          "due": "2026-06-24", "done": false },
+      { "id": "m_lyra_4", "title": "Beta to power users",     "due": "2026-07-08", "done": false }
+    ] }
+  ],
+  "sprints": [
+    { "id": "sprint_w22", "name": "Sprint 22 (May 25 — Jun 5)", "start": "2026-05-25", "end": "2026-06-05", "capacity": 120, "committed": 108, "status": "Active" }
+  ],
+  "tasks": [
+    { "id": "t_001", "projectId": "proj_atlas", "sprintId": "sprint_w22", "title": "Wire bulk-import CSV parser",       "assigneeId": "p_amir",   "status": "inProgress", "points": 5, "due": "2026-06-02" },
+    { "id": "t_002", "projectId": "proj_atlas", "sprintId": "sprint_w22", "title": "Bulk-import error UI",              "assigneeId": "p_jordan", "status": "inReview",   "points": 3, "due": "2026-05-30" },
+    { "id": "t_003", "projectId": "proj_atlas", "sprintId": "sprint_w22", "title": "Org-admin role gating",             "assigneeId": "p_priya",  "status": "todo",       "points": 5, "due": "2026-06-04" },
+    { "id": "t_004", "projectId": "proj_orion", "sprintId": "sprint_w22", "title": "Invoice PDF templating",            "assigneeId": "p_chen",   "status": "inProgress", "points": 8, "due": "2026-05-29" },
+    { "id": "t_005", "projectId": "proj_orion", "sprintId": "sprint_w22", "title": "Tax-jar webhook plumbing",          "assigneeId": "p_mateo",  "status": "todo",       "points": 8, "due": "2026-06-05" },
+    { "id": "t_006", "projectId": "proj_orion", "sprintId": "sprint_w22", "title": "Refund-credit reconciliation",      "assigneeId": "p_chen",   "status": "todo",       "points": 5, "due": "2026-06-04" },
+    { "id": "t_007", "projectId": "proj_lyra",  "sprintId": "sprint_w22", "title": "Ranker prototype eval harness",     "assigneeId": "p_aisha",  "status": "inProgress", "points": 8, "due": "2026-05-30" },
+    { "id": "t_008", "projectId": "proj_lyra",  "sprintId": "sprint_w22", "title": "Suggestion telemetry events",       "assigneeId": "p_amir",   "status": "todo",       "points": 3, "due": "2026-06-03" }
+  ],
+  "risks": [
+    { "id": "r_001", "projectId": "proj_orion", "severity": "high",   "title": "Tax-jar API rate limits",            "ownerId": "p_mateo", "mitigation": "Negotiating tier upgrade with TaxJar; backup local computation in flight as fallback." },
+    { "id": "r_002", "projectId": "proj_orion", "severity": "medium", "title": "PDF rendering perf on 100+ pages",   "ownerId": "p_chen",  "mitigation": "Streaming render pipeline planned; cap MVP at 50 pages." },
+    { "id": "r_003", "projectId": "proj_lyra",  "severity": "medium", "title": "Inference cost > $0.04 / suggestion", "ownerId": "p_aisha", "mitigation": "Quantize + cache top-100 suggestions; renegotiate provider quote." }
+  ],
+  "updates": [
+    { "id": "u_001", "projectId": "proj_atlas", "authorId": "p_lena",  "date": "2026-05-27", "body": "Discovery wrapped with 3 design partners; rolling into bulk-import build this sprint." },
+    { "id": "u_002", "projectId": "proj_orion", "authorId": "p_mateo", "date": "2026-05-27", "body": "Stripe integration shipped; PDF template work behind by ~3 days due to TaxJar rate limits." },
+    { "id": "u_003", "projectId": "proj_lyra",  "authorId": "p_aisha", "date": "2026-05-26", "body": "Eval harness up and running on golden set of 500 suggestions; ranker hit p95 latency target." }
+  ]
+}

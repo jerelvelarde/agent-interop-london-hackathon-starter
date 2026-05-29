@@ -1,0 +1,56 @@
+/* Chat panel polish — hidden scrollbar + staggered entrance animation.
+ *
+ * Owned by ExampleLayout (src/components/example-layout/index.tsx). The
+ * `.chat-scroll` class is applied to the chat column's overflow container so
+ * children fade up sequentially on first paint without revealing a scrollbar.
+ */
+
+/* Hidden scrollbar, scroll behavior intact (cross-browser). */
+.chat-scroll {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* legacy IE/Edge */
+}
+
+.chat-scroll::-webkit-scrollbar {
+  display: none; /* WebKit */
+}
+
+/* Fade + 8px slide-up, staggered per child. */
+@keyframes chat-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chat-scroll > * {
+  animation: chat-enter 250ms ease-out both;
+}
+.chat-scroll > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.chat-scroll > *:nth-child(2) {
+  animation-delay: 40ms;
+}
+.chat-scroll > *:nth-child(3) {
+  animation-delay: 80ms;
+}
+.chat-scroll > *:nth-child(4) {
+  animation-delay: 120ms;
+}
+.chat-scroll > *:nth-child(5) {
+  animation-delay: 160ms;
+}
+.chat-scroll > *:nth-child(n + 6) {
+  animation-delay: 200ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-scroll > * {
+    animation: none;
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "team-load",
+  "name": "TeamLoad",
+  "description": "Team capacity view for the active sprint: bar chart of assigned points per person + table of overloaded people with recommendations.",
+  "catalogId": "copilotkit://app-dashboard-catalog",
+  "pythonTool": "agent/src/tools/team_load.py:show_team_load",
+  "schema": [
+    { "id": "root", "component": "Column", "gap": 16, "children": ["team-title", "bar-card", "overload-hdr", "overload-table"] },
+    { "id": "team-title", "component": "Title", "text": "Team Capacity · Sprint 22", "level": "h1" },
+    { "id": "bar-card", "component": "DashboardCard", "title": "Points assigned per person", "child": "team-bar" },
+    { "id": "team-bar", "component": "BarChart", "data": { "path": "barData" } },
+    { "id": "overload-hdr", "component": "Title", "text": { "path": "overloadedLabel" }, "level": "h2" },
+    { "id": "overload-table", "component": "DataTable",
+      "columns": [
+        { "key": "person", "label": "Person" },
+        { "key": "pts", "label": "Pts" },
+        { "key": "role", "label": "Role" },
+        { "key": "rec", "label": "Recommendation" }
+      ],
+      "rows": { "path": "overloaded" }
+    }
+  ]
+}

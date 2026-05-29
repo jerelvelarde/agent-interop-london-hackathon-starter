@@ -1,16 +1,16 @@
 # Submitting Your Demo
 
-> **Submission flow is TBD.** Event-ops will confirm whether submissions go
-> through Devpost, A2A Net's platform, or a Notion form. Watch the event Slack
-> for the official link. Until then, prep the artifacts below so you can submit
-> the moment the flow opens.
+> **Submission flow is TBD.** The event organizers will confirm whether
+> submissions go through Devpost, A2A Net's platform, or a Notion form closer
+> to the day. Watch the event channel for the official link. Until then, prep
+> the artifacts below so you can submit the moment the flow opens.
 
 ## What you'll need
 
 - **Team name** — same as registration.
 - **Demo URL** — Vercel deploy preferred. (A "Deploy to Vercel" button will land
   in this README before event day; if not, push the repo to GitHub and run
-  `npx vercel --prod`.) <!-- TODO: wire the deploy button once the canonical fork URL is final -->
+  `npx vercel --prod`.)
 - **Public repo URL** — your fork of this starter, with your customizations.
 - **30-second demo video** — screen recording of your canned prompt sequence.
   Loom, OBS, or QuickTime all fine.
@@ -22,8 +22,8 @@
 
 ## Sponsor credit
 
-Name **Google DeepMind, CopilotKit, Manufact, A2A Net** in your submission
-copy. Judges notice.
+Name **Google DeepMind, CopilotKit, A2A Net** in your submission copy.
+Judges notice.
 
 ## Track 1 entries (A2A interop)
 
@@ -38,4 +38,4 @@ The envelope inspector still shows real A2UI surfaces from
 `public/offline-envelopes.json` — same protocol, no network. Don't sweat it.
 
 > This doc is a stub. The canonical submission link and Vercel deploy button
-> land here once event-ops confirms the platform.
+> land here once the submission platform is announced.

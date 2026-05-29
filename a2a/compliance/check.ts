@@ -8,15 +8,15 @@
  * response (JSON-RPC or SSE), and reports whether the agent emitted
  * recognizable A2UI v0.9 envelopes. Output follows the "validators that
  * teach" pattern — point at the canonical example
- * (agent/src/a2ui_fixed_schema.py:search_flights) for fixes and link
- * to the v0.9 spec.
+ * (agent/src/tools/risk_register.py:show_risk_register) for fixes and
+ * link to the v0.9 spec.
  *
  * Spec reference: https://a2ui.org/specification/v0.9-a2ui/
- * Canonical envelope-emitting example: agent/src/a2ui_fixed_schema.py
+ * Canonical envelope-emitting example: agent/src/tools/risk_register.py
  */
 
 const CANONICAL_EXAMPLE_PATH =
-  "agent/src/a2ui_fixed_schema.py:search_flights";
+  "agent/src/tools/risk_register.py:show_risk_register";
 const V09_SPEC_URL = "https://a2ui.org/specification/v0.9-a2ui/";
 
 // Recognized A2UI v0.9 envelope kinds.

@@ -1,0 +1,60 @@
+{
+  "name": "status_report_draft_orion",
+  "description": "Editable weekly update draft for Orion: TL;DR + progress bullets + risk + asks, with Edit/Send buttons.",
+  "surfaceId": "status-report-draft",
+  "catalogId": "copilotkit://app-dashboard-catalog",
+  "components": [
+    { "id": "root", "component": "Column", "gap": 16, "children": ["report-title", "tldr-card", "progress-card", "risks-card", "asks-card", "buttons-row"] },
+    { "id": "report-title", "component": "Title", "text": { "path": "headerLabel" }, "level": "h1" },
+    { "id": "tldr-card", "component": "DashboardCard", "title": "TL;DR", "child": "paragraph-tldr" },
+    { "id": "paragraph-tldr", "component": "Paragraph", "text": { "path": "tldr" } },
+    { "id": "progress-card", "component": "DashboardCard", "title": "Progress this week", "child": "progress-col" },
+    { "id": "progress-col", "component": "Column", "gap": 8, "children": { "componentId": "progress-bullet", "path": "progressBullets" } },
+    { "id": "progress-bullet", "component": "Paragraph", "text": { "path": "text" } },
+    { "id": "risks-card", "component": "DashboardCard", "title": "Risks", "child": "risks-col" },
+    { "id": "risks-col", "component": "Column", "gap": 8, "children": { "componentId": "risk-flag", "path": "risks" } },
+    { "id": "risk-flag", "component": "RiskFlag",
+      "severity": { "path": "severity" },
+      "title": { "path": "title" },
+      "ownerName": { "path": "ownerName" },
+      "projectLabel": { "path": "projectLabel" },
+      "mitigation": { "path": "mitigation" }
+    },
+    { "id": "asks-card", "component": "DashboardCard", "title": "Asks", "child": "asks-col" },
+    { "id": "asks-col", "component": "Column", "gap": 8, "children": { "componentId": "ask-bullet", "path": "askBullets" } },
+    { "id": "ask-bullet", "component": "Paragraph", "text": { "path": "text" } },
+    { "id": "buttons-row", "component": "Row", "gap": 12, "children": ["btn-edit", "btn-send"] },
+    { "id": "btn-edit", "component": "Button", "variant": "secondary", "child": "btn-edit-label" },
+    { "id": "btn-edit-label", "component": "Paragraph", "text": "✎ Edit draft" },
+    { "id": "btn-send", "component": "Button", "variant": "primary", "child": "btn-send-label",
+      "action": {
+        "event": {
+          "name": "send_status_report",
+          "context": {
+            "projectId": { "path": "projectId" },
+            "tldr": { "path": "tldr" },
+            "asks": { "path": "asksJoined" }
+          }
+        }
+      }
+    },
+    { "id": "btn-send-label", "component": "Paragraph", "text": "✓ Send to #orion-pm" }
+  ],
+  "data": {
+    "projectId": "proj_orion",
+    "headerLabel": "Draft: Weekly Update — Orion: Self-Serve Billing",
+    "tldr": "Stripe integration shipped on schedule. Invoice PDF work behind by ~3 days due to TaxJar rate limits — mitigation in flight.",
+    "progressBullets": [
+      { "text": "Closed: Stripe integration milestone (M1)" },
+      { "text": "In flight: Invoice PDF template (Chen, 8 pts)" },
+      { "text": "Started: Tax-jar webhook plumbing (Mateo, 8 pts)" }
+    ],
+    "risks": [
+      { "severity": "high", "title": "Tax-jar API rate limits", "ownerName": "Mateo Reyes", "projectLabel": "Orion", "mitigation": "Tier upgrade in flight." }
+    ],
+    "askBullets": [
+      { "text": "Need 30 min sync with infra team to confirm tier upgrade path." }
+    ],
+    "asksJoined": "Need 30 min sync with infra team to confirm tier upgrade path."
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "name": "project_dashboard_default",
+  "description": "Canonical PortKit dashboard: 4 KPIs + active sprint + 3 projects (Atlas, Orion, Lyra).",
+  "surfaceId": "project-dashboard",
+  "catalogId": "copilotkit://app-dashboard-catalog",
+  "components": [
+    { "id": "root", "component": "Column", "gap": 16, "children": ["hdr", "kpi-row", "sprint-bar", "projects-hdr", "projects-row"] },
+    { "id": "hdr", "component": "Title", "text": { "path": "weekLabel" }, "level": "h1" },
+    { "id": "kpi-row", "component": "Row", "gap": 16, "children": ["kpi-active", "kpi-risk", "kpi-tasks", "kpi-velocity"] },
+    { "id": "kpi-active", "component": "DashboardCard", "title": "Active Projects", "child": "kpi-active-m" },
+    { "id": "kpi-active-m", "component": "Metric", "label": "Projects", "value": { "path": "kpi.activeProjects" }, "trend": "neutral", "trendValue": "vs last week" },
+    { "id": "kpi-risk", "component": "DashboardCard", "title": "At Risk", "child": "kpi-risk-m" },
+    { "id": "kpi-risk-m", "component": "Metric", "label": "Risk", "value": { "path": "kpi.atRisk" } },
+    { "id": "kpi-tasks", "component": "DashboardCard", "title": "Open Tasks", "child": "kpi-tasks-m" },
+    { "id": "kpi-tasks-m", "component": "Metric", "label": "Tasks", "value": { "path": "kpi.openTasks" } },
+    { "id": "kpi-velocity", "component": "DashboardCard", "title": "Velocity", "child": "kpi-velocity-m" },
+    { "id": "kpi-velocity-m", "component": "Metric", "label": "Velocity", "value": { "path": "kpi.velocityLabel" } },
+    { "id": "sprint-bar", "component": "SprintTimelineBar",
+      "sprintName": { "path": "sprint.name" },
+      "startLabel": { "path": "sprint.startLabel" },
+      "endLabel": { "path": "sprint.endLabel" },
+      "percentComplete": { "path": "sprint.percentComplete" },
+      "daysRemainingLabel": { "path": "sprint.daysRemainingLabel" },
+      "status": { "path": "sprint.status" }
+    },
+    { "id": "projects-hdr", "component": "Title", "text": "Projects", "level": "h2" },
+    { "id": "projects-row", "component": "Row", "gap": 16, "children": { "componentId": "project-card", "path": "/projects" } },
+    { "id": "project-card", "component": "ProjectCard",
+      "name": { "path": "name" },
+      "status": { "path": "status" },
+      "ownerName": { "path": "ownerName" },
+      "sprintLabel": { "path": "sprintLabel" },
+      "percentComplete": { "path": "percentComplete" },
+      "todoCount": { "path": "taskCounts.todo" },
+      "inProgressCount": { "path": "taskCounts.inProgress" },
+      "inReviewCount": { "path": "taskCounts.inReview" },
+      "doneCount": { "path": "taskCounts.done" },
+      "action": { "event": { "name": "open_project", "context": { "projectId": { "path": "id" } } } }
+    }
+  ],
+  "data": {
+    "weekLabel": "Project Operations · Week of May 25",
+    "kpi": { "activeProjects": "3", "atRisk": "1", "openTasks": "30", "velocityLabel": "108 / 120" },
+    "sprint": { "name": "Sprint 22", "startLabel": "May 25", "endLabel": "Jun 5", "percentComplete": 65, "daysRemainingLabel": "9 days left", "status": "Active" },
+    "projects": [
+      { "id": "proj_atlas", "name": "Atlas: Enterprise Onboarding", "status": "On Track", "ownerName": "Lena Ortiz",  "sprintLabel": "Sprint 22", "percentComplete": 64, "taskCounts": { "todo": 4, "inProgress": 5, "inReview": 3, "done": 12 } },
+      { "id": "proj_orion", "name": "Orion: Self-Serve Billing",   "status": "At Risk",  "ownerName": "Mateo Reyes", "sprintLabel": "Sprint 22", "percentComplete": 41, "taskCounts": { "todo": 9, "inProgress": 3, "inReview": 1, "done": 8 } },
+      { "id": "proj_lyra",  "name": "Lyra: AI Suggestions",        "status": "On Track", "ownerName": "Aisha Khan",  "sprintLabel": "Sprint 22", "percentComplete": 28, "taskCounts": { "todo": 7, "inProgress": 2, "inReview": 0, "done": 4 } }
+    ]
+  }
+}

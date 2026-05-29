@@ -11,6 +11,11 @@
  */
 "use client";
 
+// Lives inside the (default) route group so it shares the <CopilotKit> provider
+// mounted in (default)/layout.tsx — useAgent() needs that context at render time.
+// Also opt out of static prerender as defence-in-depth.
+export const dynamic = "force-dynamic";
+
 import { useEffect, useMemo, useState } from "react";
 import { useAgent } from "@copilotkit/react-core/v2";
 import JsonView from "react18-json-view";

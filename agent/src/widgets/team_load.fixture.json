@@ -1,0 +1,38 @@
+{
+  "name": "team_load_sprint_22",
+  "description": "Team capacity for Sprint 22: bar chart of assigned points per person plus a table of overloaded teammates.",
+  "surfaceId": "team-load",
+  "catalogId": "copilotkit://app-dashboard-catalog",
+  "components": [
+    { "id": "root", "component": "Column", "gap": 16, "children": ["team-title", "bar-card", "overload-hdr", "overload-table"] },
+    { "id": "team-title", "component": "Title", "text": "Team Capacity · Sprint 22", "level": "h1" },
+    { "id": "bar-card", "component": "DashboardCard", "title": "Points assigned per person", "child": "team-bar" },
+    { "id": "team-bar", "component": "BarChart", "data": { "path": "barData" } },
+    { "id": "overload-hdr", "component": "Title", "text": { "path": "overloadedLabel" }, "level": "h2" },
+    { "id": "overload-table", "component": "DataTable",
+      "columns": [
+        { "key": "person", "label": "Person" },
+        { "key": "pts", "label": "Pts" },
+        { "key": "role", "label": "Role" },
+        { "key": "rec", "label": "Recommendation" }
+      ],
+      "rows": { "path": "overloaded" }
+    }
+  ],
+  "data": {
+    "barData": [
+      { "label": "Amir",   "value": 13 },
+      { "label": "Chen",   "value": 13 },
+      { "label": "Aisha",  "value": 8  },
+      { "label": "Mateo",  "value": 8  },
+      { "label": "Priya",  "value": 5  },
+      { "label": "Jordan", "value": 3  },
+      { "label": "Lena",   "value": 0  }
+    ],
+    "overloadedLabel": "Overloaded · 2",
+    "overloaded": [
+      { "person": "Amir Patel", "pts": "13", "role": "Engineering", "rec": "Re-assign 3 pts to Priya" },
+      { "person": "Chen Wei",   "pts": "13", "role": "Engineering", "rec": "Re-assign 5 pts to Jordan or Mateo" }
+    ]
+  }
+}

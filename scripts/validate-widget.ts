@@ -12,25 +12,24 @@
  * Three recognized JSON shapes:
  *
  *   (a) Bare catalog schema — array of v0.9 components. Lives at
- *       `agent/src/a2ui/schemas/<name>_schema.json` and
- *       `agent/src/widgets/<sub>/<name>.json`. Canonical example:
- *       `agent/src/a2ui/schemas/flight_schema.json`.
+ *       `agent/src/a2ui/schemas/<name>_schema.json`. Canonical example:
+ *       `agent/src/a2ui/schemas/risk_register_schema.json`.
  *
  *         [
- *           { "id": "root", "component": "Row", "children": {...} },
- *           { "id": "card", "component": "FlightCard", ... }
+ *           { "id": "root", "component": "Column", "children": [...] },
+ *           { "id": "risk-flag", "component": "RiskFlag", ... }
  *         ]
  *
  *   (b) Wrapper widget JSON — what `pnpm new-widget` scaffolds. The schema
  *       array is nested under a `schema` key. Canonical example:
- *       `agent/src/widgets/flight_card.json` (when present).
+ *       `agent/src/widgets/risk_register.json`.
  *
  *         {
- *           "id": "flight-card",
- *           "name": "FlightCard",
+ *           "id": "risk-register",
+ *           "name": "RiskRegister",
  *           "description": "...",
  *           "catalogId": "copilotkit://...",
- *           "pythonTool": "agent/src/.../tool.py:fn",
+ *           "pythonTool": "agent/src/tools/risk_register.py:show_risk_register",
  *           "schema": [ ...catalog-schema components... ]
  *         }
  *
@@ -38,15 +37,15 @@
  *       MUST use this shape. One flat object with the createSurface fields at
  *       the top level, the component tree under `components`, and the data
  *       model under `data`. Canonical example:
- *       `agent/src/widgets/flight_card.fixture.json`.
+ *       `agent/src/widgets/risk_register.fixture.json`.
  *
  *         {
- *           "name": "flight_card_two_results",
+ *           "name": "risk_register_default",
  *           "description": "...",
- *           "surfaceId": "flight-search-results",
+ *           "surfaceId": "risk-register",
  *           "catalogId": "copilotkit://app-dashboard-catalog",
  *           "components": [ ...catalog components... ],
- *           "data": { "flights": [ ... ] }
+ *           "data": { "risks": [ ... ] }
  *         }
  *
  *       Why this shape: the validator is the authority (issue #16). Tests,
@@ -70,11 +69,10 @@ import { join, resolve, basename } from "node:path";
 
 // Canonical references — these are real JSON files in the repo a hacker can
 // open and copy-paste. Issue #17: the validator used to point at a Python
-// file (`agent/src/a2ui_fixed_schema.py:search_flights`) which is not a
-// template you can mirror.
-const CANONICAL_CATALOG_SCHEMA_JSON = "agent/src/a2ui/schemas/flight_schema.json";
-const CANONICAL_WIDGET_JSON = "agent/src/a2ui/schemas/flight_schema.json";
-const CANONICAL_FIXTURE_JSON = "agent/src/widgets/flight_card.fixture.json";
+// file which is not a template you can mirror — these are JSON.
+const CANONICAL_CATALOG_SCHEMA_JSON = "agent/src/a2ui/schemas/risk_register_schema.json";
+const CANONICAL_WIDGET_JSON = "agent/src/widgets/risk_register.json";
+const CANONICAL_FIXTURE_JSON = "agent/src/widgets/risk_register.fixture.json";
 const CANONICAL_EXAMPLE_JSON = "other-examples/legal-contract-review/EXAMPLE.json";
 const SCHEMA_REF = "https://a2ui.org/specification/v0.9-a2ui/";
 
@@ -135,7 +133,7 @@ function validateComponent(
   if (typeof c.component !== "string" || c.component.length === 0) {
     errors.push({
       message: `Component at index ${index} (id="${c.id ?? "?"}") is missing required field 'component'.`,
-      fix: `Add a "component" field naming the catalog component (e.g. "Row", "Card", "FlightCard").`,
+      fix: `Add a "component" field naming the catalog component (e.g. "Row", "Card", "RiskFlag").`,
     });
   }
 }
@@ -208,13 +206,13 @@ function validateWrapperWidget(
   if (typeof obj.id !== "string" || obj.id.length === 0) {
     errors.push({
       message: "Wrapper widget JSON missing 'id' (must be a non-empty kebab-case string).",
-      fix: `Add an "id" field — convention is kebab-case, e.g. "flight-card".`,
+      fix: `Add an "id" field — convention is kebab-case, e.g. "risk-register".`,
     });
   }
   if (typeof obj.name !== "string" || obj.name.length === 0) {
     errors.push({
       message: "Wrapper widget JSON missing 'name' (the catalog component name).",
-      fix: `Add a "name" field — convention is PascalCase, e.g. "FlightCard".`,
+      fix: `Add a "name" field — convention is PascalCase, e.g. "RiskRegister".`,
     });
   }
   validateCatalogId(obj.catalogId, errors);
@@ -247,7 +245,7 @@ function validateCanonicalFixture(
   if (typeof obj.surfaceId !== "string" || obj.surfaceId.length === 0) {
     errors.push({
       message: "Fixture missing 'surfaceId' (the unique surface identifier).",
-      fix: `Add a top-level "surfaceId" string, e.g. "flight-search-results". See ${CANONICAL_FIXTURE_JSON}.`,
+      fix: `Add a top-level "surfaceId" string, e.g. "risk-register". See ${CANONICAL_FIXTURE_JSON}.`,
     });
   }
   validateCatalogId(obj.catalogId, errors);
@@ -262,12 +260,12 @@ function validateCanonicalFixture(
   if (!("data" in obj)) {
     errors.push({
       message: "Fixture missing 'data' object (the data model components bind to via 'path').",
-      fix: `Add a top-level "data" object whose keys match the paths your components reference, e.g. { "flights": [...] }. See ${CANONICAL_FIXTURE_JSON}.`,
+      fix: `Add a top-level "data" object whose keys match the paths your components reference, e.g. { "risks": [...] }. See ${CANONICAL_FIXTURE_JSON}.`,
     });
   } else if (typeof obj.data !== "object" || obj.data === null || Array.isArray(obj.data)) {
     errors.push({
       message: "'data' must be an object (the data model components bind to via 'path').",
-      fix: `Make 'data' an object whose keys match the paths your components reference, e.g. { "flights": [...] }. See ${CANONICAL_FIXTURE_JSON}.`,
+      fix: `Make 'data' an object whose keys match the paths your components reference, e.g. { "risks": [...] }. See ${CANONICAL_FIXTURE_JSON}.`,
     });
   }
 }

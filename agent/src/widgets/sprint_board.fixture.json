@@ -1,0 +1,70 @@
+{
+  "name": "sprint_board_22",
+  "description": "Cross-project kanban for Sprint 22 with tasks from Atlas, Orion, and Lyra in four status columns.",
+  "surfaceId": "sprint-board",
+  "catalogId": "copilotkit://app-dashboard-catalog",
+  "components": [
+    { "id": "root", "component": "Column", "gap": 16, "children": ["sprint-title", "kanban-row"] },
+    { "id": "sprint-title", "component": "Title", "text": { "path": "sprint.headerLabel" }, "level": "h1" },
+    { "id": "kanban-row", "component": "Row", "gap": 12, "children": ["kc-todo", "kc-flight", "kc-review", "kc-done"] },
+    { "id": "kc-todo", "component": "KanbanColumn",
+      "statusLabel": "To Do",
+      "count": { "path": "tasks.todoCount" },
+      "children": { "componentId": "task-card", "path": "tasks.todo" }
+    },
+    { "id": "kc-flight", "component": "KanbanColumn",
+      "statusLabel": "In Progress",
+      "count": { "path": "tasks.inProgressCount" },
+      "children": { "componentId": "task-card", "path": "tasks.inProgress" }
+    },
+    { "id": "kc-review", "component": "KanbanColumn",
+      "statusLabel": "In Review",
+      "count": { "path": "tasks.inReviewCount" },
+      "children": { "componentId": "task-card", "path": "tasks.inReview" }
+    },
+    { "id": "kc-done", "component": "KanbanColumn",
+      "statusLabel": "Done",
+      "count": { "path": "tasks.doneCount" },
+      "children": { "componentId": "task-card", "path": "tasks.done" }
+    },
+    { "id": "task-card", "component": "TaskCard",
+      "title": { "path": "title" },
+      "projectLabel": { "path": "projectLabel" },
+      "assigneeName": { "path": "assigneeName" },
+      "assigneeInitials": { "path": "assigneeInitials" },
+      "pointsLabel": { "path": "pointsLabel" },
+      "dueLabel": { "path": "dueLabel" },
+      "action": { "event": { "name": "open_task", "context": { "taskId": { "path": "id" } } } }
+    }
+  ],
+  "data": {
+    "sprint": { "headerLabel": "Sprint 22 · May 25 → Jun 5 · 9 days left" },
+    "tasks": {
+      "todoCount": 4,
+      "inProgressCount": 4,
+      "inReviewCount": 2,
+      "doneCount": 3,
+      "todo": [
+        { "id": "t_101", "title": "Tax-jar webhook plumbing", "projectLabel": "Orion",  "assigneeName": "Mateo Reyes", "assigneeInitials": "MR", "pointsLabel": "8 pts", "dueLabel": "Jun 5" },
+        { "id": "t_102", "title": "SSO admin console",        "projectLabel": "Atlas",  "assigneeName": "Lena Ortiz",  "assigneeInitials": "LO", "pointsLabel": "5 pts", "dueLabel": "Jun 4" },
+        { "id": "t_103", "title": "Suggestion ranker v2",     "projectLabel": "Lyra",   "assigneeName": "Aisha Khan",  "assigneeInitials": "AK", "pointsLabel": "5 pts", "dueLabel": "Jun 3" },
+        { "id": "t_104", "title": "Refund flow UX",           "projectLabel": "Orion",  "assigneeName": "Priya Singh", "assigneeInitials": "PS", "pointsLabel": "3 pts", "dueLabel": "Jun 5" }
+      ],
+      "inProgress": [
+        { "id": "t_201", "title": "Invoice PDF templating",   "projectLabel": "Orion",  "assigneeName": "Chen Wei",    "assigneeInitials": "CW", "pointsLabel": "8 pts", "dueLabel": "May 29" },
+        { "id": "t_202", "title": "Audit log retention",      "projectLabel": "Atlas",  "assigneeName": "Amir Patel",  "assigneeInitials": "AP", "pointsLabel": "5 pts", "dueLabel": "May 30" },
+        { "id": "t_203", "title": "Suggestion cache layer",   "projectLabel": "Lyra",   "assigneeName": "Jordan Lee",  "assigneeInitials": "JL", "pointsLabel": "3 pts", "dueLabel": "May 30" },
+        { "id": "t_204", "title": "Tax-jar API integration",  "projectLabel": "Orion",  "assigneeName": "Mateo Reyes", "assigneeInitials": "MR", "pointsLabel": "5 pts", "dueLabel": "May 30" }
+      ],
+      "inReview": [
+        { "id": "t_301", "title": "Customer billing portal copy", "projectLabel": "Orion", "assigneeName": "Priya Singh", "assigneeInitials": "PS", "pointsLabel": "3 pts", "dueLabel": "May 28" },
+        { "id": "t_302", "title": "Atlas onboarding wizard step 3", "projectLabel": "Atlas", "assigneeName": "Lena Ortiz", "assigneeInitials": "LO", "pointsLabel": "5 pts", "dueLabel": "May 27" }
+      ],
+      "done": [
+        { "id": "t_401", "title": "Stripe Connect onboarding", "projectLabel": "Orion", "assigneeName": "Mateo Reyes", "assigneeInitials": "MR", "pointsLabel": "5 pts", "dueLabel": "May 22" },
+        { "id": "t_402", "title": "Atlas SAML metadata parser", "projectLabel": "Atlas", "assigneeName": "Amir Patel", "assigneeInitials": "AP", "pointsLabel": "8 pts", "dueLabel": "May 23" },
+        { "id": "t_403", "title": "Lyra prompt regression suite", "projectLabel": "Lyra", "assigneeName": "Aisha Khan", "assigneeInitials": "AK", "pointsLabel": "3 pts", "dueLabel": "May 24" }
+      ]
+    }
+  }
+}

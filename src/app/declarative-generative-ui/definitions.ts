@@ -73,10 +73,10 @@ export const demonstrationCatalogDefinitions = {
     description:
       "A key metric display with label, value, and optional trend indicator. Great for KPIs and stats.",
     props: z.object({
-      label: z.string(),
-      value: z.string(),
+      label: DynString,
+      value: DynString,
       trend: z.enum(["up", "down", "neutral"]).optional(),
-      trendValue: z.string().optional(),
+      trendValue: DynString.optional(),
     }),
   },
 
@@ -175,6 +175,131 @@ export const demonstrationCatalogDefinitions = {
           z.null(),
         ])
         .optional(),
+    }),
+  },
+
+  ProjectCard: {
+    description:
+      "A project tile. Shows name, status pill, owner, % complete progress bar, sprint label, and task counts. 'action' wires an open-project deep-link.",
+    props: z.object({
+      name: DynString,
+      status: DynString,
+      ownerName: DynString,
+      sprintLabel: DynString,
+      percentComplete: z.number(),
+      todoCount: z.number(),
+      inProgressCount: z.number(),
+      inReviewCount: z.number(),
+      doneCount: z.number(),
+      action: z
+        .union([
+          z.object({
+            event: z.object({
+              name: z.string(),
+              context: z.record(z.any()).optional(),
+            }),
+          }),
+          z.null(),
+        ])
+        .optional(),
+    }),
+  },
+
+  TaskCard: {
+    description:
+      "A task chip for use inside a KanbanColumn. Shows title, assignee, points, due label, and optional project label.",
+    props: z.object({
+      title: DynString,
+      assigneeName: DynString,
+      assigneeInitials: DynString,
+      pointsLabel: DynString,
+      dueLabel: DynString,
+      projectLabel: DynString.optional(),
+    }),
+  },
+
+  KanbanColumn: {
+    description:
+      "A kanban status bucket. Header shows status label + count. 'children' template-binds to a filtered task list: pass { componentId: 'task-card', path: 'tasks.todo' } etc.",
+    props: z.object({
+      statusLabel: DynString,
+      count: z.number(),
+      children: z.union([
+        z.array(z.string()),
+        z.object({ componentId: z.string(), path: z.string() }),
+      ]),
+    }),
+  },
+
+  SprintTimelineBar: {
+    description:
+      "A sprint progress bar. Shows sprint name, start/end labels, % complete, and days-remaining text.",
+    props: z.object({
+      sprintName: DynString,
+      startLabel: DynString,
+      endLabel: DynString,
+      percentComplete: z.number(),
+      daysRemainingLabel: DynString,
+      status: DynString,
+    }),
+  },
+
+  MilestoneList: {
+    description:
+      "A milestone checklist. Each item has a title, due label, and done flag.",
+    props: z.object({
+      milestones: z.array(
+        z.object({
+          title: z.string(),
+          dueLabel: z.string(),
+          done: z.boolean(),
+        }),
+      ),
+    }),
+  },
+
+  PersonAvatar: {
+    description:
+      "A team-member chip. Renders avatar (or initials), name, role, and optional load label.",
+    props: z.object({
+      name: DynString,
+      initials: DynString,
+      role: DynString,
+      avatarUrl: DynString.optional(),
+      loadLabel: DynString.optional(),
+    }),
+  },
+
+  RiskFlag: {
+    description:
+      "An open-risk row. Shows severity color/label (high/medium/low), risk title, owner name, project label, and mitigation text.",
+    props: z.object({
+      severity: DynString,
+      title: DynString,
+      ownerName: DynString,
+      projectLabel: DynString,
+      mitigation: DynString,
+    }),
+  },
+
+  UpdateFeedItem: {
+    description:
+      "A status update entry. Shows author + date + project label + body text.",
+    props: z.object({
+      authorName: DynString,
+      authorInitials: DynString,
+      dateLabel: DynString,
+      projectLabel: DynString,
+      body: DynString,
+    }),
+  },
+
+  Paragraph: {
+    description:
+      "A paragraph of text. Use for body copy, multi-line descriptions, and button labels. Supports path-binding for dynamic strings.",
+    props: z.object({
+      text: DynString,
+      tone: z.enum(["default", "muted", "strong"]).optional(),
     }),
   },
 };

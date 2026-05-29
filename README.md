@@ -1,18 +1,39 @@
-# CopilotKit A2UI Hackathon Starter
+# Generative UI Hackathon — London Starter Kit
 
-> **The Generative UI Hackathon** — Track 2 starter. Frozen on **2026-05-28**. Run `pnpm verify-pins` to confirm.
+Welcome to the **London slot of the Generative UI Hackathon: Agentic Interfaces**! This starter kit gives you a working agent-driven UI — a Next.js + LangGraph app where the agent emits declarative **A2UI** envelopes and the frontend renders them as live React components. Wired up with CopilotKit, AG-UI, Google A2UI, Gemini, and an optional A2A bolt-on for Track 1 interop.
 
-## What this is
+The boring 80% (catalog wiring, envelope inspector, offline fallback, agent loop) is already built so your team can spend the 5-hour build window on the parts judges remember: your domain, your widgets, your branding.
 
-This is the canonical **Track 2 (A2UI Generative UI)** starter for the Generative UI Hackathon — a globally-coordinated, multi-city, 5-hour build slot sponsored by Google DeepMind, CopilotKit, and Manufact. You get a working Next.js + LangGraph + CopilotKit + **A2UI v0.9** app where the agent emits declarative UI envelopes and the renderer turns them into React. The boring 80% (catalog wiring, envelope inspector, offline fallback, agent loop) is already built so your team can spend the build window on the parts judges remember: your domain, your widgets, your branding.
+> Frozen on **2026-05-28**. Run `pnpm verify-pins` to confirm. Versions are pinned for the build window — see [FROZEN.md](FROZEN.md) for the why.
 
-The default LLM is **Gemini 2.5 Flash** via Google's OpenAI-compatible endpoint (free tier, sponsor-aligned, agentic-tuned). The provider is hot-swappable in a 3-line `.env.example` change.
+## About this starter
 
-## 5-minute start
+This is the canonical **Track 2 (A2UI Generative UI)** starter for the Generative UI Hackathon — a globally-coordinated, multi-city, 5-hour build slot. The default LLM is **Gemini 3.5 Flash** via the native Google Gen AI SDK (`langchain-google-genai`), with hot-swappable providers in a 3-line `.env.example` change (OpenAI GPT-5.5, Anthropic Claude Opus 4.7, or any LiteLLM-compatible endpoint).
+
+This is an example application that we built to help you get started quickly. Everything you see can be customized, replaced, augmented, or built upon. Six grep-anchored **customization seams** mark the spots designed to be edited — search the repo for `CUSTOMIZATION SEAM` and the full recipes live in [HACKATHON.md](HACKATHON.md).
+
+## Generative UI
+
+> Generative UI describes any AI-driven interface where the agent **chooses, composes, or writes UI at runtime**. The field spans a spectrum from controlled component menus (safe, predictable, but limited) to fully open-ended LLM-generated DOM (flexible, but unreliable). This starter sits in the middle — a declarative, schema-driven envelope (**A2UI v0.9**) that the agent emits and a typed renderer turns into real React.
+
+The agent sends three operations: `createSurface`, `updateComponents`, `updateDataModel`. A renderer from `@copilotkit/a2ui-renderer` materializes them into live UI. The **envelope inspector** in the right rail is non-removable on purpose — judges need to see real A2UI is actually firing.
+
+## Stack
+
+- **[A2UI](https://a2ui.org/)** — Google's open declarative UI envelope protocol. Lets agents "speak UI" by sending JSON that renders natively across frameworks. This starter is built around A2UI v0.9. [Spec →](https://a2ui.org/specification/v0.9-a2ui/) · [Repo →](https://github.com/google/A2UI)
+- **[AG-UI](https://docs.ag-ui.com/)** — Open, lightweight, event-based protocol that standardizes how agents connect to user-facing apps. Originated from CopilotKit; now maintained by the [AG-UI Protocol working group](https://github.com/ag-ui-protocol/ag-ui). AG-UI carries A2UI envelopes between the LangGraph agent and the Next.js runtime here.
+- **[A2A](https://a2a-protocol.org/)** — Agent2Agent protocol for cross-team interop. Linux Foundation project, contributed by Google. v1.0.1 GA. Wired here as a dormant bolt-on (set `A2A_AGENT_URL` to activate). [Repo →](https://github.com/a2aproject/A2A)
+- **[CopilotKit](https://docs.copilotkit.ai/)** — The runtime that wires AG-UI through your Next.js app and ships the A2UI renderer. The chat UI, envelope inspector, and provider plumbing all come from here. AI-assistant skills + MCP server at [`docs.copilotkit.ai/built-in-agent/build-with-agents`](https://docs.copilotkit.ai/built-in-agent/build-with-agents).
+- **[LangGraph (Python)](https://langchain-ai.github.io/langgraph/)** — The agent loop that emits A2UI envelopes via tool-calls. Boots via `uv`. Configured for both a single-graph layout (dashboard) and a sub-repo multi-graph layout (legal-contract-review example).
+- **[Gemini 3.5 Flash](https://aistudio.google.com/)** — Default LLM via the native Google Gen AI SDK (`langchain-google-genai`). Free tier, no credit card. The native SDK is required to handle thought-signature replay across tool turns — see [FROZEN.md](FROZEN.md) for the Gemini 3.x trap history.
+
+## Run it locally
+
+Prereqs: Node 20+, pnpm 10+, Python 3.12+, [uv](https://docs.astral.sh/uv/).
 
 ```bash
 git clone <your-fork-url>
-cd london-a2ui-hackathon
+cd agent-interop-london-hackathon-starter
 pnpm install              # also installs the Python agent via uv sync
 
 cp .env.example .env
@@ -23,17 +44,19 @@ pnpm doctor               # preflight: Node, pnpm, Python, uv, env vars, ports
 pnpm dev                  # boots Next.js + the Python agent concurrently
 ```
 
-Browser opens at `http://localhost:3000`. Send a chat like *"Show me a flights dashboard"* and watch the agent emit A2UI envelopes that render as live UI. The **envelope inspector** (right rail, default chrome) shows the raw protocol — that's how you know A2UI is actually working.
+Browser opens at `http://localhost:3000`. The default demo is **PortKit** — a project-operations workspace for a 7-person team. Send the canonical 5-turn demo (verbatim prompts in [DEMO.md](DEMO.md)):
 
-No `GEMINI_API_KEY` handy? Set `OFFLINE=1` and the agent serves pre-baked envelopes from `public/offline-envelopes.json`. The demo still works; the inspector still shows real A2UI surfaces.
+1. *"What's going on this week?"* → 4 KPIs + sprint progress + 3 ProjectCards (Atlas, Orion, Lyra)
+2. *"Drill into Orion."* → status hero + milestones + kanban + open risks
+3. *"Who's overloaded?"* → bar chart of points per person + overloaded-teammates table
+4. *"Draft a status update for Orion."* → editable TL;DR + Progress + Risks + Asks
+5. Click **Send to #orion-pm** → the button's `action.event` bubbles back to the agent
 
-## Building your demo
+Every surface is generated on demand: the agent picks the surface, emits an A2UI envelope, the renderer turns it into React. The envelope inspector (right rail, default chrome) shows the raw protocol — that's how you know A2UI is actually working.
 
-- Read **[WELCOME.md](WELCOME.md)** for the 200-word orientation.
-- Read **[HACKATHON.md](HACKATHON.md)** for your full playbook — six numbered customization seams plus an hour-by-hour template for the 5-hour window.
-- Your AI coding assistant reads **[AGENTS.md](AGENTS.md)** (also linked as `CLAUDE.md` and `GEMINI.md`) automatically. It's the cross-tool agents.md standard — Cursor, Windsurf, Codex CLI, Claude Code, Gemini CLI all pick it up natively.
-- Use the **envelope inspector** chrome to verify A2UI is actually firing — it's the right rail by default and is non-removable on purpose.
-- Need a *second visual identity* (paper, terminal, kiosk) with net-new component primitives? See **[other-examples/](other-examples/)** for the custom-catalog pattern. For just adding widgets to the dashboard, stay with the `create-a2ui-widget` skill.
+> **No `GEMINI_API_KEY` handy?** Set `OFFLINE=1` and the agent serves pre-baked envelopes from `public/offline-envelopes.json`. The demo still works; the inspector still shows real A2UI surfaces. Useful for flaky venue Wi-Fi.
+
+> **Demoing live?** Read [DEMO.md](DEMO.md) for the on-stage script with timing, talking points, and recovery patterns.
 
 ## Customization seams (the 6 things you'll touch)
 
@@ -42,54 +65,41 @@ Search the repo for `CUSTOMIZATION SEAM` to jump to each one. Full recipes live 
 - **§1 — Re-theme** → `src/lib/a2ui-theme.css` + `src/hooks/use-theme.tsx` (CSS variables, no rebuild)
 - **§2 — Re-brand the shell** → `src/components/BrandFrame.tsx` (header, logo, accents)
 - **§3 — Swap demo data** → `agent/src/query.py` (or `agent/src/domains/<name>/data/`)
-- **§4 — Add an A2UI widget (fixed schema)** → copy `agent/src/a2ui_fixed_schema.py:search_flights` and run the 5-surface dance
+- **§4 — Add an A2UI widget (fixed schema)** → copy `agent/src/tools/risk_register.py:show_risk_register` and run the 4-surface dance
 - **§5 — Switch domain** → set `DOMAIN=<name>` in `.env`; canonical stub at `agent/src/domains/shopping`
 - **§6 — BYO A2A agent (Track 1 interop)** → run `pnpm check-a2a <url>` first, then set `A2A_AGENT_URL`
 
-## Other starters (we don't gatekeep)
+Need a *second visual identity* (paper, terminal, kiosk) with net-new component primitives? See **[other-examples/](other-examples/)** for the custom-catalog pattern. For just adding widgets to the dashboard, stay with seam §4.
+
+## Vibe coding
+
+This starter is built to be vibe-code-friendly. Your AI assistant (Claude Code, Gemini CLI, Cursor, Windsurf, Codex) reads **[AGENTS.md](AGENTS.md)** automatically — it's the cross-tool [agents.md](https://agents.md/) standard backed by OpenAI, Google, Sourcegraph, Cursor, and Factory. `CLAUDE.md` and `GEMINI.md` are symlinks to the same file.
+
+The starter also ships:
+
+- **[`.mcp.json`](.mcp.json)** pointing at the canonical CopilotKit MCP server (`https://mcp.copilotkit.ai/sse`) — gives any MCP-capable assistant grounded answers about CopilotKit + A2UI APIs instead of hallucinating.
+- A **`create-a2ui-widget` skill** at `.claude/skills/` that drives an AI assistant through the [4-surface widget dance](HACKATHON.md) (catalog entry, fixture, Python tool, prompt hint).
+- **Validators that teach** — `pnpm validate-widget` and `pnpm test:widgets` point you at a real JSON template on failure (not at a Python file you can't mirror).
+
+> **The 4-surface widget dance.** Adding a fixed-schema widget touches four files. Each is grep-anchored from the canonical example: `agent/src/tools/risk_register.py:show_risk_register`. Run `pnpm new-widget <name>` to scaffold from that template.
+
+## Other tracks (we don't gatekeep)
 
 A2UI isn't the only protocol pillar in this hackathon. If your team's idea fits one of the other tracks better, build there instead — we'd rather you ship something great than force-fit your demo into our starter.
 
-- **MCP Apps track** — [Manufact's starter](https://github.com/mcp-use)
 - **Track 1 multi-team interop (A2A)** — [A2A Net's template](https://a2anet.com/)
 - **Other CopilotKit examples** — [CopilotKit/examples/integrations](https://github.com/CopilotKit/CopilotKit/tree/main/examples/integrations) (chat-first, LangGraph-only, CrewAI, Mastra, etc.)
 - **A2UI Composer** (visual envelope authoring) — [a2ui-composer.ag-ui.com](https://a2ui-composer.ag-ui.com/)
 
-## Sponsors
+## Documentation
 
-This starter is built for the **Generative UI Hackathon**, sponsored by:
-
-- **Google DeepMind** — venue + Gemini (the default LLM provider here)
-- **CopilotKit** — A2UI + AG-UI protocol + this starter
-- **Manufact** (mcp-use) — MCP Apps track
-- **A2A Net** — Track 1 multi-team interop platform
-
-If you ship something using this starter, please credit the sponsors in your submission. Judges notice.
-
-## How it's built
-
-```
-Browser (Next.js 16 / React 19 / Tailwind 4)
-  └── <CopilotKit> → <CopilotChat> + <EnvelopeInspector> (default chrome)
-        │
-        │  AG-UI (SSE)
-        ▼
-Next.js /api/copilotkit
-  └── CopilotRuntime + a2ui: { schema } + optional A2A middleware (dormant
-                                            unless A2A_AGENT_URL is set)
-        │
-        │  AG-UI
-        ▼
-LangGraph Python agent (uv, Gemini 2.5 Flash via OpenAI-compat)
-  └── create_agent(model=Gemini, tools=[query_data, *todo_tools,
-                                        generate_a2ui, search_flights])
-```
-
-The agent emits A2UI v0.9 envelopes (`createSurface`, `updateComponents`, `updateDataModel`); the renderer turns them into React. See [FROZEN.md](FROZEN.md) for the version pinning rationale and the per-directory READMEs (`src/app/README.md`, `agent/README.md`, `agent/src/README.md`) for the local view.
-
-## Submitting your demo
-
-See [SUBMITTING.md](SUBMITTING.md). (Submission flow confirmed by event-ops.)
+- **[WELCOME.md](WELCOME.md)** — 200-word orientation
+- **[HACKATHON.md](HACKATHON.md)** — your full 5-hour playbook with hour-by-hour template
+- **[DEMO.md](DEMO.md)** — on-stage demo script (3 min, 5 turns + recovery)
+- **[AGENTS.md](AGENTS.md)** — agent guide for your AI coding assistant
+- **[FROZEN.md](FROZEN.md)** — version-pinning rationale and the Gemini 3.x thought-signature trap
+- **[SUBMITTING.md](SUBMITTING.md)** — what you'll need at submission time
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** — what we'll merge post-event
 
 ## Troubleshooting
 
@@ -100,13 +110,12 @@ See [SUBMITTING.md](SUBMITTING.md). (Submission flow confirmed by event-ops.)
 
 MIT. See [LICENSE](LICENSE).
 
-## Contributing
-
-This is a hackathon starter — the primary audience is hackers during the 5-hour build window, not contributors. But if you ship a genuine improvement post-event, PRs are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
-
 ## Attribution
 
-- **A2UI protocol** — Google
-- **AG-UI protocol** — CopilotKit (makers of the AG-UI Protocol)
+- **A2UI protocol** — [Google](https://github.com/google/A2UI)
+- **AG-UI protocol** — [AG-UI Protocol working group](https://github.com/ag-ui-protocol/ag-ui) (originated at CopilotKit)
+- **A2A protocol** — [Linux Foundation + Google](https://github.com/a2aproject/A2A)
 - **agents.md spec** — Linux Foundation cross-tool standard (backed by OpenAI, Google, Sourcegraph, Cursor, Factory)
 - **Base starter** — [CopilotKit/examples/integrations/langgraph-python](https://github.com/CopilotKit/CopilotKit/tree/main/examples/integrations/langgraph-python)
+
+Built for the **Generative UI Hackathon: Agentic Interfaces** — London slot.

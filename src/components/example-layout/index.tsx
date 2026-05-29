@@ -2,7 +2,6 @@
 
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { ModeToggle } from "./mode-toggle";
 import { useFrontendTool } from "@copilotkit/react-core/v2";
 import "./example-layout.css";
 
@@ -33,7 +32,7 @@ export function ExampleLayout({ chatContent, appContent }: ExampleLayoutProps) {
 
   return (
     <div className="h-full flex flex-row pb-6">
-      <ModeToggle mode={mode} onModeChange={setMode} />
+      {/* ModeToggle hidden — agents can still flip via useFrontendTool */}
 
       {/* Chat Content */}
       <div

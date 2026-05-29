@@ -31,7 +31,6 @@ _MONTHS = [
     "Nov",
     "Dec",
 ]
-_STATUS_BUCKETS = ("todo", "inProgress", "inReview", "done")
 
 
 @tool
@@ -82,10 +81,6 @@ def _build_data(project_id: str) -> dict:
         "ownerName": owner.get("name", "Unassigned"),
         "sprintLabel": _short_sprint_label(sprint.get("name", "")),
         "percentComplete": project.get("percentComplete", 0),
-        "taskCounts": project.get(
-            "taskCounts",
-            {"todo": 0, "inProgress": 0, "inReview": 0, "done": 0},
-        ),
         "milestones": milestones,
         "sprintName": _short_sprint_label(sprint.get("name", "")),
         "sprintStartLabel": _date_label(_parse_iso(sprint.get("start"))),
@@ -96,28 +91,6 @@ def _build_data(project_id: str) -> dict:
         ),
         "sprintStatus": sprint.get("status", "Active"),
     }
-
-    tasks_grouped: dict[str, list[dict]] = {b: [] for b in _STATUS_BUCKETS}
-    sprint_id = sprint.get("id")
-    for task in cached_data.get("tasks", []):
-        if task.get("projectId") != project_id:
-            continue
-        if sprint_id and task.get("sprintId") != sprint_id:
-            continue
-        bucket = task.get("status")
-        if bucket not in tasks_grouped:
-            continue
-        assignee = people_by_id.get(task.get("assigneeId"), {})
-        tasks_grouped[bucket].append(
-            {
-                "id": task.get("id"),
-                "title": task.get("title"),
-                "assigneeName": assignee.get("name", "Unassigned"),
-                "assigneeAvatarUrl": assignee.get("avatarUrl"),
-                "points": task.get("points"),
-                "dueLabel": _date_label(_parse_iso(task.get("due"))),
-            }
-        )
 
     risks = []
     for risk in cached_data.get("risks", []):
@@ -137,7 +110,6 @@ def _build_data(project_id: str) -> dict:
 
     return {
         "project": project_payload,
-        "tasks": tasks_grouped,
         "risks": risks,
     }
 

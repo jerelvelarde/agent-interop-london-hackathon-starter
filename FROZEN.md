@@ -114,12 +114,21 @@ are sufficient; we do NOT need to ship a shared key.
 
 | Package | Pin | Notes |
 |---|---|---|
-| `@copilotkit/react-core` | `1.56.5` (exact) | No caret |
-| `@copilotkit/runtime` | `1.56.5` (exact) | No caret |
-| `@copilotkit/a2ui-renderer` | `1.56.5` (exact) | No caret |
+| `@copilotkit/react-core` | `1.57.4` (exact) | No caret |
+| `@copilotkit/runtime` | `1.57.4` (exact) | No caret |
+| `@copilotkit/a2ui-renderer` | `1.57.4` (exact) | No caret |
+| `@copilotkit/react-ui` | `1.57.4` (exact) | No caret; added to host the a2ui-pdf-analyst example |
+| `@ag-ui/client` | `^0.0.53` | Added for the a2ui-pdf-analyst example (AG-UI client transport) |
+| `pdfjs-dist` | `^4.10.38` | Added for the a2ui-pdf-analyst example (client-side PDF parse) |
 | `next` | `16.1.6` (exact) | — |
 | `react` / `react-dom` | `19.2.4` (exact) | Tightened from caret in A5 |
 | `@ag-ui/a2a-middleware` | (added in Workstream B) | — |
+
+> **2026-05-29: bumped to 1.57.4 to host the a2ui-pdf-analyst example (owner
+> sign-off; Notion plan).** The three `@copilotkit/*` pins moved `1.56.5 →
+> 1.57.4` and `@copilotkit/react-ui`, `@ag-ui/client`, and `pdfjs-dist` were
+> added. A Phase-0 spike confirmed forced `tool_choice` still works on Gemini's
+> native SDK at this version, so the Gemini default (below) is unchanged.
 
 ## Pinned versions (Python)
 
@@ -130,7 +139,8 @@ are sufficient; we do NOT need to ship a shared key.
 | `langgraph-cli[inmem]` | `0.4.21` | — |
 | `langchain-openai` | `1.1.9` | Drives the OpenAI swap path and the documented Gemini OpenAI-compat fallback |
 | `langchain-anthropic` | `1.4.1` | For the Anthropic swap matrix |
-| `copilotkit` | `0.1.87` | Python SDK |
+| `copilotkit` | `>=0.1.90` | Python SDK; floor raised 2026-05-29 for the a2ui-pdf-analyst example |
+| `ag-ui-langgraph` | `>=0.0.36` | Added 2026-05-29 for the a2ui-pdf-analyst example (AG-UI ↔ LangGraph bridge) |
 | `openai` | `1.109.1` | Transitive (used by langchain-openai) |
 
 `uv.lock` is committed and authoritative.

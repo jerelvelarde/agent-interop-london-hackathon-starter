@@ -3,11 +3,15 @@
 # has drifted from FROZEN.md.
 #
 # Verifies:
-#   - @copilotkit/react-core    == 1.56.5
-#   - @copilotkit/runtime       == 1.56.5
-#   - @copilotkit/a2ui-renderer == 1.56.5
+#   - @copilotkit/react-core    == 1.57.4
+#   - @copilotkit/runtime       == 1.57.4
+#   - @copilotkit/a2ui-renderer == 1.57.4
+#   - @copilotkit/react-ui      == 1.57.4
 #   - react / react-dom         == 19.2.4
 #   - next                      == 16.1.6
+#
+# 2026-05-29: @copilotkit/* bumped 1.56.5 -> 1.57.4 (+ @copilotkit/react-ui
+# added) to host the a2ui-pdf-analyst example. See FROZEN.md.
 #
 # Exit 0 on clean pins, 1 on drift. Machine-parsable: one line per violation
 # prefixed with "DRIFT:".
@@ -31,9 +35,10 @@ RESET='\033[0m'
 
 # Pin manifest:  package_name|expected_version
 PINS=(
-  "@copilotkit/react-core|1.56.5"
-  "@copilotkit/runtime|1.56.5"
-  "@copilotkit/a2ui-renderer|1.56.5"
+  "@copilotkit/react-core|1.57.4"
+  "@copilotkit/runtime|1.57.4"
+  "@copilotkit/a2ui-renderer|1.57.4"
+  "@copilotkit/react-ui|1.57.4"
   "next|16.1.6"
   "react|19.2.4"
   "react-dom|19.2.4"

@@ -28,6 +28,7 @@ import {
   useFrontendTool,
 } from "@copilotkit/react-core/v2";
 
+import { BrandFrame } from "@/components/BrandFrame";
 import { ExampleLayout } from "@/components/example-layout";
 import { EnvelopeInspector } from "@/components/EnvelopeInspector";
 
@@ -134,33 +135,35 @@ export default function LegalContractReviewPage() {
   });
 
   return (
-    <div className="h-full w-full flex flex-row">
-      {/* Left + center: chat + paper canvas */}
-      <div className="flex-1 min-w-0 h-full">
-        <ExampleLayout
-          chatContent={
-            <CopilotChat
-              agentId={AGENT_ID}
-              attachments={{ enabled: false }}
-              input={{
-                disclaimer: () => null,
-                className: "pb-6",
-              }}
-            />
-          }
-          appContent={<LegalCanvas />}
-        />
-      </div>
+    <BrandFrame>
+      <div className="h-full w-full flex flex-row">
+        {/* Left + center: chat + paper canvas */}
+        <div className="flex-1 min-w-0 h-full">
+          <ExampleLayout
+            chatContent={
+              <CopilotChat
+                agentId={AGENT_ID}
+                attachments={{ enabled: false }}
+                input={{
+                  disclaimer: () => null,
+                  className: "pb-6",
+                }}
+              />
+            }
+            appContent={<LegalCanvas />}
+          />
+        </div>
 
-      {/* Right rail: envelope inspector — same affordance as the dashboard so
-          judges can see the wire. Hidden below lg breakpoint to keep mobile usable. */}
-      <aside
-        className="hidden lg:flex h-full shrink-0"
-        style={{ width: 380 }}
-        aria-label="A2UI envelope inspector"
-      >
-        <EnvelopeInspector />
-      </aside>
-    </div>
+        {/* Right rail: envelope inspector — same affordance as the dashboard so
+            judges can see the wire. Hidden below lg breakpoint to keep mobile usable. */}
+        <aside
+          className="hidden lg:flex h-full shrink-0"
+          style={{ width: 380 }}
+          aria-label="A2UI envelope inspector"
+        >
+          <EnvelopeInspector />
+        </aside>
+      </div>
+    </BrandFrame>
   );
 }

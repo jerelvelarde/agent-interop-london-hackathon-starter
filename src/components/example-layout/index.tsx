@@ -35,7 +35,13 @@ export function ExampleLayout({ chatContent, appContent }: ExampleLayoutProps) {
     <div className="h-full flex flex-row pb-6">
       <ModeToggle mode={mode} onModeChange={setMode} />
 
-      {/* Chat Content */}
+      {/*
+        Chat Content.
+        Note: the page-level brand (logo + product name) lives in
+        <BrandFrame> (CUSTOMIZATION SEAM #2). See HACKATHON.md §2. The
+        chat panel intentionally has no inline brand header anymore so
+        that editing BrandFrame.tsx is the single source of truth.
+      */}
       <div
         className={`max-h-full flex flex-col bg-[var(--surface-container)] backdrop-blur-md border-r border-[var(--border-default)] shadow-[var(--elevation-sm)] ${
           mode === "app"
@@ -43,15 +49,7 @@ export function ExampleLayout({ chatContent, appContent }: ExampleLayoutProps) {
             : "flex-1 max-lg:px-4"
         }`}
       >
-        <div className="shrink-0 pt-6 pl-6 pb-2 max-lg:pl-4 max-lg:pt-4 flex gap-1.5 items-center align-center">
-          <span className="font-extrabold text-2xl pb-1.5">CopilotKit</span>
-          <img
-            src="/copilotkit-logo-mark.svg"
-            alt="CopilotKit"
-            className="h-7"
-          />
-        </div>
-        <div className="chat-scroll flex-1 min-h-0 overflow-y-auto">
+        <div className="chat-scroll flex-1 min-h-0 overflow-y-auto pt-6 max-lg:pt-4">
           {chatContent}
         </div>
       </div>

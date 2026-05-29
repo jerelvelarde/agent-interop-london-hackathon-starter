@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandFrame } from "@/components/BrandFrame";
 import { ExampleLayout } from "@/components/example-layout";
 import { ExampleCanvas } from "@/components/example-canvas";
 import { EnvelopeInspector } from "@/components/EnvelopeInspector";
@@ -11,22 +12,28 @@ import { CopilotChat } from "@copilotkit/react-core/v2";
  * Default homepage.
  *
  * Layout:
- *   ┌─────────────────────────────────────────┬─────────────────┐
- *   │  ExampleLayout (chat + optional canvas) │ EnvelopeInspector│
- *   └─────────────────────────────────────────┴─────────────────┘
+ *   ┌─────────────────────────────────────────────────────────────┐
+ *   │  BrandFrame header (CUSTOMIZATION SEAM #2 — see HACKATHON §2)│
+ *   ├─────────────────────────────────────────┬─────────────────┐ │
+ *   │  ExampleLayout (chat + optional canvas) │ EnvelopeInspector│ │
+ *   └─────────────────────────────────────────┴─────────────────┘ │
  *
  * The inspector is the hackathon's "show the wire" affordance — it ships
  * always-on as default chrome (not a toggle). Teams cannot accidentally hide
  * that they're using A2UI.
  *
  * The right rail is hidden below the `lg` breakpoint to keep mobile usable.
+ *
+ * The page-level brand wordmark, logo, ambient blur backdrop, and theme
+ * mode toggle all live inside <BrandFrame>. Edit BrandFrame.tsx (Seam #2)
+ * to re-brand — that's the documented single source of truth.
  */
 export default function HomePage() {
   useGenerativeUIExamples();
   useExampleSuggestions();
 
   return (
-    <>
+    <BrandFrame>
       <div className="h-full w-full flex flex-row">
         {/* Left + center: existing chat + app-mode canvas */}
         <div className="flex-1 min-w-0 h-full">
@@ -61,6 +68,6 @@ export default function HomePage() {
         Built for the Generative UI Hackathon. Sponsored by Google DeepMind
         &middot; CopilotKit &middot; Manufact.
       </p>
-    </>
+    </BrandFrame>
   );
 }

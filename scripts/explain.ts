@@ -95,14 +95,23 @@ function printMapping(): void {
 }
 
 /**
- * Extract a section from HACKATHON.md given a "Seam #N" heading marker.
+ * Extract a section from HACKATHON.md given a seam-number heading marker.
  * We grab from the matching heading through the next heading at the same or
  * higher level (or EOF).
+ *
+ * Matches BOTH heading conventions so the script keeps working regardless
+ * of which convention any future edit lands on:
+ *   - "## Seam #4 — Add a widget"   (legacy)
+ *   - "## §4 — Add an A2UI widget"  (current HACKATHON.md format)
  */
 function extractSeamSection(md: string, seamNumber: number): string | null {
   const lines = md.split("\n");
-  // Match either "## Seam #N:" or "### Seam #N:" or any heading containing "Seam #N"
-  const startRegex = new RegExp(`^(#+)\\s+.*Seam\\s*#?${seamNumber}\\b`, "i");
+  // Match a heading line that contains either "Seam #N" or "§N" with the
+  // matching seam number. Both forms appear in the wild (issue: F6).
+  const startRegex = new RegExp(
+    `^(#+)\\s+.*(?:Seam\\s*#?${seamNumber}\\b|§\\s*${seamNumber}\\b)`,
+    "i",
+  );
   let startIdx = -1;
   let startLevel = 0;
 
@@ -163,11 +172,16 @@ function main(): void {
   const md = readFileSync(HACKATHON_MD, "utf-8");
   const section = extractSeamSection(md, info.seam);
   if (!section) {
+    // The summary blurb already printed above is useful on its own. A failed
+    // heading lookup is a soft miss, not a hard failure — exit 0 so callers
+    // (and `pnpm explain` users) see green.
     console.log(
-      `${YELLOW}HACKATHON.md exists but I couldn't find a heading matching "Seam #${info.seam}".${RESET}`,
+      `${YELLOW}Note:${RESET} ${DIM}couldn't find a HACKATHON.md heading matching seam #${info.seam} (looked for "Seam #${info.seam}" and "§${info.seam}"). The summary above still applies.${RESET}`,
     );
-    console.log(`${DIM}Run \`grep -ni "seam" HACKATHON.md\` to see the actual headings.${RESET}`);
-    process.exit(1);
+    console.log(
+      `${DIM}Run \`grep -ni "§\\|seam" HACKATHON.md\` to see the actual headings.${RESET}`,
+    );
+    process.exit(0);
   }
 
   console.log(section);

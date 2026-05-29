@@ -104,7 +104,7 @@
   {
     "id": "kanban-row",
     "component": "Row",
-    "gap": 12,
+    "gap": 24,
     "children": [
       "kc-todo",
       "kc-flight",

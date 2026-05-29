@@ -1,0 +1,12 @@
+{
+  "id": "edtech",
+  "name": "ScholarAI",
+  "description": "Teacher / advisor copilot surfaces an at-risk roster, drills into a student profile with grade history, and drafts parent outreach.",
+  "route": "/other-examples/edtech",
+  "graphId": "edtech_agent",
+  "agentName": "edtech",
+  "catalogId": "copilotkit://edtech-catalog",
+  "screenshot": "screenshot.png",
+  "tags": ["edtech", "dashboard", "advisor"],
+  "status": "wip"
+}

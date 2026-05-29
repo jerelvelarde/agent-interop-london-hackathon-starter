@@ -1,0 +1,19 @@
+[project]
+name = "edtech-agent"
+version = "0.1.0"
+description = "LangGraph agent for the ScholarAI (edtech) example."
+requires-python = ">=3.12"
+dependencies = [
+  "langchain==1.2.15",
+  "langgraph==1.1.6",
+  "langchain-google-genai==4.2.4",
+  "copilotkit==0.1.87",
+]
+
+# The Python package lives in the sibling `edtech_agent/` directory (dir name
+# matches the import name), so setuptools auto-discovery picks it up with no
+# package-dir remapping. langgraph loads the graph via
+# `./edtech_agent/graph.py:graph` (see langgraph.json), which keeps Python's
+# package machinery intact — no sys.path hacks. See audit item #6.
+[tool.setuptools]
+packages = ["edtech_agent"]

@@ -1,0 +1,49 @@
+[
+  {
+    "id": "root",
+    "component": "DashboardSection",
+    "title": { "path": "/headline" },
+    "subtitle": { "path": "/subhead" },
+    "children": ["outreach-list"]
+  },
+  {
+    "id": "outreach-list",
+    "component": "OutreachBatchDraft",
+    "drafts": { "componentId": "outreach-row", "path": "/drafts" }
+  },
+  {
+    "id": "outreach-row",
+    "component": "OutreachDraftRow",
+    "studentId": { "path": "studentId" },
+    "studentName": { "path": "studentName" },
+    "parentName": { "path": "parentName" },
+    "parentEmail": { "path": "parentEmail" },
+    "subject": { "path": "subject" },
+    "body": { "path": "body" },
+    "riskLevel": { "path": "riskLevel" },
+    "sendAction": {
+      "event": {
+        "name": "outreach_send",
+        "context": {
+          "studentId": { "path": "studentId" }
+        }
+      }
+    },
+    "editAction": {
+      "event": {
+        "name": "outreach_edit",
+        "context": {
+          "studentId": { "path": "studentId" }
+        }
+      }
+    },
+    "skipAction": {
+      "event": {
+        "name": "outreach_skip",
+        "context": {
+          "studentId": { "path": "studentId" }
+        }
+      }
+    }
+  }
+]

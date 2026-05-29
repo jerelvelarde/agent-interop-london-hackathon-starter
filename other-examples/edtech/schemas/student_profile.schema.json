@@ -1,0 +1,23 @@
+[
+  {
+    "id": "root",
+    "component": "StudentProfile",
+    "studentId": { "path": "/id" },
+    "name": { "path": "/name" },
+    "photoInitials": { "path": "/photoInitials" },
+    "gradeLevel": { "path": "/gradeLevel" },
+    "advisor": { "path": "/advisor" },
+    "currentGrade": { "path": "/currentGrade" },
+    "gpa": { "path": "/gpa" },
+    "attendancePct": { "path": "/attendancePct" },
+    "missingAssignments": { "path": "/missingAssignments" },
+    "trend": { "path": "/trend" },
+    "trendArrow": { "path": "/trendArrow" },
+    "riskLevel": { "path": "/riskLevel" },
+    "notes": { "path": "/notes" },
+    "lastOutreach": { "path": "/lastOutreach" },
+    "gradeHistory": { "path": "/gradeHistory" },
+    "courses": { "path": "/courses" },
+    "recentAssignments": { "path": "/recentAssignments" }
+  }
+]

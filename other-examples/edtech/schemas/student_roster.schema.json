@@ -1,0 +1,40 @@
+[
+  {
+    "id": "root",
+    "component": "DashboardSection",
+    "title": { "path": "/headline" },
+    "subtitle": { "path": "/subhead" },
+    "children": ["roster-grid"]
+  },
+  {
+    "id": "roster-grid",
+    "component": "StudentGrid",
+    "children": { "componentId": "student-card", "path": "/students" }
+  },
+  {
+    "id": "student-card",
+    "component": "StudentCard",
+    "studentId": { "path": "id" },
+    "name": { "path": "name" },
+    "photoInitials": { "path": "photoInitials" },
+    "gradeLevel": { "path": "gradeLevel" },
+    "advisor": { "path": "advisor" },
+    "currentGrade": { "path": "currentGrade" },
+    "gpa": { "path": "gpa" },
+    "missingAssignments": { "path": "missingAssignments" },
+    "attendancePct": { "path": "attendancePct" },
+    "trend": { "path": "trend" },
+    "trendArrow": { "path": "trendArrow" },
+    "riskLevel": { "path": "riskLevel" },
+    "notes": { "path": "notes" },
+    "drillAction": {
+      "event": {
+        "name": "drill_into_student",
+        "context": {
+          "studentId": { "path": "id" },
+          "studentName": { "path": "name" }
+        }
+      }
+    }
+  }
+]

@@ -1,0 +1,768 @@
+/**
+ * ScholarAI / Edtech Catalog — Scoped Theme
+ *
+ * Every rule in this file is scoped under `[data-catalog-style="edtech"]`
+ * so the dashboard demo's CSS variables (defined globally in
+ * `src/lib/a2ui-theme.css` and `src/app/globals.css`) are untouched.
+ *
+ * Palette: navy `#163d65`, warm gold `#e9c46a`, cream `#fbf7ec`,
+ * paper-white `#ffffff`. Typography pairs Spectral (headlines, scholarly
+ * serif) with Inter (body) and tabular figures for grades. Dotted
+ * dividers + gold-leaf KPI pills give the surface its academic feel.
+ */
+
+[data-catalog-style="edtech"] {
+  /* ── Palette ──────────────────────────────────────────────────── */
+  --edt-navy: #163d65;
+  --edt-navy-2: #1f4d7a;
+  --edt-navy-soft: rgba(22, 61, 101, 0.08);
+  --edt-gold: #e9c46a;
+  --edt-gold-deep: #b08906;
+  --edt-gold-soft: rgba(233, 196, 106, 0.18);
+  --edt-cream: #fbf7ec;
+  --edt-paper: #ffffff;
+  --edt-ink: #1c2a3a;
+  --edt-muted: #5a6779;
+  --edt-border: #e3dccb;
+  --edt-grid: rgba(28, 42, 58, 0.08);
+
+  --edt-watch: #c97f1f;
+  --edt-watch-bg: rgba(201, 127, 31, 0.12);
+  --edt-urgent: #a02523;
+  --edt-urgent-bg: rgba(160, 37, 35, 0.12);
+  --edt-ok: #2a7a52;
+  --edt-ok-bg: rgba(42, 122, 82, 0.12);
+
+  --edt-status-submitted: #2a7a52;
+  --edt-status-graded: #2a7a52;
+  --edt-status-late: #c97f1f;
+  --edt-status-missing: #a02523;
+
+  /* ── Typography ───────────────────────────────────────────────── */
+  /* Spectral is loaded by the (edtech) route-group layout via
+   * next/font/google; Inter is the body fallback. Tabular nums lock
+   * grade columns in place. */
+  --edt-font-headline: var(--font-spectral, "Spectral", "Georgia", "Charter", serif);
+  --edt-font-body: var(--font-inter, "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif);
+
+  font-family: var(--edt-font-body);
+  color: var(--edt-ink);
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  color-scheme: light;
+}
+
+/* ── Section frame ────────────────────────────────────────────── */
+[data-catalog-style="edtech"] .edt-section {
+  background: var(--edt-paper);
+  border: 1px solid var(--edt-border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  box-shadow: 0 1px 2px rgba(22, 61, 101, 0.05);
+  margin-bottom: 16px;
+}
+
+[data-catalog-style="edtech"] .edt-section-head {
+  margin-bottom: 12px;
+}
+
+[data-catalog-style="edtech"] .edt-section-title {
+  font-family: var(--edt-font-headline);
+  font-weight: 600;
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
+  color: var(--edt-navy);
+  margin: 0 0 4px 0;
+}
+
+[data-catalog-style="edtech"] .edt-section-subtitle {
+  font-size: 0.85rem;
+  color: var(--edt-muted);
+  margin: 0 0 12px 0;
+}
+
+[data-catalog-style="edtech"] .edt-divider {
+  height: 1px;
+  background-image: radial-gradient(
+    circle at center,
+    var(--edt-border) 30%,
+    transparent 30%
+  );
+  background-size: 6px 1px;
+  background-repeat: repeat-x;
+  margin: 0 0 4px 0;
+}
+
+[data-catalog-style="edtech"] .edt-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Grid ─────────────────────────────────────────────────────── */
+[data-catalog-style="edtech"] .edt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+/* ── Card ─────────────────────────────────────────────────────── */
+[data-catalog-style="edtech"] .edt-card {
+  background: var(--edt-cream);
+  border: 1px solid var(--edt-border);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease,
+    border-color 0.12s ease;
+  position: relative;
+  outline: none;
+}
+
+[data-catalog-style="edtech"] .edt-card:hover,
+[data-catalog-style="edtech"] .edt-card:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(22, 61, 101, 0.08);
+  border-color: var(--edt-gold-deep);
+}
+
+[data-catalog-style="edtech"] .edt-card[data-risk="urgent"] {
+  border-color: var(--edt-urgent);
+  background: linear-gradient(
+    180deg,
+    rgba(160, 37, 35, 0.06),
+    var(--edt-cream) 40%
+  );
+}
+
+[data-catalog-style="edtech"] .edt-card[data-risk="watch"] {
+  border-color: var(--edt-watch);
+}
+
+[data-catalog-style="edtech"] .edt-card-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+[data-catalog-style="edtech"] .edt-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--edt-navy);
+  color: var(--edt-cream);
+  font-family: var(--edt-font-headline);
+  font-weight: 600;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  border: 2px solid var(--edt-gold);
+  flex-shrink: 0;
+}
+
+[data-catalog-style="edtech"] .edt-avatar-lg {
+  width: 64px;
+  height: 64px;
+  font-size: 1.4rem;
+}
+
+[data-catalog-style="edtech"] .edt-card-headtext {
+  min-width: 0;
+  flex: 1;
+}
+
+[data-catalog-style="edtech"] .edt-card-name {
+  font-family: var(--edt-font-headline);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--edt-navy);
+  margin: 0;
+  line-height: 1.2;
+}
+
+[data-catalog-style="edtech"] .edt-card-meta {
+  font-size: 0.78rem;
+  color: var(--edt-muted);
+  margin: 2px 0 0 0;
+}
+
+[data-catalog-style="edtech"] .edt-card-sid {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+}
+
+[data-catalog-style="edtech"] .edt-card-grade {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+[data-catalog-style="edtech"] .edt-card-grade-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--edt-muted);
+  font-weight: 500;
+}
+
+[data-catalog-style="edtech"] .edt-card-grade-value {
+  font-family: var(--edt-font-headline);
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--edt-navy);
+  line-height: 1;
+  font-feature-settings: "tnum" 1;
+}
+
+[data-catalog-style="edtech"] .edt-card-trend {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+[data-catalog-style="edtech"] .edt-card-trend[data-trend="improving"] {
+  color: var(--edt-ok);
+}
+
+[data-catalog-style="edtech"] .edt-card-trend[data-trend="declining"] {
+  color: var(--edt-urgent);
+}
+
+[data-catalog-style="edtech"] .edt-card-trend[data-trend="steady"] {
+  color: var(--edt-muted);
+}
+
+[data-catalog-style="edtech"] .edt-card-kpis,
+[data-catalog-style="edtech"] .edt-profile-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 0;
+  padding: 8px 0;
+  border-top: 1px solid var(--edt-border);
+  border-bottom: 1px solid var(--edt-border);
+}
+
+[data-catalog-style="edtech"] .edt-profile-kpis {
+  grid-template-columns: repeat(5, 1fr);
+  padding: 12px 0;
+  margin: 16px 0;
+}
+
+[data-catalog-style="edtech"] .edt-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+[data-catalog-style="edtech"] .edt-kpi dt {
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--edt-muted);
+  font-weight: 500;
+}
+
+[data-catalog-style="edtech"] .edt-kpi dd {
+  margin: 0;
+  font-family: var(--edt-font-headline);
+  font-weight: 600;
+  color: var(--edt-navy);
+  font-feature-settings: "tnum" 1;
+}
+
+[data-catalog-style="edtech"] .edt-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+[data-catalog-style="edtech"] .edt-num-lg {
+  font-size: 1.5rem;
+}
+
+[data-catalog-style="edtech"] .edt-card-notes {
+  font-size: 0.85rem;
+  color: var(--edt-ink);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Gold-leaf risk pill ──────────────────────────────────────── */
+[data-catalog-style="edtech"] .edt-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-family: var(--edt-font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: var(--edt-gold-soft);
+  color: var(--edt-gold-deep);
+  border: 1px solid var(--edt-gold);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+[data-catalog-style="edtech"] .edt-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+[data-catalog-style="edtech"] .edt-pill[data-risk="watch"] {
+  background: var(--edt-watch-bg);
+  color: var(--edt-watch);
+  border-color: var(--edt-watch);
+}
+
+[data-catalog-style="edtech"] .edt-pill[data-risk="urgent"] {
+  background: var(--edt-urgent-bg);
+  color: var(--edt-urgent);
+  border-color: var(--edt-urgent);
+}
+
+[data-catalog-style="edtech"] .edt-pill[data-risk="ok"] {
+  background: var(--edt-ok-bg);
+  color: var(--edt-ok);
+  border-color: var(--edt-ok);
+}
+
+/* ── Profile ──────────────────────────────────────────────────── */
+[data-catalog-style="edtech"] .edt-profile {
+  background: var(--edt-paper);
+  border: 1px solid var(--edt-border);
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 1px 2px rgba(22, 61, 101, 0.05);
+}
+
+[data-catalog-style="edtech"] .edt-profile-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+[data-catalog-style="edtech"] .edt-profile-name {
+  font-family: var(--edt-font-headline);
+  font-weight: 600;
+  font-size: 1.6rem;
+  color: var(--edt-navy);
+  margin: 0;
+  line-height: 1.1;
+}
+
+[data-catalog-style="edtech"] .edt-profile-meta {
+  font-size: 0.85rem;
+  color: var(--edt-muted);
+  margin: 2px 0 0 0;
+}
+
+[data-catalog-style="edtech"] .edt-profile-headtext {
+  flex: 1;
+}
+
+[data-catalog-style="edtech"] .edt-profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 960px) {
+  [data-catalog-style="edtech"] .edt-profile-grid {
+    grid-template-columns: 1fr;
+  }
+  [data-catalog-style="edtech"] .edt-profile-kpis {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+[data-catalog-style="edtech"] .edt-panel {
+  background: var(--edt-cream);
+  border: 1px solid var(--edt-border);
+  border-radius: 6px;
+  padding: 14px;
+}
+
+[data-catalog-style="edtech"] .edt-panel-wide {
+  grid-column: 1 / -1;
+}
+
+[data-catalog-style="edtech"] .edt-panel-notes {
+  margin-top: 16px;
+  background: var(--edt-cream);
+  border-left: 3px solid var(--edt-gold);
+}
+
+[data-catalog-style="edtech"] .edt-panel-title {
+  font-family: var(--edt-font-headline);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  color: var(--edt-navy);
+  margin: 0 0 10px 0;
+}
+
+[data-catalog-style="edtech"] .edt-meta {
+  font-size: 0.78rem;
+  color: var(--edt-muted);
+  margin: 8px 0 0 0;
+}
+
+/* ── Chart ────────────────────────────────────────────────────── */
+[data-catalog-style="edtech"] .edt-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+[data-catalog-style="edtech"] .edt-chart-grid {
+  stroke: var(--edt-grid);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+
+[data-catalog-style="edtech"] .edt-chart-tick {
+  font-family: var(--edt-font-body);
+  font-size: 9px;
+  fill: var(--edt-muted);
+  font-feature-settings: "tnum" 1;
+}
+
+[data-catalog-style="edtech"] .edt-chart-line {
+  fill: none;
+  stroke: var(--edt-navy);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+[data-catalog-style="edtech"] .edt-chart-point {
+  fill: var(--edt-gold);
+  stroke: var(--edt-navy);
+  stroke-width: 1.5;
+}
+
+[data-catalog-style="edtech"] .edt-chart-empty {
+  font-size: 0.85rem;
+  color: var(--edt-muted);
+  padding: 12px;
+  text-align: center;
+}
+
+/* ── Tables (assignment + courses) ────────────────────────────── */
+[data-catalog-style="edtech"] .edt-table-wrap {
+  overflow-x: auto;
+}
+
+[data-catalog-style="edtech"] .edt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+[data-catalog-style="edtech"] .edt-table thead th {
+  text-align: left;
+  font-family: var(--edt-font-headline);
+  font-weight: 600;
+  font-size: 0.78rem;
+  color: var(--edt-navy);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  border-bottom: 2px solid var(--edt-navy);
+  background: transparent;
+}
+
+[data-catalog-style="edtech"] .edt-table tbody td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--edt-border);
+  color: var(--edt-ink);
+}
+
+[data-catalog-style="edtech"] .edt-table-zebra tbody tr:nth-child(even) td {
+  background: var(--edt-cream);
+}
+
+[data-catalog-style="edtech"] .edt-sort-btn {
+  appearance: none;
+  background: transparent;
+  border: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+[data-catalog-style="edtech"] .edt-sort-btn:hover {
+  color: var(--edt-gold-deep);
+}
+
+[data-catalog-style="edtech"] .edt-sort-btn:focus-visible {
+  outline: 2px solid var(--edt-gold);
+  outline-offset: 2px;
+}
+
+/* ── Assignment status badge ──────────────────────────────────── */
+[data-catalog-style="edtech"] .edt-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: rgba(28, 42, 58, 0.06);
+  color: var(--edt-muted);
+  border: 1px solid var(--edt-border);
+}
+
+[data-catalog-style="edtech"] .edt-status[data-status="submitted"],
+[data-catalog-style="edtech"] .edt-status[data-status="graded"] {
+  color: var(--edt-status-submitted);
+  background: rgba(42, 122, 82, 0.08);
+  border-color: rgba(42, 122, 82, 0.35);
+}
+
+[data-catalog-style="edtech"] .edt-status[data-status="late"] {
+  color: var(--edt-status-late);
+  background: rgba(201, 127, 31, 0.08);
+  border-color: rgba(201, 127, 31, 0.35);
+}
+
+[data-catalog-style="edtech"] .edt-status[data-status="missing"] {
+  color: var(--edt-status-missing);
+  background: rgba(160, 37, 35, 0.08);
+  border-color: rgba(160, 37, 35, 0.35);
+}
+
+/* ── Recent assignments list (inside StudentProfile) ──────────── */
+[data-catalog-style="edtech"] .edt-assignment-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+[data-catalog-style="edtech"] .edt-assignment-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 6px 10px;
+  border: 1px solid var(--edt-border);
+  border-radius: 4px;
+  background: var(--edt-paper);
+  font-size: 0.86rem;
+}
+
+[data-catalog-style="edtech"] .edt-assignment-title {
+  font-weight: 500;
+  color: var(--edt-ink);
+}
+
+[data-catalog-style="edtech"] .edt-assignment-meta {
+  display: inline-flex;
+  gap: 8px;
+  color: var(--edt-muted);
+  font-size: 0.78rem;
+}
+
+[data-catalog-style="edtech"] .edt-empty {
+  color: var(--edt-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+  margin: 0;
+}
+
+/* ── Outreach list ────────────────────────────────────────────── */
+[data-catalog-style="edtech"] .edt-outreach-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+[data-catalog-style="edtech"] .edt-outreach-row {
+  background: var(--edt-paper);
+  border: 1px solid var(--edt-border);
+  border-left: 4px solid var(--edt-gold);
+  border-radius: 6px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+[data-catalog-style="edtech"] .edt-outreach-row[data-risk="urgent"] {
+  border-left-color: var(--edt-urgent);
+}
+
+[data-catalog-style="edtech"] .edt-outreach-row[data-risk="watch"] {
+  border-left-color: var(--edt-watch);
+}
+
+[data-catalog-style="edtech"] .edt-outreach-row[data-decision="sent"] {
+  background: var(--edt-ok-bg);
+  border-color: var(--edt-ok);
+}
+
+[data-catalog-style="edtech"] .edt-outreach-row[data-decision="skipped"] {
+  opacity: 0.6;
+}
+
+[data-catalog-style="edtech"] .edt-outreach-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+[data-catalog-style="edtech"] .edt-meta-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--edt-muted);
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+[data-catalog-style="edtech"] .edt-meta-mono {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+}
+
+[data-catalog-style="edtech"] .edt-outreach-to,
+[data-catalog-style="edtech"] .edt-outreach-re {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--edt-ink);
+}
+
+[data-catalog-style="edtech"] .edt-outreach-subject {
+  font-family: var(--edt-font-headline);
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--edt-navy);
+  margin: 4px 0 0 0;
+}
+
+[data-catalog-style="edtech"] .edt-outreach-body {
+  white-space: pre-wrap;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--edt-ink);
+  margin: 4px 0;
+}
+
+[data-catalog-style="edtech"] .edt-outreach-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+[data-catalog-style="edtech"] .edt-btn {
+  font-family: var(--edt-font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 6px 14px;
+  border-radius: 4px;
+  border: 1px solid var(--edt-navy);
+  background: var(--edt-paper);
+  color: var(--edt-navy);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease,
+    border-color 0.12s ease;
+}
+
+[data-catalog-style="edtech"] .edt-btn:hover {
+  background: var(--edt-navy-soft);
+}
+
+[data-catalog-style="edtech"] .edt-btn-primary {
+  background: var(--edt-navy);
+  color: var(--edt-cream);
+  border-color: var(--edt-navy);
+}
+
+[data-catalog-style="edtech"] .edt-btn-primary:hover {
+  background: var(--edt-navy-2);
+  border-color: var(--edt-navy-2);
+}
+
+[data-catalog-style="edtech"] .edt-btn-ghost {
+  background: transparent;
+  color: var(--edt-muted);
+  border-color: var(--edt-border);
+}
+
+[data-catalog-style="edtech"] .edt-btn-ghost:hover {
+  color: var(--edt-ink);
+  background: var(--edt-navy-soft);
+}
+
+[data-catalog-style="edtech"] .edt-outreach-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--edt-gold-soft);
+  color: var(--edt-gold-deep);
+  border: 1px solid var(--edt-gold);
+}
+
+[data-catalog-style="edtech"] .edt-outreach-state[data-decision="sent"] {
+  background: var(--edt-ok-bg);
+  color: var(--edt-ok);
+  border-color: var(--edt-ok);
+}
+
+[data-catalog-style="edtech"] .edt-outreach-state[data-decision="skipped"] {
+  background: rgba(28, 42, 58, 0.06);
+  color: var(--edt-muted);
+  border-color: var(--edt-border);
+}
+
+/* ── Placeholder text (missing-schema tell) ───────────────────── */
+[data-catalog-style="edtech"] .edt-placeholder {
+  font-size: 0.85rem;
+  color: var(--edt-muted);
+  font-style: italic;
+  padding: 12px;
+  border: 1px dashed var(--edt-border);
+  border-radius: 4px;
+}
+
+/* ── A11y utility ─────────────────────────────────────────────── */
+[data-catalog-style="edtech"] .edt-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

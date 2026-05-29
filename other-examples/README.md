@@ -30,6 +30,7 @@ other-examples/<example-id>/
 | Example                                              | Status | Catalog                              | What it shows                                                                          |
 | ---------------------------------------------------- | ------ | ------------------------------------ | -------------------------------------------------------------------------------------- |
 | [legal-contract-review/](./legal-contract-review/)   | wip    | `copilotkit://legal-paper-catalog`   | Paper-styled contract review with margin notes + redlines on a second registered catalog. |
+| [edtech/](./edtech/)                                 | wip    | `copilotkit://edtech-catalog`        | ScholarAI students-at-risk advisor copilot — navy/gold/cream dashboard with grade history, assignment table, and parent-outreach drafts. |
 
 ## How to add another
 

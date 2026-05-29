@@ -85,6 +85,23 @@ const travelAgent = new LangGraphAgent({
 });
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ScholarAI / Edtech agent (graph: edtech_agent)
+//
+// Powers the /other-examples/edtech surface. Same dev-server pattern
+// as the siblings above — canonical langgraph.json entry lives in
+// `other-examples/edtech/agent/langgraph.json` and is validated by
+// `pnpm smoke`'s per-example probe.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const edtechAgent = new LangGraphAgent({
+  deploymentUrl:
+    process.env.AGENT_URL ||
+    process.env.LANGGRAPH_DEPLOYMENT_URL ||
+    "http://localhost:8123",
+  graphId: "edtech_agent",
+  langsmithApiKey: process.env.LANGSMITH_API_KEY || "",
+});
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // CUSTOMIZATION SEAM #6 — Optional A2A bolt-on (Track 1 interop)
 //
 // Dormant unless A2A_AGENT_URL is set. When set, wraps the LangGraph
@@ -132,6 +149,7 @@ const runtime = new CopilotRuntime({
     healthcare: healthcareAgent,
     realestate: realestateAgent,
     travel: travelAgent,
+    edtech: edtechAgent,
   },
   runner: new InMemoryAgentRunner(),
   openGenerativeUI: true,

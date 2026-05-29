@@ -1,0 +1,12 @@
+[
+  {
+    "id": "root",
+    "component": "AssignmentStatusTable",
+    "title": { "path": "/title" },
+    "course": { "path": "/course" },
+    "instructor": { "path": "/instructor" },
+    "due": { "path": "/due" },
+    "totalPoints": { "path": "/totalPoints" },
+    "rows": { "path": "/rows" }
+  }
+]

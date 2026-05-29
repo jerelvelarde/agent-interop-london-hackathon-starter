@@ -1,0 +1,128 @@
+{
+  "name": "student-roster-default",
+  "description": "Canonical ScholarAI scenario: 5-student at-risk roster rendered as gold-leaf StudentCards on a cream surface.",
+  "surfaceId": "student-roster",
+  "catalogId": "copilotkit://edtech-catalog",
+  "components": [
+    {
+      "id": "root",
+      "component": "DashboardSection",
+      "title": { "path": "/headline" },
+      "subtitle": { "path": "/subhead" },
+      "children": ["roster-grid"]
+    },
+    {
+      "id": "roster-grid",
+      "component": "StudentGrid",
+      "children": { "componentId": "student-card", "path": "/students" }
+    },
+    {
+      "id": "student-card",
+      "component": "StudentCard",
+      "studentId": { "path": "id" },
+      "name": { "path": "name" },
+      "photoInitials": { "path": "photoInitials" },
+      "gradeLevel": { "path": "gradeLevel" },
+      "advisor": { "path": "advisor" },
+      "currentGrade": { "path": "currentGrade" },
+      "gpa": { "path": "gpa" },
+      "missingAssignments": { "path": "missingAssignments" },
+      "attendancePct": { "path": "attendancePct" },
+      "trend": { "path": "trend" },
+      "trendArrow": { "path": "trendArrow" },
+      "riskLevel": { "path": "riskLevel" },
+      "notes": { "path": "notes" },
+      "drillAction": {
+        "event": {
+          "name": "drill_into_student",
+          "context": {
+            "studentId": { "path": "id" },
+            "studentName": { "path": "name" }
+          }
+        }
+      }
+    }
+  ],
+  "data": {
+    "term": "current",
+    "headline": "At-risk students — current term",
+    "subhead": "5 students flagged via GPA, attendance, missing work, or trend.",
+    "students": [
+      {
+        "id": "S-1004",
+        "name": "Owen Reilly",
+        "photoInitials": "OR",
+        "gradeLevel": "Grade 10",
+        "advisor": "Mr. Patel",
+        "currentGrade": "F",
+        "gpa": 1.8,
+        "missingAssignments": 8,
+        "attendancePct": 62,
+        "trend": "declining",
+        "trendArrow": "↓",
+        "riskLevel": "urgent",
+        "notes": "URGENT: failing across all courses. Counselor + parents meeting scheduled."
+      },
+      {
+        "id": "S-1002",
+        "name": "Devon Carter",
+        "photoInitials": "DC",
+        "gradeLevel": "Grade 10",
+        "advisor": "Mr. Patel",
+        "currentGrade": "D+",
+        "gpa": 2.1,
+        "missingAssignments": 6,
+        "attendancePct": 71,
+        "trend": "declining",
+        "trendArrow": "↓",
+        "riskLevel": "urgent",
+        "notes": "At-risk: missed 4 of last 6 problem sets."
+      },
+      {
+        "id": "S-1012",
+        "name": "Samuel Okonjo",
+        "photoInitials": "SO",
+        "gradeLevel": "Grade 9",
+        "advisor": "Ms. Okafor",
+        "currentGrade": "C-",
+        "gpa": 2.2,
+        "missingAssignments": 5,
+        "attendancePct": 73,
+        "trend": "declining",
+        "trendArrow": "↓",
+        "riskLevel": "watch",
+        "notes": "Falling behind in algebra; schedule a check-in this week."
+      },
+      {
+        "id": "S-1005",
+        "name": "Leah Kowalski",
+        "photoInitials": "LK",
+        "gradeLevel": "Grade 11",
+        "advisor": "Mr. Patel",
+        "currentGrade": "C",
+        "gpa": 2.4,
+        "missingAssignments": 3,
+        "attendancePct": 80,
+        "trend": "declining",
+        "trendArrow": "↓",
+        "riskLevel": "watch",
+        "notes": "Family situation impacting focus; counselor looped in."
+      },
+      {
+        "id": "S-1006",
+        "name": "Eliana Ferreira",
+        "photoInitials": "EF",
+        "gradeLevel": "Grade 9",
+        "advisor": "Ms. Okafor",
+        "currentGrade": "C+",
+        "gpa": 2.5,
+        "missingAssignments": 4,
+        "attendancePct": 79,
+        "trend": "declining",
+        "trendArrow": "↓",
+        "riskLevel": "watch",
+        "notes": "Missing assignments piling up; reach out to parents this week."
+      }
+    ]
+  }
+}

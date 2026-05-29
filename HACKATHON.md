@@ -289,8 +289,8 @@ first pass is wrong. Less reliable in front of judges, faster to iterate.
 
 **Recipe:**
 1. Copy `agent/src/domains/default/` to `agent/src/domains/<your-domain>/`.
-2. Replace `data/`, `prompt.txt` (system prompt), and any domain-specific
-   widget overrides.
+2. Replace `data/`, `prompts.py` (the `SYSTEM_PROMPT` constant), and any
+   domain-specific widget overrides.
 3. Set `DOMAIN=<your-domain>` in `.env`.
 4. Restart the agent.
 

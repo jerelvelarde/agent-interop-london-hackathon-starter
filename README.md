@@ -46,9 +46,19 @@ pnpm doctor               # preflight: Node, pnpm, Python, uv, env vars, ports
 pnpm dev                  # boots Next.js + the Python agent concurrently
 ```
 
-Browser opens at `http://localhost:3000`. Send a chat like *"Show me a flights dashboard"* and watch the agent emit A2UI envelopes that render as live UI. The envelope inspector (right rail, default chrome) shows the raw protocol — that's how you know A2UI is actually working.
+Browser opens at `http://localhost:3000`. The default demo is **PortKit** — a project-operations workspace for a 7-person team. Send the canonical 5-turn demo (verbatim prompts in [DEMO.md](DEMO.md)):
+
+1. *"What's going on this week?"* → 4 KPIs + sprint progress + 3 ProjectCards (Atlas, Orion, Lyra)
+2. *"Drill into Orion."* → status hero + milestones + kanban + open risks
+3. *"Who's overloaded?"* → bar chart of points per person + overloaded-teammates table
+4. *"Draft a status update for Orion."* → editable TL;DR + Progress + Risks + Asks
+5. Click **Send to #orion-pm** → the button's `action.event` bubbles back to the agent
+
+Every surface is generated on demand: the agent picks the surface, emits an A2UI envelope, the renderer turns it into React. The envelope inspector (right rail, default chrome) shows the raw protocol — that's how you know A2UI is actually working.
 
 > **No `GEMINI_API_KEY` handy?** Set `OFFLINE=1` and the agent serves pre-baked envelopes from `public/offline-envelopes.json`. The demo still works; the inspector still shows real A2UI surfaces. Useful for flaky venue Wi-Fi.
+
+> **Demoing live?** Read [DEMO.md](DEMO.md) for the on-stage script with timing, talking points, and recovery patterns.
 
 ## Customization seams (the 6 things you'll touch)
 
@@ -57,7 +67,7 @@ Search the repo for `CUSTOMIZATION SEAM` to jump to each one. Full recipes live 
 - **§1 — Re-theme** → `src/lib/a2ui-theme.css` + `src/hooks/use-theme.tsx` (CSS variables, no rebuild)
 - **§2 — Re-brand the shell** → `src/components/BrandFrame.tsx` (header, logo, accents)
 - **§3 — Swap demo data** → `agent/src/query.py` (or `agent/src/domains/<name>/data/`)
-- **§4 — Add an A2UI widget (fixed schema)** → copy `agent/src/a2ui_fixed_schema.py:search_flights` and run the 5-surface dance
+- **§4 — Add an A2UI widget (fixed schema)** → copy `agent/src/tools/risk_register.py:show_risk_register` and run the 4-surface dance
 - **§5 — Switch domain** → set `DOMAIN=<name>` in `.env`; canonical stub at `agent/src/domains/shopping`
 - **§6 — BYO A2A agent (Track 1 interop)** → run `pnpm check-a2a <url>` first, then set `A2A_AGENT_URL`
 
@@ -70,17 +80,16 @@ This starter is built to be vibe-code-friendly. Your AI assistant (Claude Code, 
 The starter also ships:
 
 - **[`.mcp.json`](.mcp.json)** pointing at the canonical CopilotKit MCP server (`https://mcp.copilotkit.ai/sse`) — gives any MCP-capable assistant grounded answers about CopilotKit + A2UI APIs instead of hallucinating.
-- A **`create-a2ui-widget` skill** at `.claude/skills/` that drives an AI assistant through the [5-surface widget dance](HACKATHON.md) (catalog entry, fixture, Python tool, TS schema, prompt hint).
+- A **`create-a2ui-widget` skill** at `.claude/skills/` that drives an AI assistant through the [4-surface widget dance](HACKATHON.md) (catalog entry, fixture, Python tool, prompt hint).
 - **Validators that teach** — `pnpm validate-widget` and `pnpm test:widgets` point you at a real JSON template on failure (not at a Python file you can't mirror).
 
-> **The 5-surface widget dance.** Adding a fixed-schema widget touches five files. Each is grep-anchored from the canonical example: `agent/src/a2ui_fixed_schema.py:search_flights`. Run `pnpm new-widget <name>` to scaffold from that template.
+> **The 4-surface widget dance.** Adding a fixed-schema widget touches four files. Each is grep-anchored from the canonical example: `agent/src/tools/risk_register.py:show_risk_register`. Run `pnpm new-widget <name>` to scaffold from that template.
 
 ## Other tracks (we don't gatekeep)
 
 A2UI isn't the only protocol pillar in this hackathon. If your team's idea fits one of the other tracks better, build there instead — we'd rather you ship something great than force-fit your demo into our starter.
 
-- **MCP Apps track** — [Manufact's starter](https://github.com/mcp-use)
-- **Track 1 multi-team interop (A2A)** — [A2A Net's template](https://a2a.net)
+- **Track 1 multi-team interop (A2A)** — [A2A Net's template](https://a2anet.com/)
 - **Other CopilotKit examples** — [CopilotKit/examples/integrations](https://github.com/CopilotKit/CopilotKit/tree/main/examples/integrations) (chat-first, LangGraph-only, CrewAI, Mastra, etc.)
 - **A2UI Composer** (visual envelope authoring) — [a2ui-composer.ag-ui.com](https://a2ui-composer.ag-ui.com/)
 
@@ -88,6 +97,7 @@ A2UI isn't the only protocol pillar in this hackathon. If your team's idea fits 
 
 - **[WELCOME.md](WELCOME.md)** — 200-word orientation
 - **[HACKATHON.md](HACKATHON.md)** — your full 5-hour playbook with hour-by-hour template
+- **[DEMO.md](DEMO.md)** — on-stage demo script (3 min, 5 turns + recovery)
 - **[AGENTS.md](AGENTS.md)** — agent guide for your AI coding assistant
 - **[FROZEN.md](FROZEN.md)** — version-pinning rationale and the Gemini 3.x thought-signature trap
 - **[SUBMITTING.md](SUBMITTING.md)** — what you'll need at submission time

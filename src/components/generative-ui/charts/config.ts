@@ -1,25 +1,30 @@
 /**
  * CopilotKit brand chart palette — Plus Jakarta Sans / brand color system.
+ *
+ * Colors are routed through CSS variables (defined in src/app/globals.css and
+ * src/lib/a2ui-theme.css) so charts automatically retheme alongside the rest
+ * of the surface. Order prioritises the lavender/mint/orange/yellow accents
+ * favoured by the new lavender / frosted-glass design tokens.
  */
 export const CHART_COLORS = [
-  "#BEC2FF", // lilac-400
-  "#85ECCE", // mint-400
-  "#FFAC4D", // orange-400
-  "#FFF388", // yellow-400
-  "#189370", // mint-800
-  "#EEE6FE", // primary-100
-  "#FA5F67", // red-400
+  "var(--cpk-lilac-400)",
+  "var(--cpk-mint-400)",
+  "var(--cpk-orange-400)",
+  "var(--cpk-yellow-400)",
+  "var(--cpk-mint-800)",
+  "var(--accent)",
+  "var(--destructive)",
 ] as const;
 
 export const CHART_CONFIG = {
   tooltipStyle: {
-    backgroundColor: "var(--card)",
-    border: "1px solid var(--border)",
-    borderRadius: "10px",
+    backgroundColor: "var(--chart-tooltip-bg)",
+    border: "1px solid var(--chart-tooltip-border)",
+    borderRadius: "var(--radius-md, 12px)",
     padding: "10px 14px",
-    color: "var(--foreground)",
+    color: "var(--text-primary, var(--foreground))",
     fontSize: "13px",
     fontFamily: "var(--font-body)",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+    boxShadow: "var(--elevation-md, 0 4px 12px rgba(0,0,0,0.08))",
   },
 };

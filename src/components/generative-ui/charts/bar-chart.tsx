@@ -69,16 +69,20 @@ export function BarChart({ title, description, data }: BarChartProps) {
 
   if (!data || !Array.isArray(data) || data.length === 0) {
     return (
-      <Card className="max-w-2xl mx-auto my-4">
+      <Card className="max-w-2xl mx-auto my-4 rounded-[var(--radius-md,var(--radius))] shadow-[var(--elevation-sm,0_1px_2px_rgba(0,0,0,0.04))] bg-[var(--surface-container,var(--card))] border border-[var(--border-default,var(--border))]">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4 text-[var(--muted-foreground)]" />
-            <CardTitle>{title}</CardTitle>
+            <BarChart3 className="h-4 w-4 text-[var(--text-secondary,var(--muted-foreground))]" />
+            <CardTitle className="text-[var(--text-primary,var(--foreground))]">
+              {title}
+            </CardTitle>
           </div>
-          <CardDescription>{description}</CardDescription>
+          <CardDescription className="text-[var(--text-secondary,var(--muted-foreground))]">
+            {description}
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-[var(--muted-foreground)] text-center py-8 text-sm">
+          <p className="text-[var(--text-secondary,var(--muted-foreground))] text-center py-8 text-sm">
             No data available
           </p>
         </CardContent>
@@ -87,23 +91,35 @@ export function BarChart({ title, description, data }: BarChartProps) {
   }
 
   return (
-    <Card className="max-w-2xl mx-auto my-4 overflow-hidden">
-      {/* Scoped keyframe — no globals.css needed */}
+    <Card className="max-w-2xl mx-auto my-4 overflow-hidden rounded-[var(--radius-md,var(--radius))] shadow-[var(--elevation-sm,0_1px_2px_rgba(0,0,0,0.04))] bg-[var(--surface-container,var(--card))] border border-[var(--border-default,var(--border))]">
+      {/* Scoped keyframe — no globals.css needed.
+          Respects prefers-reduced-motion so users who opt out see the
+          chart paint in instantly instead of sliding. */}
       <style>{`
         @keyframes barSlideIn {
           from { transform: translateY(40px); opacity: 0; }
           20% { opacity: 1; }
           to { transform: translateY(0); opacity: 1; }
         }
+        @media (prefers-reduced-motion: reduce) {
+          @keyframes barSlideIn {
+            from { transform: none; opacity: 1; }
+            to { transform: none; opacity: 1; }
+          }
+        }
       `}</style>
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2">
-          <div className="flex items-center justify-center h-6 w-6 rounded-md bg-[var(--secondary)]">
-            <BarChart3 className="h-3.5 w-3.5 text-[var(--muted-foreground)]" />
+          <div className="flex items-center justify-center h-6 w-6 rounded-[var(--radius-xs,4px)] bg-[var(--accent)]">
+            <BarChart3 className="h-3.5 w-3.5 text-[var(--cpk-lilac-400)]" />
           </div>
-          <CardTitle>{title}</CardTitle>
+          <CardTitle className="text-[var(--text-primary,var(--foreground))]">
+            {title}
+          </CardTitle>
         </div>
-        <CardDescription>{description}</CardDescription>
+        <CardDescription className="text-[var(--text-secondary,var(--muted-foreground))]">
+          {description}
+        </CardDescription>
       </CardHeader>
       <CardContent className="pt-2">
         <ResponsiveContainer width="100%" height={280}>
@@ -113,25 +129,25 @@ export function BarChart({ title, description, data }: BarChartProps) {
           >
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="var(--border)"
+              stroke="var(--border-container, var(--border))"
               vertical={false}
             />
             <XAxis
               dataKey="label"
-              tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
-              stroke="var(--border)"
+              tick={{ fontSize: 12, fill: "var(--chart-axis)" }}
+              stroke="var(--border-container, var(--border))"
               tickLine={false}
               axisLine={false}
             />
             <YAxis
-              tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
-              stroke="var(--border)"
+              tick={{ fontSize: 12, fill: "var(--chart-axis)" }}
+              stroke="var(--border-container, var(--border))"
               tickLine={false}
               axisLine={false}
             />
             <Tooltip
               contentStyle={CHART_CONFIG.tooltipStyle}
-              cursor={{ fill: "var(--secondary)", opacity: 0.5 }}
+              cursor={{ fill: "var(--accent)", opacity: 0.5 }}
             />
             <Bar
               isAnimationActive={false}

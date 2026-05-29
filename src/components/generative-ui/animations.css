@@ -1,0 +1,30 @@
+/**
+ * Shared entrance animations for generative-UI renderers.
+ *
+ * Applied via className to iterated children with an inline
+ * `style={{ animationDelay: ` + "`${i * 40}ms`" + ` }}` so each item fades
+ * up slightly later than the one before it. Respects user motion prefs.
+ */
+
+@keyframes a2ui-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.a2ui-fade-up {
+  animation: a2ui-fade-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .a2ui-fade-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

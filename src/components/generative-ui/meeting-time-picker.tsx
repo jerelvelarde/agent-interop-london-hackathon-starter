@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
 import { Check, X, Clock, ChevronRight } from "lucide-react";
+import "./animations.css";
 
 export interface TimeSlot {
   date: string;
@@ -56,17 +57,17 @@ export function MeetingTimePicker({
   // Confirmed state
   if (selectedSlot) {
     return (
-      <Card className="max-w-md w-full mx-auto mb-4 overflow-hidden">
+      <Card className="max-w-md w-full mx-auto mb-4 overflow-hidden rounded-[var(--radius-md,var(--radius))] shadow-[var(--elevation-sm,0_1px_2px_rgba(0,0,0,0.04))] bg-[var(--surface-container,var(--card))] border border-[var(--border-default,var(--border))]">
         <CardContent className="p-6">
           <div className="flex flex-col items-center text-center gap-3">
-            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-[#189370]">
+            <div className="flex items-center justify-center h-10 w-10 rounded-[var(--radius-full,9999px)] bg-[var(--cpk-mint-800)]">
               <Check className="h-5 w-5 text-white" strokeWidth={3} />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-[var(--foreground)]">
+              <h3 className="text-lg font-bold text-[var(--text-primary,var(--foreground))]">
                 Meeting Scheduled
               </h3>
-              <p className="text-sm text-[var(--muted-foreground)] mt-1">
+              <p className="text-sm text-[var(--text-secondary,var(--muted-foreground))] mt-1">
                 {selectedSlot.date} at {selectedSlot.time}
               </p>
             </div>
@@ -85,17 +86,17 @@ export function MeetingTimePicker({
   // Declined state
   if (declined) {
     return (
-      <Card className="max-w-md w-full mx-auto mb-4 overflow-hidden">
+      <Card className="max-w-md w-full mx-auto mb-4 overflow-hidden rounded-[var(--radius-md,var(--radius))] shadow-[var(--elevation-sm,0_1px_2px_rgba(0,0,0,0.04))] bg-[var(--surface-container,var(--card))] border border-[var(--border-default,var(--border))]">
         <CardContent className="p-6">
           <div className="flex flex-col items-center text-center gap-3">
-            <div className="flex items-center justify-center h-12 w-12 rounded-full bg-[var(--secondary)]">
-              <X className="h-6 w-6 text-[var(--muted-foreground)]" />
+            <div className="flex items-center justify-center h-12 w-12 rounded-[var(--radius-full,9999px)] bg-[var(--secondary)]">
+              <X className="h-6 w-6 text-[var(--text-secondary,var(--muted-foreground))]" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-[var(--foreground)]">
+              <h3 className="text-lg font-bold text-[var(--text-primary,var(--foreground))]">
                 No Time Selected
               </h3>
-              <p className="text-sm text-[var(--muted-foreground)] mt-1">
+              <p className="text-sm text-[var(--text-secondary,var(--muted-foreground))] mt-1">
                 Looking for a better time that works for you
               </p>
             </div>
@@ -107,16 +108,16 @@ export function MeetingTimePicker({
 
   // Selection state
   return (
-    <Card className="max-w-md w-full mx-auto mb-4 overflow-hidden">
+    <Card className="max-w-md w-full mx-auto mb-4 overflow-hidden rounded-[var(--radius-md,var(--radius))] shadow-[var(--elevation-sm,0_1px_2px_rgba(0,0,0,0.04))] bg-[var(--surface-container,var(--card))] border border-[var(--border-default,var(--border))]">
       <CardContent className="p-6">
         <div className="flex flex-col items-center text-center mb-5">
-          <div className="flex items-center justify-center h-12 w-12 rounded-full bg-[var(--accent)] mb-3">
-            <Clock className="h-6 w-6 text-[#BEC2FF]" />
+          <div className="flex items-center justify-center h-12 w-12 rounded-[var(--radius-full,9999px)] bg-[var(--accent)] mb-3">
+            <Clock className="h-6 w-6 text-[var(--cpk-lilac-400)]" />
           </div>
-          <h3 className="text-lg font-bold text-[var(--foreground)]">
+          <h3 className="text-lg font-bold text-[var(--text-primary,var(--foreground))]">
             {displayTitle}
           </h3>
-          <p className="text-sm text-[var(--muted-foreground)] mt-1">
+          <p className="text-sm text-[var(--text-secondary,var(--muted-foreground))] mt-1">
             {status === "inProgress"
               ? "Finding available times..."
               : "Pick a time that works for you"}
@@ -135,17 +136,18 @@ export function MeetingTimePicker({
               <button
                 key={index}
                 onClick={() => handleSelectSlot(slot)}
-                className="group w-full px-6 py-5 rounded-[var(--radius)]
-                  border border-[var(--border)]
+                style={{ animationDelay: `${index * 40}ms` }}
+                className="a2ui-fade-up group w-full px-6 py-5 rounded-[var(--radius-sm,var(--radius))]
+                  border border-[var(--border-default,var(--border))]
                   hover:border-[var(--ring)] hover:bg-[var(--accent)]
                   transition-all duration-150 cursor-pointer
                   flex items-center gap-4"
               >
                 <div className="flex-1 text-left">
-                  <div className="font-semibold text-base text-[var(--foreground)]">
+                  <div className="font-semibold text-base text-[var(--text-primary,var(--foreground))]">
                     {slot.date}
                   </div>
-                  <div className="text-sm text-[var(--muted-foreground)] mt-0.5">
+                  <div className="text-sm text-[var(--text-secondary,var(--muted-foreground))] mt-0.5">
                     {slot.time}
                   </div>
                 </div>
@@ -157,14 +159,14 @@ export function MeetingTimePicker({
                     {slot.duration}
                   </Badge>
                 )}
-                <ChevronRight className="h-4 w-4 text-[var(--muted-foreground)] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                <ChevronRight className="h-4 w-4 text-[var(--text-secondary,var(--muted-foreground))] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
               </button>
             ))}
 
             <Button
               variant="ghost"
               size="sm"
-              className="w-full mt-1 text-xs text-[var(--muted-foreground)]"
+              className="w-full mt-1 text-xs text-[var(--text-secondary,var(--muted-foreground))]"
               onClick={handleDecline}
             >
               None of these work

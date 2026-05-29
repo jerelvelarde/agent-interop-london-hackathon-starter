@@ -3,7 +3,7 @@
  * demo feature when clicked.
  *
  * Ordered to match the PortKit on-stage demo script (DEMO.md):
- * dashboard → drill-in → team load → status draft → activity feed.
+ * dashboard → drill-in → team load → status draft.
  *
  * Showcase mode (showcase.json) controls which pills are visually highlighted.
  * Highlight styling: globals.css (.a2ui-highlight, .opengenui-highlight)
@@ -36,11 +36,6 @@ export const useExampleSuggestions = () => {
       {
         title: "Draft Status Update (A2UI)",
         message: "Draft a status update for Orion.",
-        className: showcase === "a2ui" ? "a2ui-highlight" : undefined,
-      },
-      {
-        title: "Recent Updates (A2UI)",
-        message: "Show me recent updates.",
         className: showcase === "a2ui" ? "a2ui-highlight" : undefined,
       },
     ],

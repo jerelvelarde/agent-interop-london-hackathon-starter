@@ -51,7 +51,7 @@ Search the repo for `CUSTOMIZATION SEAM` to jump to each one. Full recipes live 
 A2UI isn't the only protocol pillar in this hackathon. If your team's idea fits one of the other tracks better, build there instead — we'd rather you ship something great than force-fit your demo into our starter.
 
 - **MCP Apps track** — [Manufact's starter](https://github.com/mcp-use)
-- **Track 1 multi-team interop (A2A)** — [A2A Net's template](https://a2a.net)
+- **Track 1 multi-team interop (A2A)** — [A2A Net's template](https://a2anet.com/)
 - **Other CopilotKit examples** — [CopilotKit/examples/integrations](https://github.com/CopilotKit/CopilotKit/tree/main/examples/integrations) (chat-first, LangGraph-only, CrewAI, Mastra, etc.)
 - **A2UI Composer** (visual envelope authoring) — [a2ui-composer.ag-ui.com](https://a2ui-composer.ag-ui.com/)
 

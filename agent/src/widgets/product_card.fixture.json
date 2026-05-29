@@ -2,7 +2,7 @@
   "name": "product_card_running_shoes",
   "description": "Canonical fixed-schema scenario: search_products returns three running-shoe cards rendered with the base v0.9 catalog.",
   "surfaceId": "product-search-results",
-  "catalogId": "https://a2ui.org/specification/v0_9/basic_catalog.json",
+  "catalogId": "copilotkit://app-dashboard-catalog",
   "components": [
     {
       "id": "root",

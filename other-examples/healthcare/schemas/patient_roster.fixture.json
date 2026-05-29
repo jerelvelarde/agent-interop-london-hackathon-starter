@@ -1,0 +1,147 @@
+{
+  "name": "patient-roster-default",
+  "description": "Canonical RoundsAI scenario: 8-patient ward roster with mixed statuses (1 critical, 3 watch, 4 stable). PatientCards iterate from /patients via template binding.",
+  "surfaceId": "patient-roster",
+  "catalogId": "copilotkit://healthcare-catalog",
+  "components": [
+    {
+      "id": "root",
+      "component": "WardShell",
+      "title": { "path": "/title" },
+      "censusTotal": { "path": "/census/total" },
+      "censusAlerts": { "path": "/census/alerts" },
+      "stableCount": { "path": "/census/stable" },
+      "watchCount": { "path": "/census/watch" },
+      "criticalCount": { "path": "/census/critical" },
+      "children": [{ "id": "roster", "basePath": "" }]
+    },
+    {
+      "id": "roster",
+      "component": "PatientRoster",
+      "title": { "path": "/title" },
+      "patients": { "componentId": "patient-card", "path": "/patients" }
+    },
+    {
+      "id": "patient-card",
+      "component": "PatientCard",
+      "patientId": { "path": "id" },
+      "name": { "path": "name" },
+      "room": { "path": "room" },
+      "meta": { "path": "meta" },
+      "status": { "path": "status" },
+      "statusLabel": { "path": "statusLabel" },
+      "primaryIssue": { "path": "primaryIssue" },
+      "attending": { "path": "attending" },
+      "lastVitalsAt": { "path": "lastVitalsAt" },
+      "action": {
+        "event": {
+          "name": "drill_into_patient",
+          "context": {
+            "patientId": { "path": "id" },
+            "patientName": { "path": "name" }
+          }
+        }
+      }
+    }
+  ],
+  "data": {
+    "title": "Today's roster",
+    "census": {
+      "total": 8,
+      "stable": 4,
+      "watch": 3,
+      "critical": 1,
+      "alerts": 4
+    },
+    "patients": [
+      {
+        "id": "pt-001",
+        "name": "Patient A",
+        "room": "304-A",
+        "meta": "72F · Room 304-A · Day 3",
+        "status": "watch",
+        "statusLabel": "Watch",
+        "primaryIssue": "Post-op hip replacement — spiking fever",
+        "attending": "Dr. Okafor",
+        "lastVitalsAt": "2026-05-29T14:00"
+      },
+      {
+        "id": "pt-002",
+        "name": "Patient B",
+        "room": "305-B",
+        "meta": "58M · Room 305-B · Day 1",
+        "status": "watch",
+        "statusLabel": "Watch",
+        "primaryIssue": "Type-2 diabetes flare",
+        "attending": "Dr. Reyes",
+        "lastVitalsAt": "2026-05-29T14:00"
+      },
+      {
+        "id": "pt-003",
+        "name": "Patient C",
+        "room": "306-A",
+        "meta": "34F · Room 306-A · Day 2",
+        "status": "stable",
+        "statusLabel": "Stable",
+        "primaryIssue": "Pneumonia (RLL)",
+        "attending": "Dr. Okafor",
+        "lastVitalsAt": "2026-05-29T10:00"
+      },
+      {
+        "id": "pt-004",
+        "name": "Patient D",
+        "room": "307-B",
+        "meta": "81M · Room 307-B · Day 4",
+        "status": "critical",
+        "statusLabel": "Critical",
+        "primaryIssue": "Acute kidney injury",
+        "attending": "Dr. Patel",
+        "lastVitalsAt": "2026-05-29T14:00"
+      },
+      {
+        "id": "pt-005",
+        "name": "Patient E",
+        "room": "308-A",
+        "meta": "49F · Room 308-A · Day 1",
+        "status": "stable",
+        "statusLabel": "Stable",
+        "primaryIssue": "Post-op cholecystectomy",
+        "attending": "Dr. Reyes",
+        "lastVitalsAt": "2026-05-29T10:00"
+      },
+      {
+        "id": "pt-006",
+        "name": "Patient F",
+        "room": "309-A",
+        "meta": "67M · Room 309-A · Day 2",
+        "status": "watch",
+        "statusLabel": "Watch",
+        "primaryIssue": "Atrial fibrillation",
+        "attending": "Dr. Patel",
+        "lastVitalsAt": "2026-05-29T10:00"
+      },
+      {
+        "id": "pt-007",
+        "name": "Patient G",
+        "room": "310-B",
+        "meta": "29F · Room 310-B · Day 1",
+        "status": "stable",
+        "statusLabel": "Stable",
+        "primaryIssue": "Asthma exacerbation",
+        "attending": "Dr. Okafor",
+        "lastVitalsAt": "2026-05-29T06:00"
+      },
+      {
+        "id": "pt-008",
+        "name": "Patient H",
+        "room": "311-A",
+        "meta": "76M · Room 311-A · Day 5",
+        "status": "stable",
+        "statusLabel": "Stable",
+        "primaryIssue": "CHF readmission",
+        "attending": "Dr. Patel",
+        "lastVitalsAt": "2026-05-29T06:00"
+      }
+    ]
+  }
+}

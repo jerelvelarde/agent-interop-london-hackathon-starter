@@ -1,0 +1,12 @@
+{
+  "id": "healthcare",
+  "name": "RoundsAI — Ward Rounds Copilot",
+  "description": "A charge-nurse copilot that surfaces the ward roster, drills into vitals, and drafts shift handoffs.",
+  "route": "/other-examples/healthcare",
+  "graphId": "healthcare_agent",
+  "agentName": "healthcare",
+  "catalogId": "copilotkit://healthcare-catalog",
+  "screenshot": "screenshot.png",
+  "tags": ["healthcare", "rounds", "clinical"],
+  "status": "wip"
+}

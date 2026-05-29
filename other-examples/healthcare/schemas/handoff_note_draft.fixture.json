@@ -1,0 +1,53 @@
+{
+  "name": "handoff-note-pt-001",
+  "description": "Canonical handoff-note draft focused on Patient A's spiking fever. Editable textarea + Send / Edit / Discard actions.",
+  "surfaceId": "handoff-note-draft",
+  "catalogId": "copilotkit://healthcare-catalog",
+  "components": [
+    {
+      "id": "root",
+      "component": "WardShell",
+      "title": { "path": "/title" },
+      "children": [{ "id": "draft", "basePath": "" }]
+    },
+    {
+      "id": "draft",
+      "component": "HandoffNoteDraft",
+      "title": { "path": "/title" },
+      "subtitle": { "path": "/subtitle" },
+      "body": { "path": "/body" },
+      "status": { "path": "/status" },
+      "sendAction": {
+        "event": {
+          "name": "handoff_sent",
+          "context": {
+            "patientName": { "path": "/patientName" }
+          }
+        }
+      },
+      "editAction": {
+        "event": {
+          "name": "handoff_edit",
+          "context": {
+            "patientName": { "path": "/patientName" }
+          }
+        }
+      },
+      "discardAction": {
+        "event": {
+          "name": "handoff_discarded",
+          "context": {
+            "patientName": { "path": "/patientName" }
+          }
+        }
+      }
+    }
+  ],
+  "data": {
+    "title": "Night-shift handoff (draft)",
+    "subtitle": "Focus: Patient A",
+    "patientName": "Patient A",
+    "status": "draft",
+    "body": "NIGHT-SHIFT HANDOFF — 2026-05-29 14:00 UTC\nFocus patient: Patient A · Room 304-A\n\nPrimary issue: Post-op hip replacement — spiking fever\nAttending: Dr. Okafor\nAllergies: Penicillin\n\nActive concerns:\n  - [HIGH] Temp trending up — 38.4C\n      Three consecutive readings >38.0C since 06:00. Cultures pending.\n  - [MEDIUM] Wound site warm to touch\n      Noted on 10:00 rounds. Surgical team paged.\n\nActive orders:\n  - Acetaminophen 650 mg PO q6h PRN (Pain / fever)\n  - Enoxaparin 40 mg SC daily (DVT prophylaxis)\n  - Cefazolin 1 g IV q8h (Surgical prophylaxis)\n\nPlan: continue current orders. Reassess at 22:00 rounds. Page surgical team if temp >38.5C or O2 sat drops <94%."
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "name": "patient-detail-pt-001",
+  "description": "Canonical drill-in scenario: Patient A with a rising temp trend across 6 readings over 24h, two risk flags, and 3 active meds.",
+  "surfaceId": "patient-detail",
+  "catalogId": "copilotkit://healthcare-catalog",
+  "components": [
+    {
+      "id": "root",
+      "component": "WardShell",
+      "title": { "path": "/patient/name" },
+      "children": [{ "id": "detail", "basePath": "" }]
+    },
+    {
+      "id": "detail",
+      "component": "PatientDetail",
+      "patientName": { "path": "/patient/name" },
+      "patientMeta": { "path": "/patient/meta" },
+      "status": { "path": "/patient/status" },
+      "statusLabel": { "path": "/patient/statusLabel" },
+      "primaryIssue": { "path": "/patient/primaryIssue" },
+      "attending": { "path": "/patient/attending" },
+      "allergies": { "path": "/patient/allergies" },
+      "vitalsChild": "vitals",
+      "medsChild": "meds",
+      "risksChild": "risks"
+    },
+    {
+      "id": "vitals",
+      "component": "VitalsChart",
+      "windowHours": { "path": "/vitals/windowHours" },
+      "readings": { "componentId": "vitals-reading", "path": "/vitals/readings" },
+      "latestHr": { "path": "/vitals/latest/heartRate" },
+      "latestBpLabel": { "path": "/vitals/latest/bpLabel" },
+      "latestTemp": { "path": "/vitals/latest/tempC" },
+      "latestO2": { "path": "/vitals/latest/o2Sat" }
+    },
+    {
+      "id": "vitals-reading",
+      "component": "VitalsReading",
+      "timeLabel": { "path": "timeLabel" },
+      "heartRate": { "path": "heartRate" },
+      "bpLabel": { "path": "bpLabel" },
+      "respRate": { "path": "respRate" },
+      "tempC": { "path": "tempC" },
+      "o2Sat": { "path": "o2Sat" },
+      "note": { "path": "note" }
+    },
+    {
+      "id": "meds",
+      "component": "MedsList",
+      "title": "Active medications",
+      "meds": { "componentId": "med-row", "path": "/meds" }
+    },
+    {
+      "id": "med-row",
+      "component": "MedRow",
+      "name": { "path": "name" },
+      "dose": { "path": "dose" },
+      "indication": { "path": "indication" }
+    },
+    {
+      "id": "risks",
+      "component": "RiskFlagList",
+      "title": "Risk flags",
+      "flags": { "componentId": "risk-flag", "path": "/riskFlags" }
+    },
+    {
+      "id": "risk-flag",
+      "component": "RiskFlag",
+      "severity": { "path": "severity" },
+      "label": { "path": "label" },
+      "detail": { "path": "detail" }
+    }
+  ],
+  "data": {
+    "patient": {
+      "id": "pt-001",
+      "name": "Patient A",
+      "room": "304-A",
+      "meta": "72F · Room 304-A · Day 3",
+      "status": "watch",
+      "statusLabel": "Watch",
+      "primaryIssue": "Post-op hip replacement — spiking fever",
+      "attending": "Dr. Okafor",
+      "allergies": "Penicillin"
+    },
+    "vitals": {
+      "windowHours": 24,
+      "readings": [
+        { "ts": "2026-05-28T18:00", "timeLabel": "18:00", "heartRate": 76, "systolicBp": 124, "diastolicBp": 80, "respRate": 16, "tempC": 37.1, "o2Sat": 98, "bpLabel": "124/80", "note": "Stable evening rounds" },
+        { "ts": "2026-05-28T22:00", "timeLabel": "22:00", "heartRate": 80, "systolicBp": 126, "diastolicBp": 82, "respRate": 16, "tempC": 37.4, "o2Sat": 97, "bpLabel": "126/82", "note": "Slight temp uptick" },
+        { "ts": "2026-05-29T02:00", "timeLabel": "02:00", "heartRate": 84, "systolicBp": 128, "diastolicBp": 82, "respRate": 18, "tempC": 37.9, "o2Sat": 97, "bpLabel": "128/82", "note": "Temp rising; PRN acetaminophen" },
+        { "ts": "2026-05-29T06:00", "timeLabel": "06:00", "heartRate": 88, "systolicBp": 130, "diastolicBp": 84, "respRate": 18, "tempC": 38.1, "o2Sat": 97, "bpLabel": "130/84", "note": "Temp persistent — surgical team paged" },
+        { "ts": "2026-05-29T10:00", "timeLabel": "10:00", "heartRate": 94, "systolicBp": 132, "diastolicBp": 86, "respRate": 20, "tempC": 38.3, "o2Sat": 96, "bpLabel": "132/86", "note": "Wound site warm; cultures drawn" },
+        { "ts": "2026-05-29T14:00", "timeLabel": "14:00", "heartRate": 98, "systolicBp": 134, "diastolicBp": 88, "respRate": 20, "tempC": 38.4, "o2Sat": 96, "bpLabel": "134/88", "note": "Trending up — cultures pending" }
+      ],
+      "latest": { "timeLabel": "14:00", "heartRate": 98, "systolicBp": 134, "diastolicBp": 88, "respRate": 20, "tempC": 38.4, "o2Sat": 96, "bpLabel": "134/88", "note": "Trending up — cultures pending" }
+    },
+    "meds": [
+      { "name": "Acetaminophen", "dose": "650 mg PO q6h PRN", "indication": "Pain / fever" },
+      { "name": "Enoxaparin", "dose": "40 mg SC daily", "indication": "DVT prophylaxis" },
+      { "name": "Cefazolin", "dose": "1 g IV q8h", "indication": "Surgical prophylaxis" }
+    ],
+    "riskFlags": [
+      { "id": "rf-001", "severity": "high", "label": "Temp trending up — 38.4C", "detail": "Three consecutive readings >38.0C since 06:00. Cultures pending." },
+      { "id": "rf-002", "severity": "medium", "label": "Wound site warm to touch", "detail": "Noted on 10:00 rounds. Surgical team paged." }
+    ]
+  }
+}

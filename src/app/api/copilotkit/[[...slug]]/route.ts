@@ -33,6 +33,25 @@ const legalAgent = new LangGraphAgent({
 });
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// RoundsAI Ward Rounds Copilot agent (graph: healthcare_agent)
+//
+// Sibling agent that powers the /other-examples/healthcare surface.
+// Points at the same LangGraph deployment as `defaultAgent` — when
+// active in dev, the `healthcare_agent` graph entry would live in the
+// project-root `agent/langgraph.json` (currently disabled by default
+// alongside legal_review_agent; canonical entry is in
+// `other-examples/healthcare/agent/langgraph.json`).
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const healthcareAgent = new LangGraphAgent({
+  deploymentUrl:
+    process.env.AGENT_URL ||
+    process.env.LANGGRAPH_DEPLOYMENT_URL ||
+    "http://localhost:8123",
+  graphId: "healthcare_agent",
+  langsmithApiKey: process.env.LANGSMITH_API_KEY || "",
+});
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // CUSTOMIZATION SEAM #6 — Optional A2A bolt-on (Track 1 interop)
 //
 // Dormant unless A2A_AGENT_URL is set. When set, wraps the LangGraph
@@ -74,7 +93,11 @@ const orchestrationAgent =
       })();
 
 const runtime = new CopilotRuntime({
-  agents: { default: orchestrationAgent, legal: legalAgent },
+  agents: {
+    default: orchestrationAgent,
+    legal: legalAgent,
+    healthcare: healthcareAgent,
+  },
   runner: new InMemoryAgentRunner(),
   openGenerativeUI: true,
   a2ui: {

@@ -1,0 +1,785 @@
+/**
+ * Healthcare Catalog — Scoped Theme
+ *
+ * Every rule in this file is scoped under `[data-catalog-style="healthcare"]`
+ * so the dashboard demo's CSS variables (defined globally in
+ * `src/lib/a2ui-theme.css` and `src/app/globals.css`) are untouched.
+ *
+ * Visual identity (from the Notion plan):
+ *   - Clinical teal #0b8e83 primary, seafoam mint surface tints,
+ *     deep navy text on cream.
+ *   - Inter for prose, JetBrains Mono for numerals (vital readings),
+ *     tabular figures aligned.
+ *   - Hairline 1px borders, soft drop shadow.
+ *   - Iconography: Lucide stroke set, pulse / heart / clipboard motifs.
+ *   - NO animation. Medical UIs feel wrong with juicy easing.
+ */
+
+[data-catalog-style="healthcare"] {
+  /* ── Palette ─────────────────────────────────────────────────── */
+  --hc-bg: #fbfdfc;
+  --hc-surface: #ffffff;
+  --hc-surface-tint: #effaf7;
+  --hc-cream: #f8f6ef;
+  --hc-border: #d8e6e1;
+  --hc-border-strong: #b2cec5;
+  --hc-text: #0c1f2c;
+  --hc-text-muted: #4b6271;
+  --hc-text-soft: #6e8190;
+
+  --hc-primary: #0b8e83;
+  --hc-primary-strong: #066f66;
+  --hc-primary-soft: #6fd9cf;
+  --hc-primary-tint: #d4f1ec;
+
+  --hc-stable: #2d8c5a;
+  --hc-stable-bg: rgba(45, 140, 90, 0.1);
+  --hc-watch: #b06a00;
+  --hc-watch-bg: rgba(176, 106, 0, 0.12);
+  --hc-critical: #b91c1c;
+  --hc-critical-bg: rgba(185, 28, 28, 0.1);
+
+  --hc-line-hr: #b91c1c;
+  --hc-line-bp: #0b8e83;
+  --hc-line-temp: #b06a00;
+  --hc-line-o2: #4f46e5;
+
+  /* ── Typography ──────────────────────────────────────────────── */
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  line-height: 1.5;
+  color: var(--hc-text);
+  background: var(--hc-bg);
+  color-scheme: light;
+}
+
+[data-catalog-style="healthcare"] .hc-mono {
+  font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  letter-spacing: 0;
+}
+
+/* ── Shell ─────────────────────────────────────────────────────── */
+[data-catalog-style="healthcare"] .hc-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: var(--hc-bg);
+  /* Ultra-light medical-grid background — 24px squares, very subtle. */
+  background-image:
+    linear-gradient(to right, rgba(11, 142, 131, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(11, 142, 131, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+[data-catalog-style="healthcare"] .hc-strip {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: var(--hc-surface);
+  border-bottom: 1px solid var(--hc-border);
+  padding: 12px 20px;
+  font-size: 13px;
+}
+
+[data-catalog-style="healthcare"] .hc-strip-title {
+  font-weight: 600;
+  color: var(--hc-text);
+  font-size: 14px;
+  letter-spacing: -0.005em;
+}
+
+[data-catalog-style="healthcare"] .hc-strip-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+[data-catalog-style="healthcare"] .hc-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--hc-border);
+  background: var(--hc-surface);
+  color: var(--hc-text-muted);
+  letter-spacing: 0.01em;
+}
+
+[data-catalog-style="healthcare"] .hc-pill--total {
+  border-color: var(--hc-border-strong);
+  color: var(--hc-text);
+}
+[data-catalog-style="healthcare"] .hc-pill--stable {
+  background: var(--hc-stable-bg);
+  border-color: rgba(45, 140, 90, 0.3);
+  color: var(--hc-stable);
+}
+[data-catalog-style="healthcare"] .hc-pill--watch {
+  background: var(--hc-watch-bg);
+  border-color: rgba(176, 106, 0, 0.35);
+  color: var(--hc-watch);
+}
+[data-catalog-style="healthcare"] .hc-pill--critical {
+  background: var(--hc-critical-bg);
+  border-color: rgba(185, 28, 28, 0.4);
+  color: var(--hc-critical);
+}
+[data-catalog-style="healthcare"] .hc-pill--alert {
+  background: rgba(185, 28, 28, 0.06);
+  border-color: rgba(185, 28, 28, 0.3);
+  color: var(--hc-critical);
+}
+
+[data-catalog-style="healthcare"] .hc-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  min-width: 0;
+}
+
+[data-catalog-style="healthcare"] .hc-footer {
+  border-top: 1px solid var(--hc-border);
+  padding: 8px 20px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--hc-text-soft);
+  background: var(--hc-surface);
+  text-align: center;
+}
+
+/* ── Status pill (shared) ──────────────────────────────────────── */
+[data-catalog-style="healthcare"] .hc-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+[data-catalog-style="healthcare"] .hc-status-pill[data-status="stable"] {
+  background: var(--hc-stable-bg);
+  border-color: rgba(45, 140, 90, 0.4);
+  color: var(--hc-stable);
+}
+[data-catalog-style="healthcare"] .hc-status-pill[data-status="watch"] {
+  background: var(--hc-watch-bg);
+  border-color: rgba(176, 106, 0, 0.45);
+  color: var(--hc-watch);
+}
+[data-catalog-style="healthcare"] .hc-status-pill[data-status="critical"] {
+  background: var(--hc-critical-bg);
+  border-color: rgba(185, 28, 28, 0.5);
+  color: var(--hc-critical);
+}
+
+/* ── Roster ────────────────────────────────────────────────────── */
+[data-catalog-style="healthcare"] .hc-roster-title {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--hc-text-soft);
+}
+
+[data-catalog-style="healthcare"] .hc-roster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+[data-catalog-style="healthcare"] .hc-card {
+  background: var(--hc-surface);
+  border: 1px solid var(--hc-border);
+  border-radius: 6px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 2px rgba(12, 31, 44, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+[data-catalog-style="healthcare"] .hc-card[data-status="watch"] {
+  border-left: 3px solid var(--hc-watch);
+}
+[data-catalog-style="healthcare"] .hc-card[data-status="critical"] {
+  border-left: 3px solid var(--hc-critical);
+}
+[data-catalog-style="healthcare"] .hc-card[data-status="stable"] {
+  border-left: 3px solid var(--hc-stable);
+}
+
+[data-catalog-style="healthcare"] .hc-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+[data-catalog-style="healthcare"] .hc-card-name-block {
+  min-width: 0;
+}
+
+[data-catalog-style="healthcare"] .hc-card-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--hc-text);
+  line-height: 1.2;
+}
+
+[data-catalog-style="healthcare"] .hc-card-meta {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: var(--hc-text-soft);
+}
+
+[data-catalog-style="healthcare"] .hc-card-issue {
+  margin: 0;
+  font-size: 13px;
+  color: var(--hc-text);
+  line-height: 1.4;
+}
+
+[data-catalog-style="healthcare"] .hc-card-meta-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 10px;
+  row-gap: 2px;
+  margin: 0;
+  font-size: 12px;
+}
+
+[data-catalog-style="healthcare"] .hc-card-meta-grid dt {
+  color: var(--hc-text-soft);
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+[data-catalog-style="healthcare"] .hc-card-meta-grid dd {
+  margin: 0;
+  color: var(--hc-text);
+}
+
+[data-catalog-style="healthcare"] .hc-card-action {
+  margin-top: 4px;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1px solid var(--hc-border-strong);
+  color: var(--hc-primary-strong);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+[data-catalog-style="healthcare"] .hc-card-action:hover {
+  background: var(--hc-primary-tint);
+  border-color: var(--hc-primary);
+}
+
+/* ── Detail ────────────────────────────────────────────────────── */
+[data-catalog-style="healthcare"] .hc-detail {
+  background: var(--hc-surface);
+  border: 1px solid var(--hc-border);
+  border-radius: 6px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 2px rgba(12, 31, 44, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+[data-catalog-style="healthcare"] .hc-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--hc-border);
+}
+
+[data-catalog-style="healthcare"] .hc-detail-name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--hc-text);
+  letter-spacing: -0.01em;
+}
+
+[data-catalog-style="healthcare"] .hc-detail-meta {
+  margin: 2px 0 0 0;
+  font-size: 13px;
+  color: var(--hc-text-soft);
+}
+
+[data-catalog-style="healthcare"] .hc-detail-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 16px;
+  row-gap: 4px;
+  margin: 0;
+  font-size: 13px;
+}
+
+[data-catalog-style="healthcare"] .hc-detail-grid dt {
+  color: var(--hc-text-soft);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  padding-top: 3px;
+}
+
+[data-catalog-style="healthcare"] .hc-detail-grid dd {
+  margin: 0;
+  color: var(--hc-text);
+}
+
+[data-catalog-style="healthcare"] .hc-detail-section {
+  border-top: 1px solid var(--hc-border);
+  padding-top: 14px;
+}
+
+/* ── Vitals ────────────────────────────────────────────────────── */
+[data-catalog-style="healthcare"] .hc-vitals {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+[data-catalog-style="healthcare"] .hc-vitals-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+[data-catalog-style="healthcare"] .hc-vitals-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--hc-text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--hc-primary-strong);
+}
+
+[data-catalog-style="healthcare"] .hc-vitals-latest {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+[data-catalog-style="healthcare"] .hc-vitals-latest li {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.1;
+}
+
+[data-catalog-style="healthcare"] .hc-vitals-latest-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--hc-text-soft);
+}
+
+[data-catalog-style="healthcare"] .hc-vitals-latest-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--hc-text);
+}
+
+[data-catalog-style="healthcare"] .hc-vitals-chart-wrap {
+  background: var(--hc-cream);
+  border: 1px solid var(--hc-border);
+  border-radius: 4px;
+  padding: 12px;
+}
+
+[data-catalog-style="healthcare"] .hc-vitals-chart {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+[data-catalog-style="healthcare"] .hc-vitals-grid {
+  stroke: rgba(11, 142, 131, 0.12);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+[data-catalog-style="healthcare"] .hc-vitals-line {
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+[data-catalog-style="healthcare"] .hc-vitals-axis-label {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10px;
+  fill: var(--hc-text-soft);
+}
+
+[data-catalog-style="healthcare"] .hc-vitals-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 4px 0 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--hc-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+[data-catalog-style="healthcare"] .hc-vitals-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+[data-catalog-style="healthcare"] .hc-legend-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 2px;
+  border-radius: 1px;
+}
+
+[data-catalog-style="healthcare"] .hc-vitals-empty {
+  font-size: 13px;
+  color: var(--hc-text-soft);
+  text-align: center;
+  padding: 24px 12px;
+  border: 1px dashed var(--hc-border);
+  border-radius: 4px;
+}
+
+[data-catalog-style="healthcare"] .hc-vitals-row td {
+  border-top: 1px solid var(--hc-border);
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+/* ── Meds ──────────────────────────────────────────────────────── */
+[data-catalog-style="healthcare"] .hc-meds-title,
+[data-catalog-style="healthcare"] .hc-risks-title {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--hc-primary-strong);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+[data-catalog-style="healthcare"] .hc-meds-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+[data-catalog-style="healthcare"] .hc-meds-list > li {
+  padding: 6px 10px;
+  border-left: 2px solid var(--hc-primary-soft);
+  background: var(--hc-surface-tint);
+  border-radius: 0 4px 4px 0;
+}
+
+[data-catalog-style="healthcare"] .hc-med-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+
+[data-catalog-style="healthcare"] .hc-med-name {
+  font-weight: 600;
+  color: var(--hc-text);
+}
+
+[data-catalog-style="healthcare"] .hc-med-dose {
+  color: var(--hc-text-muted);
+  font-size: 12px;
+}
+
+[data-catalog-style="healthcare"] .hc-med-indication {
+  color: var(--hc-text-soft);
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* ── Risks ─────────────────────────────────────────────────────── */
+[data-catalog-style="healthcare"] .hc-risks-title {
+  color: var(--hc-critical);
+}
+
+[data-catalog-style="healthcare"] .hc-risks-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+[data-catalog-style="healthcare"] .hc-risks-empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--hc-text-soft);
+  font-style: italic;
+}
+
+[data-catalog-style="healthcare"] .hc-risk {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--hc-border);
+  background: var(--hc-surface);
+}
+
+[data-catalog-style="healthcare"] .hc-risk[data-severity="high"] {
+  border-color: rgba(185, 28, 28, 0.4);
+  background: rgba(185, 28, 28, 0.04);
+}
+[data-catalog-style="healthcare"] .hc-risk[data-severity="medium"] {
+  border-color: rgba(176, 106, 0, 0.4);
+  background: rgba(176, 106, 0, 0.05);
+}
+[data-catalog-style="healthcare"] .hc-risk[data-severity="low"] {
+  border-color: rgba(45, 140, 90, 0.35);
+  background: rgba(45, 140, 90, 0.04);
+}
+
+[data-catalog-style="healthcare"] .hc-risk-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+}
+
+[data-catalog-style="healthcare"] .hc-risk[data-severity="high"] .hc-risk-pill {
+  background: var(--hc-critical);
+  color: #fff;
+}
+[data-catalog-style="healthcare"] .hc-risk[data-severity="medium"] .hc-risk-pill {
+  background: var(--hc-watch);
+  color: #fff;
+}
+[data-catalog-style="healthcare"] .hc-risk[data-severity="low"] .hc-risk-pill {
+  background: var(--hc-stable);
+  color: #fff;
+}
+
+[data-catalog-style="healthcare"] .hc-risk-body {
+  min-width: 0;
+}
+
+[data-catalog-style="healthcare"] .hc-risk-label {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--hc-text);
+  line-height: 1.3;
+}
+
+[data-catalog-style="healthcare"] .hc-risk-detail {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: var(--hc-text-muted);
+  line-height: 1.4;
+}
+
+/* ── Handoff draft ─────────────────────────────────────────────── */
+[data-catalog-style="healthcare"] .hc-handoff {
+  background: var(--hc-surface);
+  border: 1px solid var(--hc-border);
+  border-radius: 6px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 2px rgba(12, 31, 44, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+[data-catalog-style="healthcare"] .hc-handoff-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--hc-border);
+}
+
+[data-catalog-style="healthcare"] .hc-handoff-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--hc-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+[data-catalog-style="healthcare"] .hc-handoff-subtitle {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: var(--hc-text-soft);
+}
+
+[data-catalog-style="healthcare"] .hc-handoff-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  background: var(--hc-primary-tint);
+  border: 1px solid rgba(11, 142, 131, 0.4);
+  color: var(--hc-primary-strong);
+}
+
+[data-catalog-style="healthcare"] .hc-handoff-body {
+  width: 100%;
+  min-height: 180px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--hc-text);
+  background: var(--hc-cream);
+  border: 1px solid var(--hc-border);
+  border-radius: 4px;
+  padding: 10px 12px;
+  resize: vertical;
+  outline: none;
+  font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+[data-catalog-style="healthcare"] .hc-handoff-body:focus {
+  border-color: var(--hc-primary);
+  box-shadow: 0 0 0 2px var(--hc-primary-tint);
+}
+
+[data-catalog-style="healthcare"] .hc-handoff-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+[data-catalog-style="healthcare"] .hc-handoff-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid;
+}
+
+[data-catalog-style="healthcare"] .hc-handoff-btn--send {
+  background: var(--hc-primary);
+  color: #fff;
+  border-color: var(--hc-primary);
+}
+[data-catalog-style="healthcare"] .hc-handoff-btn--send:hover {
+  background: var(--hc-primary-strong);
+  border-color: var(--hc-primary-strong);
+}
+
+[data-catalog-style="healthcare"] .hc-handoff-btn--edit {
+  background: var(--hc-surface);
+  color: var(--hc-text);
+  border-color: var(--hc-border-strong);
+}
+[data-catalog-style="healthcare"] .hc-handoff-btn--edit:hover {
+  background: var(--hc-surface-tint);
+  border-color: var(--hc-primary);
+}
+
+[data-catalog-style="healthcare"] .hc-handoff-btn--discard {
+  background: var(--hc-surface);
+  color: var(--hc-critical);
+  border-color: rgba(185, 28, 28, 0.4);
+}
+[data-catalog-style="healthcare"] .hc-handoff-btn--discard:hover {
+  background: rgba(185, 28, 28, 0.06);
+}
+
+/* ── Divider ───────────────────────────────────────────────────── */
+[data-catalog-style="healthcare"] .hc-divider {
+  border: none;
+  border-top: 1px solid var(--hc-border);
+  margin: 12px 0;
+  width: 100%;
+}
+
+/* ── Mobile (< 1024px) ─────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  [data-catalog-style="healthcare"] .hc-strip {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  [data-catalog-style="healthcare"] .hc-body {
+    padding: 12px;
+  }
+  [data-catalog-style="healthcare"] .hc-roster-grid {
+    grid-template-columns: 1fr;
+  }
+}

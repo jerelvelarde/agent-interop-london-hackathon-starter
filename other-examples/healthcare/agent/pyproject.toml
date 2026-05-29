@@ -1,0 +1,20 @@
+[project]
+name = "healthcare-agent"
+version = "0.1.0"
+description = "LangGraph agent for the RoundsAI Ward Rounds Copilot example."
+requires-python = ">=3.12"
+dependencies = [
+    "copilotkit",
+    "langchain",
+    "langchain-google-genai",
+    "langgraph",
+]
+
+# The Python package lives in the sibling `healthcare_agent/` directory
+# (dir name matches the import name), so setuptools auto-discovery picks
+# it up with no package-dir remapping. langgraph loads the graph via
+# `./healthcare_agent/graph.py:graph` (see langgraph.json), which keeps
+# Python's package machinery intact — `from .tools import ...` inside
+# graph.py works without sys.path hacks.
+[tool.setuptools]
+packages = ["healthcare_agent"]

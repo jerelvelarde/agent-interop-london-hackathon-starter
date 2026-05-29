@@ -1,0 +1,41 @@
+[
+  {
+    "id": "root",
+    "component": "WardShell",
+    "title": { "path": "/title" },
+    "censusTotal": { "path": "/census/total" },
+    "censusAlerts": { "path": "/census/alerts" },
+    "stableCount": { "path": "/census/stable" },
+    "watchCount": { "path": "/census/watch" },
+    "criticalCount": { "path": "/census/critical" },
+    "children": [{ "id": "roster", "basePath": "" }]
+  },
+  {
+    "id": "roster",
+    "component": "PatientRoster",
+    "title": { "path": "/title" },
+    "patients": { "componentId": "patient-card", "path": "/patients" }
+  },
+  {
+    "id": "patient-card",
+    "component": "PatientCard",
+    "patientId": { "path": "id" },
+    "name": { "path": "name" },
+    "room": { "path": "room" },
+    "meta": { "path": "meta" },
+    "status": { "path": "status" },
+    "statusLabel": { "path": "statusLabel" },
+    "primaryIssue": { "path": "primaryIssue" },
+    "attending": { "path": "attending" },
+    "lastVitalsAt": { "path": "lastVitalsAt" },
+    "action": {
+      "event": {
+        "name": "drill_into_patient",
+        "context": {
+          "patientId": { "path": "id" },
+          "patientName": { "path": "name" }
+        }
+      }
+    }
+  }
+]

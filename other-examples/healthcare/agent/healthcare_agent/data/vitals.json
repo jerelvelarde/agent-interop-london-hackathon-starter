@@ -1,0 +1,28 @@
+{
+  "pt-001": {
+    "patientId": "pt-001",
+    "patientName": "Patient A",
+    "windowHours": 24,
+    "readings": [
+      { "ts": "2026-05-28T18:00", "heartRate": 76, "systolicBp": 124, "diastolicBp": 80, "respRate": 16, "tempC": 37.1, "o2Sat": 98, "note": "Stable evening rounds" },
+      { "ts": "2026-05-28T22:00", "heartRate": 80, "systolicBp": 126, "diastolicBp": 82, "respRate": 16, "tempC": 37.4, "o2Sat": 97, "note": "Slight temp uptick" },
+      { "ts": "2026-05-29T02:00", "heartRate": 84, "systolicBp": 128, "diastolicBp": 82, "respRate": 18, "tempC": 37.9, "o2Sat": 97, "note": "Temp rising; PRN acetaminophen" },
+      { "ts": "2026-05-29T06:00", "heartRate": 88, "systolicBp": 130, "diastolicBp": 84, "respRate": 18, "tempC": 38.1, "o2Sat": 97, "note": "Temp persistent — surgical team paged" },
+      { "ts": "2026-05-29T10:00", "heartRate": 94, "systolicBp": 132, "diastolicBp": 86, "respRate": 20, "tempC": 38.3, "o2Sat": 96, "note": "Wound site warm; cultures drawn" },
+      { "ts": "2026-05-29T14:00", "heartRate": 98, "systolicBp": 134, "diastolicBp": 88, "respRate": 20, "tempC": 38.4, "o2Sat": 96, "note": "Trending up — cultures pending" }
+    ]
+  },
+  "pt-004": {
+    "patientId": "pt-004",
+    "patientName": "Patient D",
+    "windowHours": 24,
+    "readings": [
+      { "ts": "2026-05-28T18:00", "heartRate": 98, "systolicBp": 102, "diastolicBp": 62, "respRate": 20, "tempC": 37.4, "o2Sat": 94, "note": "UOP 22mL/hr" },
+      { "ts": "2026-05-28T22:00", "heartRate": 100, "systolicBp": 100, "diastolicBp": 60, "respRate": 21, "tempC": 37.5, "o2Sat": 93, "note": "Nephrology paged" },
+      { "ts": "2026-05-29T02:00", "heartRate": 104, "systolicBp": 98, "diastolicBp": 58, "respRate": 22, "tempC": 37.6, "o2Sat": 93, "note": "UOP 18mL/hr — concerning" },
+      { "ts": "2026-05-29T06:00", "heartRate": 102, "systolicBp": 98, "diastolicBp": 58, "respRate": 22, "tempC": 37.6, "o2Sat": 93, "note": "Lasix dose held" },
+      { "ts": "2026-05-29T10:00", "heartRate": 108, "systolicBp": 96, "diastolicBp": 56, "respRate": 24, "tempC": 37.8, "o2Sat": 91, "note": "Nephrology consulted" },
+      { "ts": "2026-05-29T14:00", "heartRate": 112, "systolicBp": 92, "diastolicBp": 54, "respRate": 26, "tempC": 38.0, "o2Sat": 89, "note": "Family meeting at 16:00" }
+    ]
+  }
+}

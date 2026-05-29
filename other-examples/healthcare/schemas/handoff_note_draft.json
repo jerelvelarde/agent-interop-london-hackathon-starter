@@ -1,0 +1,40 @@
+[
+  {
+    "id": "root",
+    "component": "WardShell",
+    "title": { "path": "/title" },
+    "children": [{ "id": "draft", "basePath": "" }]
+  },
+  {
+    "id": "draft",
+    "component": "HandoffNoteDraft",
+    "title": { "path": "/title" },
+    "subtitle": { "path": "/subtitle" },
+    "body": { "path": "/body" },
+    "status": { "path": "/status" },
+    "sendAction": {
+      "event": {
+        "name": "handoff_sent",
+        "context": {
+          "patientName": { "path": "/patientName" }
+        }
+      }
+    },
+    "editAction": {
+      "event": {
+        "name": "handoff_edit",
+        "context": {
+          "patientName": { "path": "/patientName" }
+        }
+      }
+    },
+    "discardAction": {
+      "event": {
+        "name": "handoff_discarded",
+        "context": {
+          "patientName": { "path": "/patientName" }
+        }
+      }
+    }
+  }
+]

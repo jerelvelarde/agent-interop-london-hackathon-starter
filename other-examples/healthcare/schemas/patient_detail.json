@@ -1,0 +1,69 @@
+[
+  {
+    "id": "root",
+    "component": "WardShell",
+    "title": { "path": "/patient/name" },
+    "children": [{ "id": "detail", "basePath": "" }]
+  },
+  {
+    "id": "detail",
+    "component": "PatientDetail",
+    "patientName": { "path": "/patient/name" },
+    "patientMeta": { "path": "/patient/meta" },
+    "status": { "path": "/patient/status" },
+    "statusLabel": { "path": "/patient/statusLabel" },
+    "primaryIssue": { "path": "/patient/primaryIssue" },
+    "attending": { "path": "/patient/attending" },
+    "allergies": { "path": "/patient/allergies" },
+    "vitalsChild": "vitals",
+    "medsChild": "meds",
+    "risksChild": "risks"
+  },
+  {
+    "id": "vitals",
+    "component": "VitalsChart",
+    "windowHours": { "path": "/vitals/windowHours" },
+    "readings": { "componentId": "vitals-reading", "path": "/vitals/readings" },
+    "latestHr": { "path": "/vitals/latest/heartRate" },
+    "latestBpLabel": { "path": "/vitals/latest/bpLabel" },
+    "latestTemp": { "path": "/vitals/latest/tempC" },
+    "latestO2": { "path": "/vitals/latest/o2Sat" }
+  },
+  {
+    "id": "vitals-reading",
+    "component": "VitalsReading",
+    "timeLabel": { "path": "timeLabel" },
+    "heartRate": { "path": "heartRate" },
+    "bpLabel": { "path": "bpLabel" },
+    "respRate": { "path": "respRate" },
+    "tempC": { "path": "tempC" },
+    "o2Sat": { "path": "o2Sat" },
+    "note": { "path": "note" }
+  },
+  {
+    "id": "meds",
+    "component": "MedsList",
+    "title": "Active medications",
+    "meds": { "componentId": "med-row", "path": "/meds" }
+  },
+  {
+    "id": "med-row",
+    "component": "MedRow",
+    "name": { "path": "name" },
+    "dose": { "path": "dose" },
+    "indication": { "path": "indication" }
+  },
+  {
+    "id": "risks",
+    "component": "RiskFlagList",
+    "title": "Risk flags",
+    "flags": { "componentId": "risk-flag", "path": "/riskFlags" }
+  },
+  {
+    "id": "risk-flag",
+    "component": "RiskFlag",
+    "severity": { "path": "severity" },
+    "label": { "path": "label" },
+    "detail": { "path": "detail" }
+  }
+]

@@ -1,0 +1,163 @@
+{
+  "patients": [
+    {
+      "id": "pt-001",
+      "name": "Patient A",
+      "age": 72,
+      "sex": "F",
+      "room": "304-A",
+      "status": "watch",
+      "primaryIssue": "Post-op hip replacement — spiking fever",
+      "attending": "Dr. Okafor",
+      "admittedDays": 3,
+      "allergies": "Penicillin",
+      "lastVitalsAt": "2026-05-29T14:00",
+      "meds": [
+        { "name": "Acetaminophen", "dose": "650 mg PO q6h PRN", "indication": "Pain / fever" },
+        { "name": "Enoxaparin", "dose": "40 mg SC daily", "indication": "DVT prophylaxis" },
+        { "name": "Cefazolin", "dose": "1 g IV q8h", "indication": "Surgical prophylaxis" }
+      ],
+      "riskFlags": [
+        { "id": "rf-001", "severity": "high", "label": "Temp trending up — 38.4C", "detail": "Three consecutive readings >38.0C since 06:00. Cultures pending." },
+        { "id": "rf-002", "severity": "medium", "label": "Wound site warm to touch", "detail": "Noted on 10:00 rounds. Surgical team paged." }
+      ]
+    },
+    {
+      "id": "pt-002",
+      "name": "Patient B",
+      "age": 58,
+      "sex": "M",
+      "room": "305-B",
+      "status": "watch",
+      "primaryIssue": "Type-2 diabetes flare",
+      "attending": "Dr. Reyes",
+      "admittedDays": 1,
+      "allergies": "None known",
+      "lastVitalsAt": "2026-05-29T14:00",
+      "meds": [
+        { "name": "Insulin sliding scale", "dose": "Per protocol", "indication": "Hyperglycemia" }
+      ],
+      "riskFlags": [
+        { "id": "rf-101", "severity": "medium", "label": "Glucose 248 at admission", "detail": "Trending down with insulin (196 at 14:00)." }
+      ]
+    },
+    {
+      "id": "pt-003",
+      "name": "Patient C",
+      "age": 34,
+      "sex": "F",
+      "room": "306-A",
+      "status": "stable",
+      "primaryIssue": "Pneumonia (RLL)",
+      "attending": "Dr. Okafor",
+      "admittedDays": 2,
+      "allergies": "Sulfa drugs",
+      "lastVitalsAt": "2026-05-29T10:00",
+      "meds": [
+        { "name": "Ceftriaxone", "dose": "1 g IV q24h", "indication": "Community-acquired pneumonia" },
+        { "name": "Azithromycin", "dose": "500 mg PO daily", "indication": "Atypical coverage" }
+      ],
+      "riskFlags": []
+    },
+    {
+      "id": "pt-004",
+      "name": "Patient D",
+      "age": 81,
+      "sex": "M",
+      "room": "307-B",
+      "status": "critical",
+      "primaryIssue": "Acute kidney injury",
+      "attending": "Dr. Patel",
+      "admittedDays": 4,
+      "allergies": "None known",
+      "lastVitalsAt": "2026-05-29T14:00",
+      "meds": [
+        { "name": "Furosemide", "dose": "40 mg IV q12h", "indication": "Volume management" }
+      ],
+      "riskFlags": [
+        { "id": "rf-201", "severity": "high", "label": "UOP 18 mL/hr — oliguric", "detail": "Nephrology consulted. Family meeting at 16:00." },
+        { "id": "rf-202", "severity": "high", "label": "O2 sat trending down (89%)", "detail": "Up from 93% on admission. NC at 4L." }
+      ]
+    },
+    {
+      "id": "pt-005",
+      "name": "Patient E",
+      "age": 49,
+      "sex": "F",
+      "room": "308-A",
+      "status": "stable",
+      "primaryIssue": "Post-op cholecystectomy",
+      "attending": "Dr. Reyes",
+      "admittedDays": 1,
+      "allergies": "Latex",
+      "lastVitalsAt": "2026-05-29T10:00",
+      "meds": [
+        { "name": "Acetaminophen", "dose": "650 mg PO q6h PRN", "indication": "Pain" }
+      ],
+      "riskFlags": []
+    },
+    {
+      "id": "pt-006",
+      "name": "Patient F",
+      "age": 67,
+      "sex": "M",
+      "room": "309-A",
+      "status": "watch",
+      "primaryIssue": "Atrial fibrillation",
+      "attending": "Dr. Patel",
+      "admittedDays": 2,
+      "allergies": "Aspirin",
+      "lastVitalsAt": "2026-05-29T10:00",
+      "meds": [
+        { "name": "Diltiazem", "dose": "20 mg IV bolus", "indication": "Rate control" },
+        { "name": "Apixaban", "dose": "5 mg PO BID", "indication": "Anticoagulation" }
+      ],
+      "riskFlags": [
+        { "id": "rf-301", "severity": "medium", "label": "Afib with RVR overnight", "detail": "Rate-controlled with diltiazem; HR 96 at 10:00." }
+      ]
+    },
+    {
+      "id": "pt-007",
+      "name": "Patient G",
+      "age": 29,
+      "sex": "F",
+      "room": "310-B",
+      "status": "stable",
+      "primaryIssue": "Asthma exacerbation",
+      "attending": "Dr. Okafor",
+      "admittedDays": 1,
+      "allergies": "Cats; ibuprofen",
+      "lastVitalsAt": "2026-05-29T06:00",
+      "meds": [
+        { "name": "Albuterol nebs", "dose": "2.5 mg q4h", "indication": "Bronchodilation" },
+        { "name": "Methylprednisolone", "dose": "60 mg IV q8h", "indication": "Inflammation" }
+      ],
+      "riskFlags": []
+    },
+    {
+      "id": "pt-008",
+      "name": "Patient H",
+      "age": 76,
+      "sex": "M",
+      "room": "311-A",
+      "status": "stable",
+      "primaryIssue": "CHF readmission",
+      "attending": "Dr. Patel",
+      "admittedDays": 5,
+      "allergies": "Sulfa drugs",
+      "lastVitalsAt": "2026-05-29T06:00",
+      "meds": [
+        { "name": "Furosemide", "dose": "20 mg PO BID", "indication": "Diuresis" },
+        { "name": "Lisinopril", "dose": "10 mg PO daily", "indication": "Afterload reduction" }
+      ],
+      "riskFlags": []
+    }
+  ],
+  "census": {
+    "total": 8,
+    "stable": 4,
+    "watch": 3,
+    "critical": 1,
+    "alerts": 4
+  }
+}

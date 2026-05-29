@@ -168,6 +168,8 @@ for judges who want to A/B your design in dark and light).
    (the `SYSTEM_PROMPT` constant) to ground the agent in your domain. Keep
    it 1-2 sentences. The default domain is `default`; if you set
    `DOMAIN=shopping` in `.env` then edit the shopping prompts file instead.
+   `agent/main.py` reads `DOMAIN` from `.env` and loads the matching
+   prompts module.
 4. Restart the agent (`uv run --reload` handles this for you).
 
 > **Schema contract:** `db.csv` ships with the columns `date, category,

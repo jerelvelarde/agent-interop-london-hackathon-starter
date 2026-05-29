@@ -40,6 +40,10 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 from copilotkit import a2ui
 
+# Shared JSON-serialization guard — same pattern as the fixed-schema and
+# shopping-domain tools. See agent/src/a2ui/_safe.py for the rationale.
+from src.a2ui._safe import _safe_envelope_data
+
 CUSTOM_CATALOG_ID = "copilotkit://app-dashboard-catalog"
 
 
@@ -132,7 +136,11 @@ def generate_a2ui(runtime: ToolRuntime[Any]) -> str:
         a2ui.update_components(surface_id, components),
     ]
     if data:
-        ops.append(a2ui.update_data_model(surface_id, data))
+        ops.append(
+            a2ui.update_data_model(
+                surface_id, _safe_envelope_data(data, surface_id=surface_id)
+            )
+        )
 
     result = a2ui.render(operations=ops)
     print(

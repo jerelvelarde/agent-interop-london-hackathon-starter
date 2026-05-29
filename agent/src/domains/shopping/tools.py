@@ -23,6 +23,10 @@ from typing import TypedDict
 from copilotkit import a2ui
 from langchain.tools import tool
 
+# Shared JSON-serialization guard — same pattern as the fixed-schema and
+# dynamic-schema paths. See agent/src/a2ui/_safe.py for the rationale.
+from src.a2ui._safe import _safe_envelope_data
+
 CATALOG_ID = a2ui.BASIC_CATALOG_ID
 SURFACE_ID = "product-search-results"
 
@@ -85,11 +89,12 @@ def search_products(query: str) -> str:
         matches = _products[:3]
     # Cap at 6 so we don't blow out the UI.
     products = [_format_product(r) for r in matches[:6]]
+    data = _safe_envelope_data({"products": products}, surface_id=SURFACE_ID)
     return a2ui.render(
         operations=[
             a2ui.create_surface(SURFACE_ID, catalog_id=CATALOG_ID),
             a2ui.update_components(SURFACE_ID, PRODUCT_SCHEMA),
-            a2ui.update_data_model(SURFACE_ID, {"products": products}),
+            a2ui.update_data_model(SURFACE_ID, data),
         ],
     )
 

@@ -2,7 +2,7 @@
   "id": "product-card",
   "name": "ProductCard",
   "description": "Shopping product search result card. Built from base v0.9 catalog primitives (Card, Column, Row, Image, Text, Button). Shows product image, name, price, rating, category, and an 'Add to cart' action.",
-  "catalogId": "https://a2ui.org/specification/v0_9/basic_catalog.json",
+  "catalogId": "copilotkit://app-dashboard-catalog",
   "pythonTool": "agent/src/domains/shopping/tools.py:search_products",
   "schema": [
     {

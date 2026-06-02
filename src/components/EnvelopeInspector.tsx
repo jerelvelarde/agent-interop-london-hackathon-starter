@@ -11,8 +11,11 @@
  *  3. "Open in Composer" — opens https://a2ui-composer.ag-ui.com/ with the
  *     envelope JSON as a query param (Composer reads it on load)
  *
- * Do not replace this with a toggle. Teams should never be able to
- * accidentally hide that they're using A2UI.
+ * Ships visible by default. It can be hidden via the header control (the
+ * preference persists in localStorage, owned by the page shell) and reopened
+ * from a slim edge tab — but it is never hidden out from under you on first
+ * load. By default it scopes to the active surface; "Show all" reveals every
+ * captured surface.
  */
 "use client";
 
@@ -25,6 +28,8 @@ import {
   ExternalLink,
   Layers,
   Inbox,
+  PanelRightClose,
+  ListFilter,
 } from "lucide-react";
 import JsonView from "react18-json-view";
 import "react18-json-view/src/style.css";
@@ -417,10 +422,11 @@ const textBtnStyle: React.CSSProperties = {
 };
 
 /** The main inspector — renders as the default right-rail chrome. */
-export function EnvelopeInspector() {
+export function EnvelopeInspector({ onHide }: { onHide?: () => void } = {}) {
   const { theme } = useTheme();
   const { envelopes, bySurface, isDemo } = useEnvelopeStream();
   const [toast, setToast] = useState<string | null>(null);
+  const [showAllSurfaces, setShowAllSurfaces] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   // Detect dark mode at runtime — the `theme` from useTheme can be "system".
@@ -446,6 +452,16 @@ export function EnvelopeInspector() {
 
   const total = envelopes.length;
   const surfaceCount = bySurface.size;
+
+  // Scope to the active (latest) surface by default; "Show all" reveals the rest.
+  const activeSurfaceId =
+    envelopes.length > 0 ? envelopes[envelopes.length - 1].surfaceId : null;
+  const groups = Array.from(bySurface.entries());
+  const scoped = !showAllSurfaces && groups.length > 1;
+  const visibleGroups = scoped
+    ? groups.filter(([sid]) => sid === activeSurfaceId)
+    : groups;
+  const otherSurfaceCount = groups.length - visibleGroups.length;
 
   return (
     <div
@@ -509,23 +525,36 @@ export function EnvelopeInspector() {
               </span>
             </div>
           </div>
-          {isDemo && (
-            <span
-              title="No live envelopes captured yet — showing canned demo envelopes. They'll be replaced the moment a real envelope streams in."
-              style={{
-                fontSize: "0.65rem",
-                color: "var(--muted-foreground)",
-                padding: "2px 6px",
-                borderRadius: 6,
-                border: "1px dashed var(--border)",
-                background:
-                  "color-mix(in srgb, var(--cpk-lilac-400) 12%, var(--card))",
-                fontFamily: "var(--font-code)",
-              }}
-            >
-              DEMO
-            </span>
-          )}
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            {isDemo && (
+              <span
+                title="No live envelopes captured yet — showing canned demo envelopes. They'll be replaced the moment a real envelope streams in."
+                style={{
+                  fontSize: "0.65rem",
+                  color: "var(--muted-foreground)",
+                  padding: "2px 6px",
+                  borderRadius: 6,
+                  border: "1px dashed var(--border)",
+                  background:
+                    "color-mix(in srgb, var(--cpk-lilac-400) 12%, var(--card))",
+                  fontFamily: "var(--font-code)",
+                }}
+              >
+                DEMO
+              </span>
+            )}
+            {onHide && (
+              <button
+                type="button"
+                onClick={onHide}
+                title="Hide the inspector"
+                aria-label="Hide the inspector"
+                style={iconBtnStyle}
+              >
+                <PanelRightClose size={14} />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Lifecycle legend — teaches create → components → bind. */}
@@ -596,15 +625,38 @@ export function EnvelopeInspector() {
         {bySurface.size === 0 ? (
           <EmptyState />
         ) : (
-          Array.from(bySurface.entries()).map(([surfaceId, surfaceEnvs]) => (
-            <SurfaceGroup
-              key={surfaceId ?? "__no_surface__"}
-              surfaceId={surfaceId}
-              envelopes={surfaceEnvs}
-              onToast={setToast}
-              isDark={isDark}
-            />
-          ))
+          <>
+            {groups.length > 1 && (
+              <button
+                type="button"
+                onClick={() => setShowAllSurfaces((v) => !v)}
+                style={{
+                  ...textBtnStyle,
+                  alignSelf: "flex-start",
+                  gap: 6,
+                }}
+                title={
+                  scoped
+                    ? "Show envelopes for every captured surface"
+                    : "Scope to the active surface only"
+                }
+              >
+                <ListFilter size={12} />
+                {scoped
+                  ? `Show all surfaces (+${otherSurfaceCount})`
+                  : "Show active surface only"}
+              </button>
+            )}
+            {visibleGroups.map(([surfaceId, surfaceEnvs]) => (
+              <SurfaceGroup
+                key={surfaceId ?? "__no_surface__"}
+                surfaceId={surfaceId}
+                envelopes={surfaceEnvs}
+                onToast={setToast}
+                isDark={isDark}
+              />
+            ))}
+          </>
         )}
       </div>
 

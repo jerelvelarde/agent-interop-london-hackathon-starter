@@ -42,9 +42,10 @@ export function ExampleLayout({ chatContent, appContent }: ExampleLayoutProps) {
     <div className="h-full flex flex-row pb-6">
       {/* ModeToggle hidden — agents can still flip via useFrontendTool */}
 
-      {/* Chat Content */}
+      {/* Chat Content — intentional solid card (was a translucent white glass
+          film that read as an accidental white slab next to the canvas). */}
       <div
-        className={`max-h-full flex flex-col bg-[var(--white-30)] backdrop-blur-md border-r-2 border-[var(--border-default)] shadow-[var(--elevation-sm)] ${
+        className={`max-h-full flex flex-col bg-[var(--card)] border-r border-[var(--border)] shadow-[var(--elevation-sm)] ${
           mode === "app"
             ? "w-1/3 px-6 max-lg:hidden" // Hide on mobile in app mode
             : "flex-1 max-lg:px-4"

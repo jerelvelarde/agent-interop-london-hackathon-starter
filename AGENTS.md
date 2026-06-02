@@ -35,8 +35,12 @@ Read `HACKATHON.md` for the customization recipes.
    `langchain-openai`. The OpenAI-compat path is documented as a fallback in
    `FROZEN.md` § LLM provider (sticks on `gemini-2.5-flash` for the same
    reason).
-5. **Don't edit `src/components/EnvelopeInspector.tsx`** unless asked. It is
-   the hackathon's "show the wire" affordance — surfaces must stay visible.
+5. **Edit `src/components/EnvelopeInspector.tsx` with care.** It is the
+   hackathon's "show the wire" affordance and ships **visible by default**. It
+   may be hidden via its header control (the preference persists in
+   `localStorage`, owned by the page shell; reopen from the slim edge tab) and
+   it scopes to the active surface by default — but it must never start hidden
+   on first load.
 6. **Don't write new React renderers for A2UI primitives.** Use the catalog
    + theme system. The renderer is provided by `@copilotkit/a2ui-renderer`.
 
@@ -120,7 +124,9 @@ When the hacker says:
 - Don't add new top-level dependencies without checking if base already has
   an equivalent (e.g. don't pull in `framer-motion` if the existing
   CSS-transition path suffices).
-- Don't replace the envelope inspector with a toggle. It must stay visible.
+- The envelope inspector ships visible by default. A hide control + persisted
+  preference is allowed (added intentionally), but don't make it hidden by
+  default — teams shouldn't accidentally ship with the wire hidden.
 - Don't hand-roll React renderers for A2UI primitives. Use the catalog +
   theme system. (`@copilotkit/a2ui-renderer` owns rendering.)
 - Don't change `agent/main.py`'s `ChatOpenAI(...)` model call. The provider,

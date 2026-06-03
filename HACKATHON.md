@@ -50,11 +50,11 @@ to generate ad-hoc UI. Better a polished re-skin than a half-shipped widget.
 
 > **Quick note on the chat framework workarounds.** `src/app/globals.css`
 > ends with a clearly labelled block of three defensive CSS overrides that
-> patch known issues on our pinned CopilotKit `1.56.5`: (1) restoring
+> patch known issues on our pinned CopilotKit `1.57.4`: (1) restoring
 > `pointer-events` on items below the input pill (disclaimer slot),
 > (2) adding a default 12px cushion below the chat input, and
 > (3) making chat descendants transparent so the frosted backdrop shows
-> through. Leave them in place unless you upgrade CopilotKit past 1.56.5
+> through. Leave them in place unless you upgrade CopilotKit past 1.57.4
 > — and you can't, because it's [FROZEN](FROZEN.md).
 
 **Recipe:**

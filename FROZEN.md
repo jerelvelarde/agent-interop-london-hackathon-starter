@@ -152,11 +152,17 @@ are sufficient; we do NOT need to ship a shared key.
 | JavaScript | pnpm | `pnpm-lock.yaml` (committed) |
 | Python | uv | `agent/uv.lock` (committed) |
 
-## Vendoring (Workstream F)
+## Vendoring
 
-`vendor/` will mirror `@copilotkit/a2ui-renderer` and `copilotkit` (Python) as a
-fallback if upstream cuts a breaking release before event day. CI proves the
-vendored mirror builds and renders the smoke envelope. Swap procedure documented
-in `vendor/README.md`.
+`vendor/` mirrors the two load-bearing CopilotKit packages as break-glass
+insurance if upstream yanks or breaks a pinned release before event day:
 
-_Not yet populated — added in Workstream F._
+| Package | Vendored as | Version |
+|---|---|---|
+| `@copilotkit/a2ui-renderer` | `vendor/copilotkit-a2ui-renderer/` (extracted) | `1.57.4` |
+| `copilotkit` (Python) | `vendor/copilotkit-python/copilotkit-0.1.93-py3-none-any.whl` | `0.1.93` |
+
+Both match the pins above. Note: the `copilotkit` `0.1.9x` line is already
+yanked from public PyPI, so the vendored wheel is the retained copy — install
+relies on the exact pin in `agent/uv.lock`. CI proves the vendored swap builds;
+swap + refresh procedure in `vendor/README.md`.

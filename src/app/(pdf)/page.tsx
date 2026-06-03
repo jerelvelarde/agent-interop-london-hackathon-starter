@@ -29,7 +29,7 @@ export default function Home() {
       <main className="flex-1 max-w-[1320px] mx-auto px-6 py-12 w-full">
         <div className="grid md:grid-cols-2 gap-5">
           <ModeCard
-            href="/pdf-analyst/fixed"
+            href="/fixed"
             badge="01 · FIXED SCHEMA"
             title="Same layout, your data"
             blurb="You author the dashboard once. The agent only fills in the numbers. Fast, predictable, brand-locked."
@@ -41,7 +41,7 @@ export default function Home() {
             cta="Open the fixed demo"
           />
           <ModeCard
-            href="/pdf-analyst/dynamic"
+            href="/dynamic"
             badge="02 · DYNAMIC SCHEMA"
             title="Agent picks the shape"
             blurb="No pre-written layout. The agent answers your question, then a second LLM pass invents the UI from the catalog."
@@ -65,7 +65,7 @@ export default function Home() {
               </h2>
             </div>
             <Link
-              href="/pdf-analyst/catalog"
+              href="/catalog"
               className="mono text-[12px] text-[var(--ink)] hover:text-[var(--lilac)] transition"
             >
               See them all →

@@ -20,15 +20,15 @@ export function SiteNav({
   active?: "home" | "fixed" | "dynamic" | "catalog";
 }) {
   const links: Array<{ href: string; label: string; key: typeof active }> = [
-    { href: "/pdf-analyst", label: "Overview", key: "home" },
-    { href: "/pdf-analyst/fixed", label: "Fixed schema", key: "fixed" },
-    { href: "/pdf-analyst/dynamic", label: "Dynamic schema", key: "dynamic" },
-    { href: "/pdf-analyst/catalog", label: "Catalog", key: "catalog" },
+    { href: "/", label: "Overview", key: "home" },
+    { href: "/fixed", label: "Fixed schema", key: "fixed" },
+    { href: "/dynamic", label: "Dynamic schema", key: "dynamic" },
+    { href: "/catalog", label: "Catalog", key: "catalog" },
   ];
   return (
     <header className="shrink-0 border-b border-[var(--line)] bg-[var(--surface)]">
       <div className="max-w-[1480px] mx-auto px-5 h-14 flex items-center justify-between">
-        <Link href="/pdf-analyst" className="flex items-center gap-3">
+        <Link href="/" className="flex items-center gap-3">
           <Logo size={22} />
           <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-[var(--line)] bg-[var(--surface-soft)] text-[10.5px] uppercase tracking-[0.12em] mono text-[var(--muted)]">
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--lilac)]" />

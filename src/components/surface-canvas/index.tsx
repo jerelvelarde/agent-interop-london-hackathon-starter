@@ -10,7 +10,12 @@ import {
 } from "react";
 import { useAgent, createA2UIMessageRenderer } from "@copilotkit/react-core/v2";
 import { viewerTheme, type Theme } from "@copilotkit/a2ui-renderer";
-import { demonstrationCatalog } from "@/app/declarative-generative-ui/renderers";
+// NOTE: the PortKit `demonstrationCatalog` was archived to
+// other-examples/portkit/ during the pdf-analyst default swap. This shell
+// canvas is no longer mounted by any kept route (the pdf default uses
+// @/components/pdf-analyst/SurfaceCanvas), so we repoint to the pdf-analyst
+// catalog purely to keep this file typecheck-valid.
+import { catalog as demonstrationCatalog } from "@/a2ui/catalog";
 import { useLatestSurface } from "@/lib/surface-bus";
 import { A2UI_OPERATIONS_KEY } from "@/types/a2ui";
 

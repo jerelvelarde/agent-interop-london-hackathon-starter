@@ -26,7 +26,7 @@ const splineMono = Spline_Sans_Mono({
  *
  * Intentionally minimal: only `<html>`, `<body>`, and `<ThemeProvider>`. The
  * Copilot provider is mounted per route group (see
- * `src/app/(default)/layout.tsx` and `src/app/(legal)/layout.tsx`) so each
+ * `src/app/(pdf)/layout.tsx` and `src/app/(legal)/layout.tsx`) so each
  * group can carry its own agent + A2UI catalog without double-mounting the
  * provider.
  *

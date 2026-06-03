@@ -11,41 +11,40 @@
  *
  * Three recognized JSON shapes:
  *
- *   (a) Bare catalog schema — array of v0.9 components. Lives at
- *       `agent/src/a2ui/schemas/<name>_schema.json`. Canonical example:
- *       `agent/src/a2ui/schemas/risk_register_schema.json`.
+ *   (a) Bare catalog schema — array of v0.9 components. Canonical example:
+ *       `agent/src/a2ui/schemas/dashboard.json` (the pdf-analyst dashboard
+ *       surface).
  *
  *         [
- *           { "id": "root", "component": "Column", "children": [...] },
- *           { "id": "risk-flag", "component": "RiskFlag", ... }
+ *           { "id": "root", "component": "Stack", "children": [...] },
+ *           { "id": "kpi-1", "component": "StatCard", ... }
  *         ]
  *
  *   (b) Wrapper widget JSON — what `pnpm new-widget` scaffolds. The schema
- *       array is nested under a `schema` key. Canonical example:
- *       `agent/src/widgets/risk_register.json`.
+ *       array is nested under a `schema` key. No such file ships in the
+ *       pdf-analyst default; run `pnpm new-widget <name>` to generate one.
  *
  *         {
- *           "id": "risk-register",
- *           "name": "RiskRegister",
+ *           "id": "my-widget",
+ *           "name": "MyWidget",
  *           "description": "...",
  *           "catalogId": "copilotkit://...",
- *           "pythonTool": "agent/src/tools/risk_register.py:show_risk_register",
  *           "schema": [ ...catalog-schema components... ]
  *         }
  *
- *   (c) CANONICAL FIXTURE — every *.fixture.json under agent/src/widgets/
+ *   (c) CANONICAL FIXTURE — every *.fixture.json under a widget/schemas dir
  *       MUST use this shape. One flat object with the createSurface fields at
  *       the top level, the component tree under `components`, and the data
  *       model under `data`. Canonical example:
- *       `agent/src/widgets/risk_register.fixture.json`.
+ *       `other-examples/legal-contract-review/schemas/contract_review.fixture.json`.
  *
  *         {
- *           "name": "risk_register_default",
+ *           "name": "contract-review-nda-default",
  *           "description": "...",
- *           "surfaceId": "risk-register",
- *           "catalogId": "copilotkit://app-dashboard-catalog",
+ *           "surfaceId": "contract-review",
+ *           "catalogId": "copilotkit://legal-paper-catalog",
  *           "components": [ ...catalog components... ],
- *           "data": { "risks": [ ... ] }
+ *           "data": { "clauses": [ ... ] }
  *         }
  *
  *       Why this shape: the validator is the authority (issue #16). Tests,
@@ -70,9 +69,22 @@ import { join, resolve, basename } from "node:path";
 // Canonical references — these are real JSON files in the repo a hacker can
 // open and copy-paste. Issue #17: the validator used to point at a Python
 // file which is not a template you can mirror — these are JSON.
-const CANONICAL_CATALOG_SCHEMA_JSON = "agent/src/a2ui/schemas/risk_register_schema.json";
-const CANONICAL_WIDGET_JSON = "agent/src/widgets/risk_register.json";
-const CANONICAL_FIXTURE_JSON = "agent/src/widgets/risk_register.fixture.json";
+//
+// pdf-analyst default swap: the former PortKit risk_register.* references
+// were archived to other-examples/portkit/. The bare catalog-schema example
+// is now the pdf-analyst dashboard schema, and the canonical fixture +
+// wrapper-widget example come from the in-repo legal-contract-review example
+// (the closest live `{ surfaceId, catalogId, components, data }` fixture).
+// The catalog itself is defined in TypeScript at src/a2ui/catalog/
+// definitions.ts — see `pnpm new-widget` for the copy-this pattern.
+const CANONICAL_CATALOG_SCHEMA_JSON = "agent/src/a2ui/schemas/dashboard.json";
+// Shape (b) — the schema-under-`schema`-key wrapper widget — is what
+// `pnpm new-widget <name>` scaffolds; no such file ships in the pdf-analyst
+// default (the in-repo catalog schemas are bare arrays, shape (a)). Point
+// at the bare catalog schema so the `schema`-array content is still
+// openable, and lean on `pnpm new-widget` for the wrapper envelope itself.
+const CANONICAL_WIDGET_JSON = "agent/src/a2ui/schemas/dashboard.json (the array that goes under \"schema\"; `pnpm new-widget` scaffolds the wrapper)";
+const CANONICAL_FIXTURE_JSON = "other-examples/legal-contract-review/schemas/contract_review.fixture.json";
 const CANONICAL_EXAMPLE_JSON = "other-examples/legal-contract-review/EXAMPLE.json";
 const SCHEMA_REF = "https://a2ui.org/specification/v0.9-a2ui/";
 
@@ -227,7 +239,7 @@ function validateWrapperWidget(
 }
 
 /**
- * Shape (c): CANONICAL FIXTURE (every `*.fixture.json` under agent/src/widgets/).
+ * Shape (c): CANONICAL FIXTURE (every `*.fixture.json` under a widget/schemas dir).
  *
  * Required: surfaceId, catalogId, components (non-empty array with a root),
  *           data (object).
@@ -245,7 +257,7 @@ function validateCanonicalFixture(
   if (typeof obj.surfaceId !== "string" || obj.surfaceId.length === 0) {
     errors.push({
       message: "Fixture missing 'surfaceId' (the unique surface identifier).",
-      fix: `Add a top-level "surfaceId" string, e.g. "risk-register". See ${CANONICAL_FIXTURE_JSON}.`,
+      fix: `Add a top-level "surfaceId" string, e.g. "contract-review". See ${CANONICAL_FIXTURE_JSON}.`,
     });
   }
   validateCatalogId(obj.catalogId, errors);

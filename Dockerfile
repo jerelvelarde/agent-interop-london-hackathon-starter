@@ -11,12 +11,13 @@ COPY public/ ./public/
 COPY next.config.ts tsconfig.json postcss.config.mjs ./
 COPY showcase.json ./showcase.json
 
-# Docker override: use AG-UI HttpAgent instead of LangGraphAgent
-# (LangGraphAgent needs Docker-in-Docker which Railway doesn't provide)
-# Next.js 16+ rejects both /api/copilotkit/route.ts AND /api/copilotkit/[[...slug]]/route.ts
-RUN rm -f ./src/app/api/copilotkit/\[\[...slug\]\]/route.ts
-COPY docker-route-override.ts ./src/app/api/copilotkit/route.ts
-RUN npm install @ag-ui/client
+# pdf-analyst default swap: no route surgery needed. Both copilotkit routes
+# (src/app/api/copilotkit/[[...slug]]/route.ts for the legal example and
+# src/app/api/copilotkit-pdf/route.ts for the pdf default) are already
+# AG-UI HttpAgent based and talk to the FastAPI agent on :8123 — see the
+# entrypoint. @ag-ui/client is a normal package.json dependency, so the
+# `npm install` above already provides it; the old docker-route-override.ts
+# swap is no longer used.
 
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 # Next.js 16+ uses Turbopack by default; use --webpack for serverExternalPackages compat
@@ -40,27 +41,20 @@ ENV PATH="/root/.local/bin:$PATH"
 
 WORKDIR /app
 
-# Install Python deps — EXCLUDING langgraph-cli and langgraph-api
-# (they need Docker-in-Docker which Railway doesn't provide)
-# Instead serve via ag-ui-langgraph + copilotkit (same protocol, no Docker needed)
+# pdf-analyst default swap: the agent is now the FastAPI app at
+# agent/main.py (POST /fixed, /dynamic, /legal), served directly with
+# uvicorn — no langgraph-cli, no Docker-in-Docker, no serve.py wrapper. We
+# install from the agent's own pyproject.toml + uv.lock via `uv sync`, which
+# pulls the FROZEN dependency set (langchain-google-genai, ag-ui-langgraph,
+# copilotkit, fastapi, uvicorn, …). The legal example's graph is imported
+# cross-package by agent/main.py, so copy other-examples/ too.
 COPY agent/ ./agent/
-# Install ag-ui-langgraph FIRST at pinned version (before copilotkit can override it)
-RUN uv pip install --system "ag-ui-langgraph[fastapi]==0.0.22" && \
-    uv pip install --system --no-deps "copilotkit==0.1.78" && \
-    uv pip install --system "partialjson>=0.0.8,<0.0.9" "toml>=0.10.2,<0.11.0" && \
-    uv pip install --system \
-    "langchain==1.0.1" \
-    "langchain-openai>=1.1.0" \
-    "langchain-anthropic>=1.3.4" \
-    "langgraph==1.0.5" \
-    "langsmith>=0.4.49" \
-    "openai>=1.68.2,<2.0.0" \
-    "python-dotenv>=1.0.0,<2.0.0" \
-    "fastapi>=0.115.5,<1.0.0" \
-    "uvicorn>=0.29.0,<1.0.0"
+COPY other-examples/ ./other-examples/
 
-# serve.py adapts the original agent for Docker (no langgraph-cli needed)
-COPY serve.py ./
+# `uv sync` into the agent's own .venv from the locked manifest. --frozen
+# fails loudly if uv.lock has drifted from pyproject.toml rather than
+# silently re-resolving (matches the repo's FROZEN-pins discipline).
+RUN cd agent && uv sync --frozen --no-dev
 
 # Copy Next.js standalone build
 COPY --from=frontend /app/.next/standalone ./

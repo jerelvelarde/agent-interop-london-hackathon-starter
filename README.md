@@ -1,8 +1,8 @@
 # Agent Interoperability (A2A, A2UI, & AG-UI) Generative UI Hackathon — London Starter Kit
 
-Welcome to the **Agent Interoperability (A2A, A2UI, & AG-UI) Generative UI Hackathon**! This starter kit gives you a working agent-driven UI — a Next.js + LangGraph app where the agent emits declarative **A2UI** envelopes and the frontend renders them as live React components. Wired up with CopilotKit, AG-UI, Google A2UI, Gemini, and an optional A2A bolt-on for Track 1 interop.
+Welcome to the **Agent Interoperability (A2A, A2UI, & AG-UI) Generative UI Hackathon**! This starter kit gives you a working agent-driven UI — a Next.js + FastAPI app where the agent emits declarative **A2UI** envelopes and the frontend renders them as live React components. Wired up with CopilotKit, AG-UI, Google A2UI, Gemini, and an optional A2A bolt-on for Track 1 interop.
 
-The boring 80% (catalog wiring, envelope inspector, offline fallback, agent loop) is already built so your team can spend the 5-hour build window on the parts judges remember: your domain, your widgets, your branding.
+The headline demo is **pdf-analyst**: drop a PDF in chat and the agent builds the answer UI for you — a fixed-schema dashboard for the at-a-glance view and dynamic A2UI surfaces (Recharts) for any follow-up question. The boring 80% (a 21-component A2UI catalog, envelope inspector, the agent loop, the FastAPI transport) is already built so your team can spend the 5-hour build window on the parts judges remember: your domain, your widgets, your branding.
 
 https://github.com/user-attachments/assets/c053d2e8-1d40-43cb-8c5a-8e5c121b851f
 
@@ -26,7 +26,7 @@ The agent sends three operations: `createSurface`, `updateComponents`, `updateDa
 - **[A2UI](https://a2ui.org/)** — Google's open declarative UI envelope protocol. Lets agents "speak UI" by sending JSON that renders natively across frameworks. This starter is built around A2UI v0.9. [Spec →](https://a2ui.org/specification/v0.9-a2ui/) · [Repo →](https://github.com/google/A2UI)
 - **[AG-UI](https://docs.ag-ui.com/)** — Open, lightweight, event-based protocol that standardizes how agents connect to user-facing apps. Originated from CopilotKit; now maintained by the [AG-UI Protocol working group](https://github.com/ag-ui-protocol/ag-ui). AG-UI carries A2UI envelopes between the LangGraph agent and the Next.js runtime here.
 - **[CopilotKit](https://docs.copilotkit.ai/)** — The runtime that wires AG-UI through your Next.js app and ships the A2UI renderer. The chat UI, envelope inspector, and provider plumbing all come from here. AI-assistant skills + MCP server at [`docs.copilotkit.ai/built-in-agent/build-with-agents`](https://docs.copilotkit.ai/built-in-agent/build-with-agents).
-- **[LangGraph (Python)](https://langchain-ai.github.io/langgraph/)** — The agent loop that emits A2UI envelopes via tool-calls. Boots via `uv`. Configured for both a single-graph layout (dashboard) and a sub-repo multi-graph layout (legal-contract-review example).
+- **[LangGraph (Python)](https://langchain-ai.github.io/langgraph/)** — The agent loop that emits A2UI envelopes via tool-calls. Two graphs ship by default — a **fixed-schema** dashboard agent and a **dynamic-schema** Q&A agent — served over a FastAPI app (`agent/main.py`, `uvicorn main:app` on `:8123`) that exposes `/fixed`, `/dynamic`, and `/legal`. Boots via `uv`.
 - **[Gemini 3.5 Flash](https://aistudio.google.com/)** — Default LLM via the native Google Gen AI SDK (`langchain-google-genai`). Free tier, no credit card. The native SDK is required to handle thought-signature replay across tool turns — see [FROZEN.md](FROZEN.md) for the Gemini 3.x trap history.
 
 ## Run it locally
@@ -43,35 +43,39 @@ cp .env.example .env
 # Free Gemini key (no credit card): https://aistudio.google.com/apikey
 
 pnpm doctor               # preflight: Node, pnpm, Python, uv, env vars, ports
-pnpm dev                  # boots Next.js + the Python agent concurrently
+pnpm dev                  # boots Next.js + the FastAPI agent (uvicorn main:app, :8123) concurrently
 ```
 
-Browser opens at `http://localhost:3000`. The default demo is **PortKit** — a project-operations workspace for a 7-person team. Send the canonical 5-turn demo (verbatim prompts in [DEMO.md](DEMO.md)):
+Browser opens at `http://localhost:3000`. The default demo is **pdf-analyst** — chat-with-your-PDF, where the agent builds the answer UI from a 21-component A2UI catalog. The landing page (`/`) routes to two modes; both read the **same** catalog:
 
-1. *"What's going on this week?"* → 4 KPIs + sprint progress + 3 ProjectCards (Atlas, Orion, Lyra)
-2. *"Drill into Orion."* → status hero + milestones + kanban + open risks
-3. *"Who's overloaded?"* → bar chart of points per person + overloaded-teammates table
-4. *"Draft a status update for Orion."* → editable TL;DR + Progress + Risks + Asks
-5. Click **Send to #orion-pm** → the button's `action.event` bubbles back to the agent
+- **`/fixed` — fixed-schema dashboard.** You author the dashboard layout once (one JSON file); the agent extracts KPIs, a trend, a share split, and table rows from the PDF and fills them in. Fast, predictable, brand-locked.
+- **`/dynamic` — dynamic A2UI surfaces.** Ask any follow-up question and a secondary LLM invents the component tree for the answer — Recharts bar/line/donut charts, tables, callouts — on demand.
+- **`/catalog`** — a gallery of every primitive the agent is allowed to use.
 
-Every surface is generated on demand: the agent picks the surface, emits an A2UI envelope, the renderer turns it into React. The envelope inspector (right rail, default chrome) shows the raw protocol — that's how you know A2UI is actually working.
+Try it:
 
-> **No `GEMINI_API_KEY` handy?** Set `OFFLINE=1` and the agent serves pre-baked envelopes from `public/offline-envelopes.json`. The demo still works; the inspector still shows real A2UI surfaces. Useful for flaky venue Wi-Fi.
+1. Open `/fixed`, attach a PDF in chat (a quarterly report, a paper, an invoice). → the agent paints a KPI dashboard with a trend chart and a data table, all streamed down as A2UI.
+2. *"Break the revenue down by region as a bar chart."* → a dynamic surface invents the chart from the document.
+3. *"Summarise the risks as a bulleted callout."* → a dynamic surface composes a callout + bullet list.
 
-> **Demoing live?** Read [DEMO.md](DEMO.md) for the on-stage script with timing, talking points, and recovery patterns.
+Every surface is generated on demand: the agent picks the components, emits an A2UI envelope, the renderer turns it into React. The envelope inspector (right rail, default chrome) shows the raw protocol — that's how you know A2UI is actually working.
+
+> **No `GEMINI_API_KEY` handy?** The agent still serves real A2UI surfaces and the inspector still shows the wire. (The legacy `OFFLINE=1` pre-baked-envelope path belongs to the archived PortKit demo — see [`other-examples/portkit/`](other-examples/portkit/).) Useful for flaky venue Wi-Fi.
+
+> **Demoing live?** Have a tested PDF ready and run the walkthrough above. (The previous on-stage script belonged to the archived PortKit demo — see [`other-examples/portkit/DEMO.md`](other-examples/portkit/DEMO.md).)
 
 ## Customization seams (the 6 things you'll touch)
 
 Search the repo for `CUSTOMIZATION SEAM` to jump to each one. Full recipes live in [HACKATHON.md](HACKATHON.md).
 
-- **§1 — Re-theme** → `src/lib/a2ui-theme.css` + `src/hooks/use-theme.tsx` (CSS variables, no rebuild)
-- **§2 — Re-brand the shell** → `src/components/BrandFrame.tsx` (header, logo, accents)
-- **§3 — Swap demo data** → `agent/src/query.py` (or `agent/src/domains/<name>/data/`)
-- **§4 — Add an A2UI widget (fixed schema)** → copy `agent/src/tools/risk_register.py:show_risk_register` and run the 4-surface dance
-- **§5 — Switch domain** → set `DOMAIN=<name>` in `.env`; canonical stub at `agent/src/domains/shopping`
+- **§1 — Re-theme** → `src/a2ui/theme.css` (A2UI surface tokens) + `src/app/(pdf)/pdf-analyst.css` (shell brand) + `src/hooks/use-theme.tsx` (CSS variables, no rebuild)
+- **§2 — Re-brand the shell** → `src/components/pdf-analyst/Brand.tsx` (header, nav, page hero)
+- **§3 — Swap demo data** → the PDF is the data; tune extraction in `agent/src/pdf_tools.py` (or feed a different document)
+- **§4 — Add an A2UI component** → add a definition + renderer in `src/a2ui/catalog/{definitions.ts,renderers.tsx}` and mirror its prompt summary in `agent/src/catalog.py`
+- **§5 — Swap the agent flow** → edit `agent/src/fixed_agent.py` (dashboard) or `agent/src/dynamic_agent.py` (Q&A); both served from `agent/main.py`
 - **§6 — BYO A2A agent (Track 1 interop)** → run `pnpm check-a2a <url>` first, then set `A2A_AGENT_URL`
 
-Need a *second visual identity* (paper, terminal, kiosk) with net-new component primitives? See **[other-examples/](other-examples/)** for the custom-catalog pattern. For just adding widgets to the dashboard, stay with seam §4.
+Need the original project-dashboard demo (flights / sprints / todos via a LangGraph-cli agent), a second visual identity (legal paper), or net-new component primitives? See **[other-examples/](other-examples/)** — the archived **PortKit** demo lives at `other-examples/portkit/` and the legal-paper catalog at `other-examples/legal-contract-review/`.
 
 ## Vibe coding
 
@@ -80,10 +84,10 @@ This starter is built to be vibe-code-friendly. Your AI assistant (Claude Code, 
 The starter also ships:
 
 - **[`.mcp.json`](.mcp.json)** pointing at the canonical CopilotKit MCP server (`https://mcp.copilotkit.ai/sse`) — gives any MCP-capable assistant grounded answers about CopilotKit + A2UI APIs instead of hallucinating.
-- A **`create-a2ui-widget` skill** at `.claude/skills/` that drives an AI assistant through the [4-surface widget dance](HACKATHON.md) (catalog entry, fixture, Python tool, prompt hint).
-- **Validators that teach** — `pnpm validate-widget` and `pnpm test:widgets` point you at a real JSON template on failure (not at a Python file you can't mirror).
+- A **`create-a2ui-widget` skill** at `.claude/skills/` that drives an AI assistant through adding an A2UI component to the catalog.
+- **Validators that teach** — `pnpm validate-widget` and `pnpm test:widgets` point you at a real JSON template on failure.
 
-> **The 4-surface widget dance.** Adding a fixed-schema widget touches four files. Each is grep-anchored from the canonical example: `agent/src/tools/risk_register.py:show_risk_register`. Run `pnpm new-widget <name>` to scaffold from that template.
+> **Adding a component.** The pdf-analyst catalog is a single design system — a component definition + React renderer in `src/a2ui/catalog/{definitions.ts,renderers.tsx}`, mirrored as a prompt summary in `agent/src/catalog.py` so the agent knows it exists. (The original fixed-schema "widget dance" — catalog JSON + fixture + Python tool + prompt hint — lives with the archived PortKit demo under [`other-examples/portkit/`](other-examples/portkit/).)
 
 ## Other tracks (we don't gatekeep)
 
@@ -97,7 +101,7 @@ A2UI isn't the only protocol pillar in this hackathon. If your team's idea fits 
 
 - **[WELCOME.md](WELCOME.md)** — 200-word orientation
 - **[HACKATHON.md](HACKATHON.md)** — your full 5-hour playbook with hour-by-hour template
-- **[DEMO.md](DEMO.md)** — on-stage demo script (3 min, 5 turns + recovery)
+- **[other-examples/portkit/DEMO.md](other-examples/portkit/DEMO.md)** — the archived PortKit on-stage script (3 min, 5 turns + recovery)
 - **[AGENTS.md](AGENTS.md)** — agent guide for your AI coding assistant
 - **[FROZEN.md](FROZEN.md)** — version-pinning rationale and the Gemini 3.x thought-signature trap
 - **[SUBMITTING.md](SUBMITTING.md)** — what you'll need at submission time

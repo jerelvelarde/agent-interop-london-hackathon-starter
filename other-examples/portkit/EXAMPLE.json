@@ -2,7 +2,7 @@
   "id": "portkit",
   "name": "PortKit Project Dashboard",
   "description": "The original starter demo: an agent that generates a live project dashboard (KPI cards, sprint progress, per-project drill-downs), plus flight-search and to-do surfaces — every UI streamed down the wire as A2UI v0.9 envelopes. Archived from the host `/` route during the pdf-analyst default swap; the frontend now lives under other-examples/portkit/ and is not mounted in the host app.",
-  "route": "/other-examples",
+  "route": "/other-examples/portkit",
   "graphId": "sample_agent",
   "agentName": "default",
   "tags": ["dashboard", "flights", "todos", "generative-ui", "langgraph"],

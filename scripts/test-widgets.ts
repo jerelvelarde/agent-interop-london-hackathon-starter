@@ -1,11 +1,19 @@
 #!/usr/bin/env node
 /**
  * pnpm test:widgets — Run the validator (a proxy for the renderer at this
- * stage of the starter) against every *.fixture.json in agent/src/widgets/.
+ * stage of the starter) against every *.fixture.json in the repo's widget /
+ * schema directories.
  *
- * If no fixtures exist (Workstream E hasn't landed yet), exit 0 with a
- * friendly message. CI calls this from `pnpm smoke`, so it must be
- * non-destructive in the no-fixtures-yet state.
+ * pdf-analyst default swap: the former root PortKit fixtures at
+ * `agent/src/widgets/` were archived to other-examples/portkit/. The
+ * pdf-analyst default ships its catalog in TypeScript (src/a2ui/catalog/)
+ * and keeps its in-repo example fixtures under the example's own schemas
+ * dir. This script scans every WIDGET_DIR below and validates whatever
+ * `*.fixture.json` it finds. If a dir is absent, it's silently skipped.
+ *
+ * If no fixtures exist anywhere, exit 0 with a friendly message. CI calls
+ * this from `pnpm smoke`, so it must be non-destructive in the
+ * no-fixtures state.
  *
  * Note: a "real" renderer test would mount each fixture in the @copilotkit/
  * a2ui-renderer and assert no React errors. That requires a JSDOM/Playwright
@@ -17,7 +25,16 @@ import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 
 const REPO_ROOT = join(__dirname, "..");
-const WIDGETS_DIR = join(REPO_ROOT, "agent", "src", "widgets");
+
+// Directories that may hold canonical *.fixture.json files in the
+// pdf-analyst layout. Order is informational only. Missing dirs are skipped.
+const WIDGET_DIRS = [
+  // Root agent schemas (pdf-analyst). Bare catalog schemas live here today;
+  // any *.fixture.json a hacker drops alongside them gets picked up too.
+  join(REPO_ROOT, "agent", "src", "a2ui", "schemas"),
+  // In-repo legal-contract-review example fixtures (canonical fixture shape).
+  join(REPO_ROOT, "other-examples", "legal-contract-review", "schemas"),
+];
 const VALIDATE_SCRIPT = join(__dirname, "validate-widget.ts");
 
 const GREEN = "\x1b[32m";
@@ -46,17 +63,24 @@ function findFixtures(dir: string): string[] {
 function main(): void {
   console.log(`${BOLD}pnpm test:widgets${RESET} — fixture validation pass\n`);
 
-  if (!existsSync(WIDGETS_DIR)) {
+  const presentDirs = WIDGET_DIRS.filter(
+    (d) => existsSync(d) && statSync(d).isDirectory(),
+  );
+  if (presentDirs.length === 0) {
     console.log(
-      `${YELLOW}!${RESET} ${DIM}${WIDGETS_DIR} doesn't exist yet${RESET} — Workstream E hasn't landed.`,
+      `${YELLOW}!${RESET} ${DIM}None of the known widget/schema dirs exist:${RESET}`,
     );
-    console.log(`${DIM}Exiting 0; this is the expected pre-E state.${RESET}`);
+    for (const d of WIDGET_DIRS) console.log(`  ${DIM}${d}${RESET}`);
+    console.log(`${DIM}Exiting 0; no root widget fixtures to validate.${RESET}`);
     process.exit(0);
   }
 
-  const fixtures = findFixtures(WIDGETS_DIR);
+  const fixtures = presentDirs.flatMap((d) => findFixtures(d));
   if (fixtures.length === 0) {
-    console.log(`${YELLOW}!${RESET} ${DIM}No *.fixture.json files in ${WIDGETS_DIR}${RESET}`);
+    console.log(
+      `${YELLOW}!${RESET} ${DIM}No *.fixture.json files found under:${RESET}`,
+    );
+    for (const d of presentDirs) console.log(`  ${DIM}${d}${RESET}`);
     console.log(`${DIM}Run \`pnpm new-widget <name>\` to scaffold one, then re-run.${RESET}`);
     process.exit(0);
   }

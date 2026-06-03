@@ -1,22 +1,29 @@
 #!/usr/bin/env bash
-# scripts/new-widget.sh — Scaffold a new A2UI widget from the risk_register template.
+# scripts/new-widget.sh — Scaffold a new A2UI widget catalog schema + fixture.
 #
 # Bare-bones equivalent of the .claude/skills/create-a2ui-widget skill (which
-# walks an AI assistant + the hacker through the full five-surface dance). This
+# walks an AI assistant + the hacker through the full widget dance). This
 # script seeds the two JSON files (catalog schema + fixture) so the hacker has
 # a stable starting point.
+#
+# pdf-analyst default swap: the canonical "copy this" widget is no longer the
+# archived PortKit risk_register tool. The pdf-analyst default defines its
+# catalog in TypeScript at src/a2ui/catalog/definitions.ts (component props,
+# Zod schemas) + src/a2ui/catalog/renderers.tsx (the React renderers). The
+# backing agent is the FastAPI app at agent/main.py (/fixed, /dynamic,
+# /legal). See the printed next-steps below.
 #
 # Usage:  pnpm new-widget <name>
 # Example:  pnpm new-widget product_card
 #
-# Creates:
-#   agent/src/widgets/<name>.json          (catalog schema)
-#   agent/src/widgets/<name>.fixture.json  (fixture for pnpm test:widgets)
+# Creates (under agent/src/a2ui/schemas/, which `pnpm test:widgets` scans):
+#   agent/src/a2ui/schemas/<name>.json          (catalog schema)
+#   agent/src/a2ui/schemas/<name>.fixture.json  (fixture for pnpm test:widgets)
 
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-WIDGETS_DIR="$ROOT/agent/src/widgets"
+WIDGETS_DIR="$ROOT/agent/src/a2ui/schemas"
 
 if [[ $# -lt 1 ]]; then
   echo "Usage: pnpm new-widget <name>" >&2
@@ -55,7 +62,8 @@ if [[ -e "$FIXTURE_PATH" ]]; then
   exit 1
 fi
 
-# Catalog schema — mirrors the shape of agent/src/widgets/risk_register.json
+# Catalog schema — bare v0.9 component array (shape (a)). Mirrors the shape of
+# agent/src/a2ui/schemas/dashboard.json (the pdf-analyst dashboard surface).
 cat > "$CATALOG_PATH" <<JSON
 [
   {
@@ -117,14 +125,18 @@ echo -e "${GREEN}${BOLD}Created two widget files:${RESET}"
 echo -e "  ${BOLD}${CATALOG_PATH}${RESET}"
 echo -e "  ${BOLD}${FIXTURE_PATH}${RESET}"
 echo
-echo -e "${BOLD}Next steps (the five-surface widget dance):${RESET}"
+echo -e "${BOLD}Next steps (the widget dance — pdf-analyst layout):${RESET}"
 echo -e "  ${DIM}1. (done) Catalog schema → ${NAME}.json${RESET}"
 echo -e "  ${DIM}2. (done) Fixture       → ${NAME}.fixture.json${RESET}"
-echo -e "  ${DIM}3. Add a Python tool that emits a createSurface for catalogId${RESET}"
-echo -e "     ${DIM}\"copilotkit://app-dashboard-catalog\" + this schema.${RESET}"
-echo -e "     ${DIM}Copy agent/src/tools/risk_register.py as the template (canonical minimal example).${RESET}"
-echo -e "  ${DIM}4. Register the tool in agent/src/domains/default/tools.py default_tools=[...].${RESET}"
-echo -e "  ${DIM}5. Add a prompt hint in agent/src/domains/default/prompts.py that teaches the agent WHEN to call it.${RESET}"
+echo -e "  ${DIM}3. Register the component in the frontend catalog:${RESET}"
+echo -e "     ${DIM}- src/a2ui/catalog/definitions.ts  → add \"${PASCAL_NAME}\" (props + Zod schema)${RESET}"
+echo -e "     ${DIM}- src/a2ui/catalog/renderers.tsx   → add the React renderer for it${RESET}"
+echo -e "  ${DIM}4. Make the agent emit it. The default agent is the FastAPI app at${RESET}"
+echo -e "     ${DIM}agent/main.py (/fixed, /dynamic, /legal). For a fixed surface, add the${RESET}"
+echo -e "     ${DIM}schema to a tool in agent/src/fixed_agent.py; for a generated one, the${RESET}"
+echo -e "     ${DIM}secondary LLM in agent/src/dynamic_agent.py emits the tree at runtime.${RESET}"
+echo -e "  ${DIM}5. Cite the new component in the agent's system prompt so the LLM knows WHEN${RESET}"
+echo -e "     ${DIM}to use it (see the prompt strings in agent/src/fixed_agent.py).${RESET}"
 echo
 echo -e "${BOLD}Verify with:${RESET}"
 echo -e "  ${DIM}pnpm validate-widget agent/src/widgets/${NAME}.json${RESET}"

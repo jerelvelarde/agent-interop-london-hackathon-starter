@@ -9,16 +9,31 @@ canonical examples named in this guide rather than inventing new ones.
 ## What this repo is
 
 A Next.js + LangGraph + CopilotKit + A2UI v0.9 starter that demonstrates
-**agent-driven generative UI**. Three subsystems:
+**agent-driven generative UI**. The default demo is **pdf-analyst**:
+chat-with-your-PDF, where the agent builds the answer UI from a shared
+21-component A2UI catalog — a fixed-schema dashboard for the at-a-glance
+view and dynamic surfaces (Recharts) for follow-up questions. Three
+subsystems:
 
-- `src/app/` — Next.js 16 + React 19 + Tailwind 4 web app
-- `agent/` — Python LangGraph agent emitting A2UI envelopes via CopilotKit
+- `src/app/` — Next.js 16 + React 19 + Tailwind 4 web app. The pdf-analyst
+  routes live under the `(pdf)` route group: `/`, `/fixed`, `/dynamic`,
+  `/catalog`. The A2UI catalog (definitions + renderers) is at `src/a2ui/`.
+- `agent/` — Python LangGraph agents served over **FastAPI**
+  (`agent/main.py`, run with `uvicorn main:app` on `:8123`), exposing
+  `/fixed`, `/dynamic`, and `/legal`.
 - `a2a/` — Optional A2A bolt-on for Track 1 multi-agent interop (dormant
   until `A2A_AGENT_URL` is set)
 
 The agent emits A2UI v0.9 declarative UI envelopes (`createSurface`,
 `updateComponents`, `updateDataModel`). The renderer turns them into React.
 Read `HACKATHON.md` for the customization recipes.
+
+> **PortKit is archived.** The previous default demo (a project-operations
+> dashboard with flights/sprints/todos, served by a LangGraph-cli agent)
+> now lives at `other-examples/portkit/` as a deeper, self-contained
+> example. Anchors below point at pdf-analyst; PortKit-era paths
+> (`agent/src/query.py`, `risk_register`, `domains/`) only exist under
+> `other-examples/portkit/`.
 
 ## Hard rules
 
@@ -29,12 +44,13 @@ Read `HACKATHON.md` for the customization recipes.
 3. **Always run `pnpm smoke`** before declaring work done. `smoke` is a
    composite gate: validators + pin check + offline path + canned prompt.
 4. **Default LLM is Gemini 3.5 Flash via the native Google Gen AI SDK
-   (`langchain-google-genai`).** Do not change the model line in
-   `agent/main.py` unless told. The native SDK is required because Gemini
-   3.x's thought-signature replay across tool turns is not implemented by
-   `langchain-openai`. The OpenAI-compat path is documented as a fallback in
-   `FROZEN.md` § LLM provider (sticks on `gemini-2.5-flash` for the same
-   reason).
+   (`langchain-google-genai`).** Do not change the `ChatGoogleGenerativeAI(...)`
+   model line (it lives in `agent/src/fixed_agent.py`,
+   `agent/src/dynamic_agent.py`, and `agent/src/pdf_tools.py`) unless told.
+   The native SDK is required because Gemini 3.x's thought-signature replay
+   across tool turns is not implemented by `langchain-openai`. The
+   OpenAI-compat path is documented as a fallback in `FROZEN.md` § LLM
+   provider (sticks on `gemini-2.5-flash` for the same reason).
 5. **Edit `src/components/EnvelopeInspector.tsx` with care.** It is the
    hackathon's "show the wire" affordance and ships **visible by default**. It
    may be hidden via its header control (the preference persists in
@@ -49,18 +65,26 @@ Read `HACKATHON.md` for the customization recipes.
 These are the six grep-anchored seams a hacker (or you) edit to make this
 starter their own. Search for `CUSTOMIZATION SEAM` to find each one in code.
 
-1. **Re-theme** → `src/lib/a2ui-theme.css` (CSS variables) + `src/hooks/use-theme.tsx`
-2. **Re-brand the shell** → `src/components/BrandFrame.tsx` (header, logo, palette accents)
-3. **Swap demo data** → `agent/src/query.py` (or `agent/src/domains/<active>/data/`)
-4. **Add an A2UI widget (fixed schema)** → copy
-   `agent/src/tools/risk_register.py:show_risk_register` (one helper, one
-   tree, one template binding — simplest canonical), register in
-   `agent/src/domains/default/tools.py`, and add a hint to
-   `agent/src/domains/default/prompts.py`'s `TOOL_RULES`.
-5. **Switch domain** → set `DOMAIN=<name>` in `.env`; canonical stub at
-   `agent/src/domains/shopping`
+1. **Re-theme** → `src/a2ui/theme.css` (A2UI surface tokens) +
+   `src/app/(pdf)/pdf-analyst.css` (shell brand) + `src/hooks/use-theme.tsx`
+2. **Re-brand the shell** → `src/components/pdf-analyst/Brand.tsx`
+   (`SiteNav`, `PageHeader`, logo/nav, page hero)
+3. **Swap demo data** → the uploaded **PDF is the data**. Tune extraction
+   in `agent/src/pdf_tools.py` (the structured-JSON extractor the agents
+   call), or feed a different document. There is no static dataset file in
+   the default demo.
+4. **Add an A2UI component** → add a definition + Zod prop schema in
+   `src/a2ui/catalog/definitions.ts`, a matching React renderer in
+   `src/a2ui/catalog/renderers.tsx`, and mirror its one-line prompt summary
+   in `agent/src/catalog.py`'s `CATALOG_PROMPT`. The 21-component catalog is
+   one shared design system (no per-widget JSON/fixture/tool in this demo).
+5. **Swap the agent flow** → edit `agent/src/fixed_agent.py` (the
+   fixed-schema dashboard agent + its `render_dashboard` tool; the dashboard
+   layout itself is the JSON at `agent/src/a2ui/schemas/dashboard.json`) or
+   `agent/src/dynamic_agent.py` (the dynamic-schema Q&A agent + its
+   `generate_a2ui` tool). Both are wired in `agent/main.py`.
 6. **BYO A2A agent** → set `A2A_AGENT_URL`; run `pnpm check-a2a <url>` first.
-   Wired in `src/app/api/copilotkit/route.ts`.
+   Wired in `src/app/api/copilotkit/[[...slug]]/route.ts`.
 
 `HACKATHON.md` has the full step-by-step recipe for each seam.
 
@@ -68,33 +92,39 @@ starter their own. Search for `CUSTOMIZATION SEAM` to find each one in code.
 
 When the hacker asks for a new something, grep-find and copy the canonical:
 
-- **Fixed-schema A2UI widget (minimal):**
-  `agent/src/tools/risk_register.py:show_risk_register` — one helper, one
-  component tree, one template binding. Read this first when adding a
-  widget. Pair it with `agent/src/widgets/risk_register.json` (catalog
-  entry) and `agent/src/widgets/risk_register.fixture.json` (offline data).
-- **Fixed-schema A2UI widget (showcase):**
-  `agent/src/tools/project_dashboard.py:show_project_dashboard` — the
-  opening-demo surface with 4 KPIs, a sprint timeline, and 3 ProjectCards.
-  Heavier `_build_data` if you want to see what filtering + enrichment
-  looks like at scale.
-- **Dynamic-schema A2UI:** `agent/src/a2ui_dynamic_schema.py:generate_a2ui`
-  (secondary LLM produces the component tree on demand)
-- **A2UI envelope (raw JSON):** `agent/src/widgets/*.fixture.json`
-- **Brand shell:** `src/components/BrandFrame.tsx`
-- **Theme tokens:** `src/lib/a2ui-theme.css`
+- **Fixed-schema A2UI agent:**
+  `agent/src/fixed_agent.py` — the dashboard agent. Reads the PDF text,
+  calls `render_dashboard` with structured data extracted in the same model
+  pass, and streams a surface built from the JSON layout at
+  `agent/src/a2ui/schemas/dashboard.json`. Read this first to see how a
+  hand-authored layout binds to agent-extracted data.
+- **Dynamic-schema A2UI agent:**
+  `agent/src/dynamic_agent.py:generate_a2ui` — a server-side tool that spawns
+  a secondary LLM to invent the component tree for a follow-up question, then
+  wraps it into `create_surface` + `update_components` + `update_data_model`
+  ops. The file's docstring explains why it's a real Python tool (not an
+  injected frontend tool) — copy that pattern, not the orphan-`function_call`
+  trap.
+- **The A2UI catalog (21 components):**
+  `src/a2ui/catalog/definitions.ts` (Zod prop schemas + descriptions) and
+  `src/a2ui/catalog/renderers.tsx` (the React renderers). The Python mirror
+  the agents cite is `agent/src/catalog.py` (`CATALOG_ID` + `CATALOG_PROMPT`).
+- **PDF → structured data:** `agent/src/pdf_tools.py` (the shared extractor
+  the fixed agent uses to turn document text into KPIs/points/rows).
+- **Brand shell:** `src/components/pdf-analyst/Brand.tsx`
+- **Theme tokens:** `src/a2ui/theme.css` + `src/app/(pdf)/pdf-analyst.css`
 
 ## Commands
 
 | Command | What it does |
 |---|---|
 | `pnpm doctor` | Preflight env check (Node, pnpm, Python, uv, env vars, ports) |
-| `pnpm dev` | Boot Next.js + Python agent concurrently |
+| `pnpm dev` | Boot Next.js + the FastAPI agent (`uvicorn main:app`, `:8123`) concurrently |
 | `pnpm smoke` | Composite gate (validators + pins + offline + canned prompt) |
 | `pnpm validate-widget <path>` | Validate a widget JSON against A2UI v0.9 |
 | `pnpm check-a2a <url>` | Validate a partner A2A endpoint |
 | `pnpm explain <topic>` | Print the right HACKATHON.md section (`themes`, `widgets`, `a2a`, `data`, `branding`, `domain`) |
-| `pnpm new-widget <name>` | Scaffold from `risk_register` template |
+| `pnpm new-widget <name>` | Scaffold a catalog schema + fixture under `agent/src/a2ui/schemas/` |
 | `pnpm theme:reset` | Revert theme to defaults |
 | `pnpm verify-pins` | Fail if lockfiles drifted from `FROZEN.md` |
 
@@ -102,19 +132,20 @@ When the hacker asks for a new something, grep-find and copy the canonical:
 
 When the hacker says:
 
-- **"add a widget"** → follow `HACKATHON.md` §4 (prefer fixed-schema for
-  demo predictability). Copy `risk_register`. Run the **4-surface dance**:
-  catalog entry + fixture + Python tool (registered in
-  `agent/src/domains/default/tools.py`) + prompt hint (in
-  `agent/src/domains/default/prompts.py`'s `TOOL_RULES`). Run
+- **"add a widget" / "add a component"** → follow `HACKATHON.md` §4. Add a
+  definition + Zod prop schema to `src/a2ui/catalog/definitions.ts`, a React
+  renderer to `src/a2ui/catalog/renderers.tsx`, and mirror its one-line
+  prompt summary in `agent/src/catalog.py`'s `CATALOG_PROMPT`. Run
   `pnpm validate-widget` then `pnpm smoke` before declaring done.
-- **"theme it for X"** → only edit `src/lib/a2ui-theme.css` and
-  `src/hooks/use-theme.tsx`. Don't restructure components. Don't bump deps.
-- **"re-brand it"** → edit `src/components/BrandFrame.tsx`. Don't touch the
-  envelope inspector or chat affordances.
-- **"make it about Y"** (e.g. shopping, healthcare) → swap demo data in
-  `agent/src/query.py` and the system prompt in `agent/main.py`. Don't
-  restructure. Reference `agent/src/domains/shopping/` as the pattern.
+- **"theme it for X"** → only edit `src/a2ui/theme.css`,
+  `src/app/(pdf)/pdf-analyst.css`, and `src/hooks/use-theme.tsx`. Don't
+  restructure components. Don't bump deps.
+- **"re-brand it"** → edit `src/components/pdf-analyst/Brand.tsx`. Don't
+  touch the envelope inspector or chat affordances.
+- **"make it about Y"** (e.g. a different document type) → tune the
+  extraction prompt in `agent/src/pdf_tools.py` and the agent system prompts
+  in `agent/src/fixed_agent.py` / `agent/src/dynamic_agent.py`. The data is
+  the uploaded PDF — there's no static dataset to swap. Don't restructure.
 - **"connect to another agent"** → run `pnpm check-a2a <url>` first; only
   then set `A2A_AGENT_URL` in `.env`. See HACKATHON.md §6.
 
@@ -123,14 +154,19 @@ When the hacker says:
 - Don't run `pnpm install` against a new `@copilotkit/*` version.
 - Don't add new top-level dependencies without checking if base already has
   an equivalent (e.g. don't pull in `framer-motion` if the existing
-  CSS-transition path suffices).
+  CSS-transition path suffices). The AG-UI client transport for the
+  pdf-analyst demo already ships: `@ag-ui/client` and `@ag-ui/core`
+  (`^0.0.53`), plus `recharts` for charts and `pdfjs-dist` for client-side
+  PDF parsing — see `FROZEN.md`.
 - The envelope inspector ships visible by default. A hide control + persisted
   preference is allowed (added intentionally), but don't make it hidden by
   default — teams shouldn't accidentally ship with the wire hidden.
 - Don't hand-roll React renderers for A2UI primitives. Use the catalog +
   theme system. (`@copilotkit/a2ui-renderer` owns rendering.)
-- Don't change `agent/main.py`'s `ChatOpenAI(...)` model call. The provider,
-  base URL, and model ID are FROZEN — see `FROZEN.md`.
+- Don't change the `ChatGoogleGenerativeAI(...)` model call (in
+  `agent/src/fixed_agent.py`, `agent/src/dynamic_agent.py`,
+  `agent/src/pdf_tools.py`). The provider and model ID are FROZEN — see
+  `FROZEN.md`.
 - Don't fabricate seams. If `CUSTOMIZATION SEAM` doesn't grep, the hacker is
   asking you to invent one. Push back and ask which existing seam fits.
 
@@ -143,7 +179,10 @@ Follow them when the hacker types them in chat. Skills live at:
 Useful grep starting points:
 - `grep -r "CUSTOMIZATION SEAM" .` — find all seams in two seconds
 - `grep -r "Pattern to copy" .` — find canonical examples
-- `agent/src/tools/risk_register.py` — read this top-to-bottom before adding a widget
+- `agent/src/fixed_agent.py` and `agent/src/dynamic_agent.py` — read these
+  top-to-bottom before changing an agent flow
+- `src/a2ui/catalog/definitions.ts` — the 21-component catalog, read before
+  adding a component
 
 ## Gemini CLI users
 
@@ -152,7 +191,7 @@ Useful grep starting points:
 
 Useful one-liners:
 - `gemini -p "explain seam #4 from HACKATHON.md"` — see the recipe
-- `gemini -p "add a recipe-card widget patterned after risk_register"`
+- `gemini -p "add a Timeline component to the A2UI catalog"`
 
 ## Cursor / Windsurf / Codex users
 
@@ -192,18 +231,20 @@ pnpm install --frozen-lockfile
 Takes ~12s. After that, `pnpm validate-widget`, `pnpm typecheck`, and the
 other scripts work normally inside the worktree.
 
-### Worktree-aware env loading (langgraph)
+### Worktree-aware env loading (FastAPI agent)
 
-`langgraph dev` started from a worktree's `agent/` directory will **not**
-pick up the main checkout's `.env` — it only looks at the worktree root.
-Two workarounds, in order of preference:
+The agent (`uvicorn main:app` via `pnpm dev:agent` → `scripts/run-agent.sh`)
+calls `load_dotenv()` from the `agent/` directory, so it reads `agent/.env`
+(or walks up to the repo root). Started from a worktree, it will **not** pick
+up the main checkout's `.env`. Two workarounds, in order of preference:
 
 1. Copy `.env` into the worktree root: `cp ../../.env .env` (from the
    worktree). Don't commit it — `.env` is already gitignored.
-2. Export the var inline: `GEMINI_API_KEY=... langgraph dev`.
+2. Export the var inline: `GEMINI_API_KEY=... uvicorn main:app --port 8123`
+   (run from the worktree's `agent/` dir).
 
 `pnpm dev` from the **main** checkout is unaffected — the issue only
-applies when launching langgraph from inside a worktree.
+applies when launching the agent from inside a worktree.
 
 ### What you can't smoke-test from a worktree
 

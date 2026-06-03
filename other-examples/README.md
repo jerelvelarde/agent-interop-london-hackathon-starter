@@ -1,10 +1,10 @@
 # Other Examples
 
-Self-contained example modules. Each one demonstrates the next layer of A2UI customization beyond the dashboard demo.
+Self-contained example modules. Each one demonstrates a layer of A2UI customization beyond the default **pdf-analyst** demo (chat-with-your-PDF, at the repo root).
 
 ## What goes here
 
-This directory is the home for **content-complete examples that go one layer deeper than the dashboard demo**. The dashboard demo (and the `create-a2ui-widget` skill that adds to it) covers the 95% case — single catalog, pure-data widgets. Examples under `other-examples/` cover the 5% case where you need *new visual primitives, a second catalog, a different reading experience,* or a domain story that needs its own setting (legal paper, terminal kiosk, retail receipt, etc.).
+This directory is the home for **content-complete examples and archived demos**. The default pdf-analyst demo (and the `create-a2ui-widget` skill that adds to its catalog) covers the 95% case — a single shared catalog the agent composes from. Folders under `other-examples/` cover the rest: a *second catalog or a different reading experience* (legal paper), or a *full prior demo kept for reference* (PortKit — the original project-dashboard starter, archived here when pdf-analyst became the default).
 
 Each example folder follows the same sub-repo layout:
 
@@ -25,12 +25,18 @@ other-examples/<example-id>/
 - Shared deps come from the parent `package.json` and `agent/pyproject.toml`
 - The Next.js route lives at `src/app/(<group>)/<example-id>/page.tsx` as a thin shim — the *content* lives here, the *mount point* lives under `src/app/`
 
+> **Archived demos are the exception.** `portkit/` is not built from this
+> scaffold — it's a full snapshot of the previous default demo, so it carries
+> its own `src/` (the `(default)` route group + components/hooks), `agent/`
+> (a langgraph-cli package with `langgraph.json`), `public/`, and `DEMO.md`.
+> See its README for what it takes to run standalone.
+
 ## Index
 
-| Example                                              | Status | Catalog                              | What it shows                                                                          |
-| ---------------------------------------------------- | ------ | ------------------------------------ | -------------------------------------------------------------------------------------- |
-| [legal-contract-review/](./legal-contract-review/)   | wip    | `copilotkit://legal-paper-catalog`   | Paper-styled contract review with margin notes + redlines on a second registered catalog. |
-| [a2ui-pdf-analyst/](./a2ui-pdf-analyst/)             | wip    | self-contained mini-app (Gemini)     | Chat-with-your-PDF; the agent builds the answer UI (fixed + dynamic schema, Recharts). Runs as its own app (web :3000 + agent :8123), not mounted into the host. |
+| Example                                              | Status   | Catalog                              | What it shows                                                                          |
+| ---------------------------------------------------- | -------- | ------------------------------------ | -------------------------------------------------------------------------------------- |
+| [legal-contract-review/](./legal-contract-review/)   | wip      | `copilotkit://legal-paper-catalog`   | Paper-styled contract review with margin notes + redlines on a second registered catalog. |
+| [portkit/](./portkit/)                               | archived | catalog of 9 dashboard primitives    | The original starter demo: an agent that generates a project dashboard (KPI cards, sprint progress, per-project drill-downs) plus flight-search + to-do surfaces, served by a LangGraph-cli agent. Archived snapshot of the previous `/` route, not mounted in the host. |
 
 ## How to add another
 

@@ -1,17 +1,22 @@
 #!/bin/bash
 set -e
 
-echo "[entrypoint] Starting: langgraph-python starter"
+echo "[entrypoint] Starting: pdf-analyst FastAPI agent + Next.js"
 
-if [ -z "$OPENAI_API_KEY" ]; then
-  echo "[entrypoint] WARNING: OPENAI_API_KEY not set!"
+# The pdf-analyst agents default to Gemini via langchain-google-genai.
+if [ -z "$GEMINI_API_KEY" ]; then
+  echo "[entrypoint] WARNING: GEMINI_API_KEY not set! The agent will import but live calls will fail."
 else
-  echo "[entrypoint] OPENAI_API_KEY: set"
+  echo "[entrypoint] GEMINI_API_KEY: set"
 fi
 
-# Start agent via AG-UI protocol (serve.py wraps the original graph)
-echo "[entrypoint] Starting agent on port 8123..."
-AGENT_PORT=8123 python serve.py 2>&1 &
+# Start the FastAPI agent (agent/main.py exposes /fixed, /dynamic, /legal).
+# Served directly with uvicorn from the agent's uv-managed venv — no
+# langgraph-cli, no serve.py wrapper. Bind 0.0.0.0 so the Next.js process
+# (and the host) can reach it. The frontend routes default to
+# http://localhost:8123/{fixed,dynamic,legal}.
+echo "[entrypoint] Starting agent (uvicorn main:app) on port ${AGENT_PORT:-8123}..."
+( cd agent && uv run uvicorn main:app --host 0.0.0.0 --port "${AGENT_PORT:-8123}" ) 2>&1 &
 AGENT_PID=$!
 
 sleep 3

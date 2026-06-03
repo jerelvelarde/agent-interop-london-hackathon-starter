@@ -82,22 +82,18 @@ function envelopeSourceLocation(env: CapturedEnvelope): {
   path: string;
   line: number;
 } {
-  // PortKit fixed-schema surfaces each live in their own tool file under
-  // agent/src/tools/. The dynamic-schema path is the fallback for anything
-  // we don't recognise. Hackers can extend this map as they add widgets.
+  // pdf-analyst (the default demo) has two surface producers: the fixed-schema
+  // agent (deterministic dashboard) and the dynamic-schema agent (an LLM builds
+  // the component tree on demand). Map known fixed surfaces to the fixed agent;
+  // everything else falls back to the dynamic agent. Hackers can extend this
+  // map as they add widgets.
   const SURFACE_TO_TOOL: Record<string, string> = {
-    "project-dashboard": "agent/src/tools/project_dashboard.py",
-    "project-detail": "agent/src/tools/project_detail.py",
-    "sprint-board": "agent/src/tools/sprint_board.py",
-    "team-load": "agent/src/tools/team_load.py",
-    "risk-register": "agent/src/tools/risk_register.py",
-    "status-report-draft": "agent/src/tools/status_report.py",
-    "update-feed": "agent/src/tools/update_feed.py",
+    "pdf-dashboard": "agent/src/fixed_agent.py",
   };
   if (env.surfaceId && SURFACE_TO_TOOL[env.surfaceId]) {
     return { path: SURFACE_TO_TOOL[env.surfaceId], line: 1 };
   }
-  return { path: "agent/src/a2ui_dynamic_schema.py", line: 1 };
+  return { path: "agent/src/dynamic_agent.py", line: 1 };
 }
 
 /** Copy a string to the clipboard, fall back to a textarea hack on older browsers. */
@@ -421,10 +417,33 @@ const textBtnStyle: React.CSSProperties = {
   fontSize: "0.68rem",
 };
 
-/** The main inspector — renders as the default right-rail chrome. */
-export function EnvelopeInspector({ onHide }: { onHide?: () => void } = {}) {
+/**
+ * The main inspector — renders as the default right-rail chrome.
+ *
+ * Props (all optional, backward compatible):
+ *  - `onHide` — header hide control callback (page shell owns the persisted
+ *    preference + the slim edge tab to reopen).
+ *  - `agentId` — which v2 agent's activity stream to harvest envelopes from.
+ *    The default pdf-analyst demo passes "fixed_agent" / "dynamic_agent".
+ *  - `enableDemoFallback` — seed the built-in canned envelopes when nothing
+ *    has streamed yet. Defaults to `false`: the bundled DEMO_ENVELOPES describe
+ *    the old PortKit `project-dashboard` surface, which would be stale/wrong on
+ *    the pdf default — we want the real stream or an honest empty state instead.
+ */
+export function EnvelopeInspector({
+  onHide,
+  agentId,
+  enableDemoFallback = false,
+}: {
+  onHide?: () => void;
+  agentId?: string;
+  enableDemoFallback?: boolean;
+} = {}) {
   const { theme } = useTheme();
-  const { envelopes, bySurface, isDemo } = useEnvelopeStream();
+  const { envelopes, bySurface, isDemo } = useEnvelopeStream({
+    agentId,
+    enableDemoFallback,
+  });
   const [toast, setToast] = useState<string | null>(null);
   const [showAllSurfaces, setShowAllSurfaces] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);

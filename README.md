@@ -2,7 +2,7 @@
 
 Welcome to the **Agent Interoperability (A2A, A2UI, & AG-UI) Generative UI Hackathon**! This starter kit gives you a working agent-driven UI — a Next.js + FastAPI app where the agent emits declarative **A2UI** envelopes and the frontend renders them as live React components. Wired up with CopilotKit, AG-UI, Google A2UI, Gemini, and an optional A2A bolt-on for Track 1 interop.
 
-The headline demo is **pdf-analyst**: drop a PDF in chat and the agent builds the answer UI for you — a fixed-schema dashboard for the at-a-glance view and dynamic A2UI surfaces (Recharts) for any follow-up question. The boring 80% (a 21-component A2UI catalog, envelope inspector, the agent loop, the FastAPI transport) is already built so your team can spend the 5-hour build window on the parts judges remember: your domain, your widgets, your branding.
+The headline demo is **pdf-analyst**: drop a PDF in chat and the agent builds the answer UI for you — a fixed-schema dashboard for the at-a-glance view and dynamic A2UI surfaces (Recharts) for any follow-up question. The boring 80% (a 21-component A2UI catalog, the in-canvas surface renderer, the agent loop, the FastAPI transport) is already built so your team can spend the 5-hour build window on the parts judges remember: your domain, your widgets, your branding.
 
 https://github.com/user-attachments/assets/c053d2e8-1d40-43cb-8c5a-8e5c121b851f
 
@@ -18,14 +18,14 @@ This is an example application that we built to help you get started quickly. Ev
 
 > Generative UI describes any AI-driven interface where the agent **chooses, composes, or writes UI at runtime**. The field spans a spectrum from controlled component menus (safe, predictable, but limited) to fully open-ended LLM-generated DOM (flexible, but unreliable). This starter sits in the middle — a declarative, schema-driven envelope (**A2UI v0.9**) that the agent emits and a typed renderer turns into real React.
 
-The agent sends three operations: `createSurface`, `updateComponents`, `updateDataModel`. A renderer from `@copilotkit/a2ui-renderer` materializes them into live UI. The **envelope inspector** in the right rail is non-removable on purpose — judges need to see real A2UI is actually firing.
+The agent sends three operations: `createSurface`, `updateComponents`, `updateDataModel`. A renderer from `@copilotkit/a2ui-renderer` materializes them into live UI. The rendered surface fills the **canvas** beside the chat, and a `MirrorRenderer` pill echoes it inline in the conversation — so judges can see real A2UI is actually firing.
 
 ## Stack
 
 - **[A2A](https://a2a-protocol.org/)** — Agent2Agent protocol for cross-team interop. Linux Foundation project, contributed by Google. v1.0.1 GA. Wired here as a dormant bolt-on (set `A2A_AGENT_URL` to activate). [Repo →](https://github.com/a2aproject/A2A)
 - **[A2UI](https://a2ui.org/)** — Google's open declarative UI envelope protocol. Lets agents "speak UI" by sending JSON that renders natively across frameworks. This starter is built around A2UI v0.9. [Spec →](https://a2ui.org/specification/v0.9-a2ui/) · [Repo →](https://github.com/google/A2UI)
 - **[AG-UI](https://docs.ag-ui.com/)** — Open, lightweight, event-based protocol that standardizes how agents connect to user-facing apps. Originated from CopilotKit; now maintained by the [AG-UI Protocol working group](https://github.com/ag-ui-protocol/ag-ui). AG-UI carries A2UI envelopes between the LangGraph agent and the Next.js runtime here.
-- **[CopilotKit](https://docs.copilotkit.ai/)** — The runtime that wires AG-UI through your Next.js app and ships the A2UI renderer. The chat UI, envelope inspector, and provider plumbing all come from here. AI-assistant skills + MCP server at [`docs.copilotkit.ai/built-in-agent/build-with-agents`](https://docs.copilotkit.ai/built-in-agent/build-with-agents).
+- **[CopilotKit](https://docs.copilotkit.ai/)** — The runtime that wires AG-UI through your Next.js app and ships the A2UI renderer. The chat UI, the in-canvas surface renderer, and provider plumbing all come from here. AI-assistant skills + MCP server at [`docs.copilotkit.ai/built-in-agent/build-with-agents`](https://docs.copilotkit.ai/built-in-agent/build-with-agents).
 - **[LangGraph (Python)](https://langchain-ai.github.io/langgraph/)** — The agent loop that emits A2UI envelopes via tool-calls. Two graphs ship by default — a **fixed-schema** dashboard agent and a **dynamic-schema** Q&A agent — served over a FastAPI app (`agent/main.py`, `uvicorn main:app` on `:8123`) that exposes `/fixed`, `/dynamic`, and `/legal`. Boots via `uv`.
 - **[Gemini 3.5 Flash](https://aistudio.google.com/)** — Default LLM via the native Google Gen AI SDK (`langchain-google-genai`). Free tier, no credit card. The native SDK is required to handle thought-signature replay across tool turns — see [FROZEN.md](FROZEN.md) for the Gemini 3.x trap history.
 
@@ -58,9 +58,9 @@ Try it:
 2. *"Break the revenue down by region as a bar chart."* → a dynamic surface invents the chart from the document.
 3. *"Summarise the risks as a bulleted callout."* → a dynamic surface composes a callout + bullet list.
 
-Every surface is generated on demand: the agent picks the components, emits an A2UI envelope, the renderer turns it into React. The envelope inspector (right rail, default chrome) shows the raw protocol — that's how you know A2UI is actually working.
+Every surface is generated on demand: the agent picks the components, emits an A2UI envelope, the renderer turns it into React. The surface paints into the canvas beside the chat, with a `MirrorRenderer` pill echoing it inline — that's how you know A2UI is actually working.
 
-> **No `GEMINI_API_KEY` handy?** The agent still serves real A2UI surfaces and the inspector still shows the wire. (The legacy `OFFLINE=1` pre-baked-envelope path belongs to the archived PortKit demo — see [`other-examples/portkit/`](other-examples/portkit/).) Useful for flaky venue Wi-Fi.
+> **No `GEMINI_API_KEY` handy?** The agent still serves real A2UI surfaces and the canvas still paints them. (The legacy `OFFLINE=1` pre-baked-envelope path belongs to the archived PortKit demo — see [`other-examples/portkit/`](other-examples/portkit/).) Useful for flaky venue Wi-Fi.
 
 > **Demoing live?** Have a tested PDF ready and run the walkthrough above. (The previous on-stage script belonged to the archived PortKit demo — see [`other-examples/portkit/DEMO.md`](other-examples/portkit/DEMO.md).)
 

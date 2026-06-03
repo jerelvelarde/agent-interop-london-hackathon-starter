@@ -9,7 +9,6 @@
 // drop it in without breaking anything.
 //
 // Don't touch:
-//   - src/components/EnvelopeInspector.tsx (judging chrome)
 //   - chat affordances in src/app/page.tsx
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 

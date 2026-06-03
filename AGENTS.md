@@ -51,12 +51,12 @@ Read `HACKATHON.md` for the customization recipes.
    across tool turns is not implemented by `langchain-openai`. The
    OpenAI-compat path is documented as a fallback in `FROZEN.md` § LLM
    provider (sticks on `gemini-2.5-flash` for the same reason).
-5. **Edit `src/components/EnvelopeInspector.tsx` with care.** It is the
-   hackathon's "show the wire" affordance and ships **visible by default**. It
-   may be hidden via its header control (the preference persists in
-   `localStorage`, owned by the page shell; reopen from the slim edge tab) and
-   it scopes to the active surface by default — but it must never start hidden
-   on first load.
+5. **(Removed — no EnvelopeInspector.)** The pdf-analyst approach no longer
+   ships a "show the wire" envelope-inspector rail. The agent's A2UI output is
+   surfaced two ways instead: the in-canvas `SurfaceCanvas`
+   (`src/components/pdf-analyst/SurfaceCanvas.tsx`) renders the live surface,
+   and the chat `MirrorRenderer` pill echoes it inline. Don't reintroduce a
+   standalone inspector component.
 6. **Don't write new React renderers for A2UI primitives.** Use the catalog
    + theme system. The renderer is provided by `@copilotkit/a2ui-renderer`.
 
@@ -141,7 +141,7 @@ When the hacker says:
   `src/app/(pdf)/pdf-analyst.css`, and `src/hooks/use-theme.tsx`. Don't
   restructure components. Don't bump deps.
 - **"re-brand it"** → edit `src/components/pdf-analyst/Brand.tsx`. Don't
-  touch the envelope inspector or chat affordances.
+  touch the chat affordances.
 - **"make it about Y"** (e.g. a different document type) → tune the
   extraction prompt in `agent/src/pdf_tools.py` and the agent system prompts
   in `agent/src/fixed_agent.py` / `agent/src/dynamic_agent.py`. The data is
@@ -158,9 +158,9 @@ When the hacker says:
   pdf-analyst demo already ships: `@ag-ui/client` and `@ag-ui/core`
   (`^0.0.53`), plus `recharts` for charts and `pdfjs-dist` for client-side
   PDF parsing — see `FROZEN.md`.
-- The envelope inspector ships visible by default. A hide control + persisted
-  preference is allowed (added intentionally), but don't make it hidden by
-  default — teams shouldn't accidentally ship with the wire hidden.
+- Don't reintroduce an envelope-inspector rail. The pdf-analyst demo surfaces
+  A2UI through the in-canvas `SurfaceCanvas` plus the chat `MirrorRenderer`
+  pill — there's no separate "show the wire" panel to keep visible.
 - Don't hand-roll React renderers for A2UI primitives. Use the catalog +
   theme system. (`@copilotkit/a2ui-renderer` owns rendering.)
 - Don't change the `ChatGoogleGenerativeAI(...)` model call (in

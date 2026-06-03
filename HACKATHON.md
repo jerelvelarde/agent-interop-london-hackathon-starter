@@ -168,8 +168,7 @@ The pdf-analyst pages compose their chrome from `Brand.tsx`:
 > group. They belong to the archived PortKit shell — don't wire them into the
 > pdf-analyst pages unless you mean to.
 
-**Don't touch:** `EnvelopeInspector.tsx` (this is judging chrome — it must
-stay visible). The chat affordances.
+**Don't touch:** the chat affordances.
 
 ---
 
@@ -343,10 +342,10 @@ You almost certainly have headroom. But if you see a `429` in chat:
 A2UI is a wire protocol. When envelopes hit the renderer and nothing shows,
 the bug is in the envelope, not the React tree. Debug systematically:
 
-1. **Check the envelope inspector** (right rail, default chrome). Did the
-   agent emit `createSurface`? `updateComponents`? `updateDataModel`? All
-   three are required. Missing one means the agent never finished the
-   handshake.
+1. **Check the canvas** (beside the chat) and the `MirrorRenderer` pill in
+   the conversation. Did the agent emit `createSurface`? `updateComponents`?
+   `updateDataModel`? All three are required. Missing one means the agent
+   never finished the handshake — and the canvas stays on its empty state.
 2. **Check the catalog mirror.** If you added a component, is it in BOTH
    `src/a2ui/catalog/definitions.ts` (+ a renderer in `renderers.tsx`) AND
    `agent/src/catalog.py`'s `CATALOG_PROMPT`? If the agent emits a component
@@ -386,8 +385,8 @@ demo — judges remember broken demos more than missing features.
 - [ ] **Known-good PDF in hand.** The pdf-analyst demo has no `OFFLINE=1`
       pre-baked path (that shipped with the archived PortKit demo) — a tested
       document + a tight script is your insurance.
-- [ ] **Envelope inspector is visible** and shows real envelopes (not just
-      the "no envelopes yet" empty state).
+- [ ] **The canvas paints a real surface** (not just the "Canvas is empty"
+      empty state) when you run your demo prompt.
 - [ ] **Read the sponsor footer.** Google DeepMind, CopilotKit, A2A Net —
       credit them, judges will notice.
 

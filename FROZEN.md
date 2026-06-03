@@ -107,8 +107,8 @@ fallback pool), this is comfortable headroom. Three rate-limit mitigations
 are sufficient; we do NOT need to ship a shared key.
 
 > **HACKATHON.md "if you get rate-limited" runbook:** if a `429` ever appears
-> in chat, fall back to `OFFLINE=1` for the demo. The envelope inspector still
-> shows real A2UI surfaces from `public/offline-envelopes.json`.
+> in chat, fall back to `OFFLINE=1` for the demo. The canvas still paints
+> real A2UI surfaces from `public/offline-envelopes.json`.
 
 ## Pinned versions (JavaScript)
 

@@ -631,11 +631,11 @@ export default function CatalogPage() {
           <span>
             Definitions:{" "}
             <code className="mono px-1.5 py-0.5 rounded bg-[var(--surface-soft)] border border-[var(--line)] text-[11px]">
-              web/src/a2ui/catalog/definitions.ts
+              src/a2ui/catalog/definitions.ts
             </code>{" "}
             · Renderers:{" "}
             <code className="mono px-1.5 py-0.5 rounded bg-[var(--surface-soft)] border border-[var(--line)] text-[11px]">
-              web/src/a2ui/catalog/renderers.tsx
+              src/a2ui/catalog/renderers.tsx
             </code>
           </span>
           <span className="mono">v0.2</span>

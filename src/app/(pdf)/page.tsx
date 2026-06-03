@@ -110,7 +110,7 @@ export default function Home() {
           <span>
             Drop your design tokens into{" "}
             <code className="mono px-1.5 py-0.5 rounded bg-[var(--surface-soft)] border border-[var(--line)] text-[11px]">
-              web/src/a2ui/theme.css
+              src/a2ui/theme.css
             </code>{" "}
             to re-skin every surface.
           </span>

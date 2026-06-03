@@ -42,14 +42,25 @@ export function ExampleLayout({ chatContent, appContent }: ExampleLayoutProps) {
     <div className="h-full flex flex-row pb-6">
       {/* ModeToggle hidden — agents can still flip via useFrontendTool */}
 
-      {/* Chat Content — intentional solid card (was a translucent white glass
-          film that read as an accidental white slab next to the canvas). */}
+      {/* Chat Content — a floating card on the ambient backdrop, in the same
+          language as the canvas cards (soft radius + elevation + a faint
+          top-to-bottom gradient) so it no longer reads as a hard pure-white
+          slab with a sharp vertical seam. The inner chat surfaces are
+          transparent (see globals.css §3), so this gradient is what shows
+          behind the messages. */}
       <div
-        className={`max-h-full flex flex-col bg-[var(--card)] border-r border-[var(--border)] shadow-[var(--elevation-sm)] ${
+        className={`max-h-full flex flex-col overflow-hidden px-6 m-3 max-lg:m-2 max-lg:px-4 ${
           mode === "app"
-            ? "w-1/3 px-6 max-lg:hidden" // Hide on mobile in app mode
-            : "flex-1 max-lg:px-4"
+            ? "w-1/3 max-lg:hidden" // Hide on mobile in app mode
+            : "flex-1"
         }`}
+        style={{
+          background:
+            "linear-gradient(177deg, var(--card) 0%, color-mix(in srgb, var(--muted) 55%, var(--card)) 100%)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--radius-lg)",
+          boxShadow: "var(--elevation-md)",
+        }}
       >
         {/* App header lives in BrandFrame (Seam #2); the chat panel is just chat. */}
         <div className="chat-scroll flex-1 min-h-0 overflow-y-auto pt-6 max-lg:pt-4">
@@ -57,12 +68,14 @@ export function ExampleLayout({ chatContent, appContent }: ExampleLayoutProps) {
         </div>
       </div>
 
-      {/* State Panel */}
+      {/* State Panel — no left border: the chat card now floats free with a
+          gap, so the old vertical seam would just be a stray line on the
+          gradient. The canvas reads as cards-on-backdrop, same as the rail. */}
       <div
         className={`h-full overflow-hidden ${
           mode === "app"
-            ? "w-2/3 max-lg:w-full border-l border-[var(--border)] max-lg:border-l-0" // Full width on mobile
-            : "w-0 border-l-0"
+            ? "w-2/3 max-lg:w-full" // Full width on mobile
+            : "w-0"
         }`}
       >
         <div className="w-full lg:w-[66.666vw] h-full">{appContent}</div>

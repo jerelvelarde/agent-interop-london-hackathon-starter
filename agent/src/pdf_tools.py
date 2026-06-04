@@ -12,11 +12,24 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 # We keep the extractor model cheap; this is structured JSON work, not chat.
 # Gemini 3.5 Flash via the native Google Gen AI SDK — same provider as the
 # primary agents (see main.py / FROZEN.md "LLM provider").
-_EXTRACTOR = ChatGoogleGenerativeAI(
-    model=os.getenv("MODEL", "gemini-3.5-flash"),
-    google_api_key=os.getenv("GEMINI_API_KEY"),
-    temperature=0,
-)
+#
+# Constructed lazily (not at import time): ChatGoogleGenerativeAI validates
+# the API key in its constructor and raises with no key. Building it on first
+# use lets `import main` succeed with OFFLINE=1 and no key (the OFFLINE /fixed
+# path never reaches these tools). Online behavior is unchanged — the client
+# is built the first time a tool runs, then cached.
+_EXTRACTOR: ChatGoogleGenerativeAI | None = None
+
+
+def _extractor() -> ChatGoogleGenerativeAI:
+    global _EXTRACTOR
+    if _EXTRACTOR is None:
+        _EXTRACTOR = ChatGoogleGenerativeAI(
+            model=os.getenv("MODEL", "gemini-3.5-flash"),
+            google_api_key=os.getenv("GEMINI_API_KEY"),
+            temperature=0,
+        )
+    return _EXTRACTOR
 
 
 class Kpi(TypedDict):
@@ -92,7 +105,7 @@ Return JSON with this shape:
 }}
 Return ONLY the JSON object.
 """
-    out = _EXTRACTOR.invoke([("system", sys), ("user", user)])
+    out = _extractor().invoke([("system", sys), ("user", user)])
     raw = _strip_to_json(out.content if isinstance(out.content, str) else str(out.content))
     # Validate. fall back to a tiny placeholder if the LLM produced invalid JSON.
     try:
@@ -148,7 +161,7 @@ Return JSON shaped like:
   "data": <payload above>
 }}
 """
-    out = _EXTRACTOR.invoke([("system", sys), ("user", user)])
+    out = _extractor().invoke([("system", sys), ("user", user)])
     raw = _strip_to_json(out.content if isinstance(out.content, str) else str(out.content))
     try:
         json.loads(raw)  # validate

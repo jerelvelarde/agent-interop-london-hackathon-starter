@@ -95,11 +95,49 @@ def render_a2ui(
 # tool_call. Gemini 3.5 Flash via the native Google Gen AI SDK. Forced
 # tool_choice across multi-turn replay is proven viable on this SDK
 # (no thought_signature 400) — see FROZEN.md "LLM provider".
-_RENDER_MODEL = ChatGoogleGenerativeAI(
-    model=os.getenv("MODEL", "gemini-3.5-flash"),
-    google_api_key=os.getenv("GEMINI_API_KEY"),
-    temperature=0,
-)
+#
+# Constructed lazily (not at import time): ChatGoogleGenerativeAI validates
+# the API key in its constructor and raises with no key. Building it on first
+# use lets `import main` succeed with OFFLINE=1 and no key. /dynamic still
+# requires a key — the client is built the first time the dynamic agent
+# actually runs (generate_a2ui or the agent's model node), so online behavior
+# is unchanged.
+_RENDER_MODEL: ChatGoogleGenerativeAI | None = None
+
+
+def _render_model() -> ChatGoogleGenerativeAI:
+    global _RENDER_MODEL
+    if _RENDER_MODEL is None:
+        _RENDER_MODEL = ChatGoogleGenerativeAI(
+            model=os.getenv("MODEL", "gemini-3.5-flash"),
+            google_api_key=os.getenv("GEMINI_API_KEY"),
+            temperature=0,
+        )
+    return _RENDER_MODEL
+
+
+class _LazyRenderModel:
+    """Defers ChatGoogleGenerativeAI construction until the dynamic agent's
+    model node first touches it (profile / bind_tools / bind / invoke).
+
+    create_agent stores the model at build time but only calls into it at
+    invoke time, so wrapping it here means `import main` (and thus building
+    the graph) never constructs a Gemini client — yet every /dynamic request
+    uses the real model exactly as before. Online behavior is unchanged.
+    """
+
+    @property
+    def profile(self) -> Any:
+        return _render_model().profile
+
+    def bind_tools(self, *args: Any, **kwargs: Any) -> Any:
+        return _render_model().bind_tools(*args, **kwargs)
+
+    def bind(self, *args: Any, **kwargs: Any) -> Any:
+        return _render_model().bind(*args, **kwargs)
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(_render_model(), name)
 
 
 @tool()
@@ -148,7 +186,7 @@ def generate_a2ui(runtime: ToolRuntime[Any]) -> str:
         "keys, no trailing commas, no comments)."
     )
 
-    model_with_tool = _RENDER_MODEL.bind_tools(
+    model_with_tool = _render_model().bind_tools(
         [render_a2ui], tool_choice="render_a2ui"
     )
     response = model_with_tool.invoke(
@@ -277,8 +315,12 @@ above. Skip charts unless the user explicitly asked for data viz.
 
 
 def build_dynamic_agent():
+    # _LazyRenderModel defers the Gemini client construction to first use, so
+    # building the graph at import never needs a key. /dynamic still requires
+    # a key the moment a request hits it (the proxy constructs the real model
+    # then). Online behavior is unchanged.
     return create_agent(
-        model=_RENDER_MODEL,
+        model=_LazyRenderModel(),
         tools=[query_pdf, generate_a2ui],
         middleware=[CopilotKitMiddleware()],
         system_prompt=SYSTEM_PROMPT,

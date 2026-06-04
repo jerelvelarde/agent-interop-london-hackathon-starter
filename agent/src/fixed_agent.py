@@ -187,15 +187,32 @@ more than two suggestions.
 # dynamic agent and the PDF extractor (see FROZEN.md "LLM provider"). The
 # native SDK replays Gemini's thought_signature across tool turns, which the
 # OpenAI-compat path does not.
-_MODEL = ChatGoogleGenerativeAI(
-    model=os.getenv("MODEL", "gemini-3.5-flash"),
-    google_api_key=os.getenv("GEMINI_API_KEY"),
-)
+#
+# Constructed lazily (not at import time): ChatGoogleGenerativeAI validates
+# the API key in its constructor and raises with no key. Building it lazily
+# lets `import main` succeed with OFFLINE=1 and no key (the offline branch of
+# build_fixed_agent never touches the live model). Online behavior is
+# unchanged — the client is built on the first build_fixed_agent() call.
+def _build_model() -> ChatGoogleGenerativeAI:
+    return ChatGoogleGenerativeAI(
+        model=os.getenv("MODEL", "gemini-3.5-flash"),
+        google_api_key=os.getenv("GEMINI_API_KEY"),
+    )
 
 
 def build_fixed_agent():
+    if os.getenv("OFFLINE") == "1":
+        # CUSTOMIZATION SEAM (offline): no Gemini call, no API key. A
+        # deterministic stub chat model drives the REAL create_agent ReAct
+        # loop + the REAL render_dashboard tool, so the emitted A2UI envelope
+        # is byte-for-byte the production shape (createSurface +
+        # updateComponents + updateDataModel wrapped in a2ui_operations).
+        from src.offline_fixed import build_offline_fixed_agent
+
+        return build_offline_fixed_agent(render_dashboard, SYSTEM_PROMPT)
+
     return create_agent(
-        model=_MODEL,
+        model=_build_model(),
         tools=[render_dashboard],
         # CopilotKitMiddleware forwards frontend tools + agent context (e.g.
         # useAgentContext payloads) to the LLM.

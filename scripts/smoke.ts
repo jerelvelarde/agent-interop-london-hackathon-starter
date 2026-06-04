@@ -24,6 +24,13 @@
  *   6. agent endpoint probe             — import agent/main.py's FastAPI app and assert
  *                                         /fixed, /dynamic, /legal are registered
  *                                         (static import; no live model call)
+ *   6a. offline /fixed probe            — with OFFLINE=1 and GEMINI_API_KEY removed,
+ *                                         import the /fixed graph and invoke it
+ *                                         in-process; assert the tool result carries
+ *                                         real A2UI surface ops (createSurface /
+ *                                         updateComponents / updateDataModel). FAILS
+ *                                         loudly if the no-key offline path errors or
+ *                                         emits no surface. No uvicorn, no port, no key.
  *   7. agent connectivity probe (live)  — SKIPPED when OFFLINE=1 or no GEMINI_API_KEY
  *
  * Exit non-zero if any step fails. Machine-parsable summary at the end.
@@ -338,6 +345,102 @@ sys.exit(0)
       // Likely env issue (missing venv or python). Don't fail smoke; warn loudly.
       console.log(
         `${YELLOW}!${RESET} ${DIM}agent endpoint probe could not run (exit ${res.status}). Run \`pnpm install:agent\` to bootstrap the venv.${RESET}\n`,
+      );
+      return { pass: true, detail: `skipped (probe exit ${res.status})` };
+    },
+  },
+  {
+    name: "offline /fixed probe (OFFLINE=1, no key → real A2UI surface)",
+    run: async () => {
+      // The OFFLINE=1 gate. The endpoint probe above proves the app IMPORTS;
+      // this proves the /fixed graph actually PAINTS a surface offline. It
+      // imports the /fixed graph and invokes it in-process (no uvicorn, no
+      // port) with OFFLINE=1 and GEMINI_API_KEY explicitly removed, then
+      // asserts the emitted tool result carries the A2UI surface ops
+      // (a2ui_operations / createSurface / updateComponents / updateDataModel).
+      // This closes the "smoke green while `dev` fails" gap: a regression that
+      // breaks the no-key offline emission (e.g. an eager Gemini client or a
+      // broken stub) FAILS here loudly.
+      const agentDir = join(REPO_ROOT, "agent");
+      const mainPy = join(agentDir, "main.py");
+      if (!existsSync(mainPy)) {
+        console.log(
+          `${YELLOW}!${RESET} ${DIM}agent/main.py not found. Skipping offline /fixed probe.${RESET}\n`,
+        );
+        return { pass: true, detail: "skipped (no agent/main.py)" };
+      }
+      const venvPython = join(agentDir, ".venv", "bin", "python");
+      const pythonBin = existsSync(venvPython) ? venvPython : "python3";
+      if (!existsSync(venvPython)) {
+        console.log(
+          `${YELLOW}!${RESET} ${DIM}agent/.venv/bin/python not found — using system python3. Run \`pnpm install:agent\` to bootstrap.${RESET}\n`,
+        );
+      }
+      const script = `
+import sys
+
+try:
+    from langchain_core.messages import HumanMessage, ToolMessage
+    from src.fixed_agent import graph
+except Exception as e:
+    import traceback
+    traceback.print_exc()
+    print(f"\\nFAIL: importing the /fixed graph (OFFLINE=1, no key) raised {type(e).__name__}: {e}")
+    sys.exit(1)
+
+try:
+    result = graph.invoke(
+        {"messages": [HumanMessage("show the dashboard")]},
+        config={"configurable": {"thread_id": "smoke-offline"}},
+    )
+except Exception as e:
+    import traceback
+    traceback.print_exc()
+    print(f"\\nFAIL: invoking the offline /fixed graph raised {type(e).__name__}: {e}")
+    sys.exit(1)
+
+tool_msgs = [m for m in result.get("messages", []) if isinstance(m, ToolMessage)]
+if not tool_msgs:
+    print("FAIL: offline /fixed produced no ToolMessage — no A2UI surface emitted.")
+    sys.exit(1)
+
+content = "".join(str(m.content) for m in tool_msgs)
+markers = ["a2ui_operations", "createSurface", "updateComponents", "updateDataModel"]
+missing = [mk for mk in markers if mk not in content]
+if missing:
+    print(f"FAIL: offline /fixed tool result is missing A2UI surface markers: {missing}")
+    sys.exit(1)
+
+for mk in markers:
+    print(f"  OK: {mk}")
+print("\\nOffline /fixed emitted a real A2UI surface (no key, OFFLINE=1).")
+sys.exit(0)
+`;
+      // Explicitly REMOVE the key so this proves the no-key path. Unlike the
+      // endpoint probe (which supplies a placeholder), the whole point here is
+      // that OFFLINE=1 needs no key at all. Strip both env names the SDK reads
+      // (GEMINI_API_KEY / GOOGLE_API_KEY) by destructuring them out of the
+      // inherited env, then force OFFLINE=1.
+      const {
+        GEMINI_API_KEY: _gemini,
+        GOOGLE_API_KEY: _google,
+        ...envWithoutKeys
+      } = process.env;
+      const offlineEnv = { ...envWithoutKeys, FORCE_COLOR: "1", OFFLINE: "1" };
+      const res = spawnSync(pythonBin, ["-c", script], {
+        cwd: agentDir,
+        stdio: "inherit",
+        env: offlineEnv,
+      });
+      if (res.status === 0) {
+        return { pass: true, detail: "offline /fixed painted a real A2UI surface (no key)" };
+      }
+      if (res.status === 1) {
+        return { pass: false, detail: "offline /fixed did not emit an A2UI surface (no key)" };
+      }
+      // Non-1 exit: probe couldn't run (missing venv/python). Warn, don't fail.
+      console.log(
+        `${YELLOW}!${RESET} ${DIM}offline /fixed probe could not run (exit ${res.status}). Run \`pnpm install:agent\` to bootstrap the venv.${RESET}\n`,
       );
       return { pass: true, detail: `skipped (probe exit ${res.status})` };
     },

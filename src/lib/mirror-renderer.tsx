@@ -20,7 +20,7 @@ import { pushSurface } from "@/lib/surface-bus";
  * The exported array MUST stay referentially stable — `<CopilotKit>` throws on
  * a changing `renderActivityMessages` prop — so it lives at module scope and is
  * imported into layout.tsx as-is. Verified available on the FROZEN
- * @copilotkit/react-core 1.56.5 (see the D6 spike).
+ * @copilotkit/react-core 1.57.4 (see the D6 spike).
  */
 
 function MirrorBreadcrumb({ content }: { content: Record<string, unknown> }) {

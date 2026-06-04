@@ -1,25 +1,35 @@
 # vendor/ — defensive fallback mirror
 
-This directory holds **frozen tarball mirrors** of the two load-bearing CopilotKit
+This directory holds **frozen mirrors** of the two load-bearing CopilotKit
 packages this starter pins:
 
 | Package | Vendored as | Pinned version |
 |---|---|---|
-| `@copilotkit/a2ui-renderer` | `vendor/copilotkit-a2ui-renderer/` (extracted) | `1.56.5` |
-| `copilotkit` (Python SDK) | `vendor/copilotkit-python/copilotkit-0.1.87-py3-none-any.whl` | `0.1.87` |
+| `@copilotkit/a2ui-renderer` | `vendor/copilotkit-a2ui-renderer/` (extracted) | `1.57.4` |
+| `copilotkit` (Python SDK) | `vendor/copilotkit-python/copilotkit-0.1.93-py3-none-any.whl` | `0.1.93` |
 
-**Frozen on:** 2026-05-28 (matches `FROZEN.md`).
+**Re-snapshotted:** 2026-06-03 — refreshed to match the 2026-05-29 pin bump
+(`@copilotkit/a2ui-renderer 1.56.5 → 1.57.4`; `copilotkit 0.1.87 → 0.1.93`).
+Matches `FROZEN.md`.
 **Forked from:** `CopilotKit/CopilotKit@upstream/main`, commit `23af69041`.
+
+> **The Python wheel matters more than it looks.** The `copilotkit` `0.1.4x–0.1.9x`
+> line is **yanked from public PyPI** — a plain `pip download copilotkit==0.1.93`
+> fails (public PyPI tops out at `0.1.39`). Install still works because
+> `agent/uv.lock` pins the exact version + hash, but if PyPI ever deletes the
+> yanked files, **this vendored wheel is the only retained copy.** The wheel here
+> was reconstructed from uv's local archive cache — the same bits `uv sync`
+> installed (verified `unzip -t` clean, RECORD/METADATA/WHEEL intact).
 
 ## Why we vendor
 
-The hackathon is a single 5-hour build slot. Between fork date (2026-05-28) and
-event day, upstream could:
+The hackathon is a single 5-hour build slot. Between fork date and event day,
+upstream could:
 
-- Cut a breaking `1.56.x` patch that breaks the renderer for a subset of envelope
+- Cut a breaking `1.57.x` patch that breaks the renderer for a subset of envelope
   shapes the demo relies on.
-- Yank `1.56.5` from npm (unlikely but not zero).
-- Have an npm registry outage on the morning of the event.
+- Yank `1.57.4` from npm (unlikely but not zero).
+- Have an npm / PyPI registry outage on the morning of the event.
 
 Any of those would brick the starter for the day. The vendored mirror is
 **break-glass insurance** — if any of the above happens, every team can flip a
@@ -37,7 +47,7 @@ In `package.json`, change:
 
 ```jsonc
 "dependencies": {
-  "@copilotkit/a2ui-renderer": "1.56.5",
+  "@copilotkit/a2ui-renderer": "1.57.4",
   // ...
 }
 ```
@@ -64,28 +74,15 @@ specifier to a local directory instead of the npm registry.
 
 ### Python (`copilotkit`)
 
-In `agent/pyproject.toml`, change the line:
-
-```toml
-"copilotkit==0.1.87",
-```
-
-to:
-
-```toml
-"copilotkit @ file:./vendor/copilotkit-python/copilotkit-0.1.87-py3-none-any.whl",
-```
-
-(The path is relative to `pyproject.toml`, so from `agent/` you need to point at
-`../vendor/copilotkit-python/...`. Adjust per your layout.) Alternatively, add an
-explicit `[tool.uv.sources]` entry:
+In `agent/pyproject.toml`, the dependency is pinned as `"copilotkit>=0.1.90"`.
+Add an explicit `[tool.uv.sources]` entry pointing at the vendored wheel:
 
 ```toml
 [tool.uv.sources]
-copilotkit = { path = "../vendor/copilotkit-python/copilotkit-0.1.87-py3-none-any.whl" }
+copilotkit = { path = "../vendor/copilotkit-python/copilotkit-0.1.93-py3-none-any.whl" }
 ```
 
-Then:
+(The path is relative to `agent/pyproject.toml`.) Then:
 
 ```bash
 cd agent
@@ -108,25 +105,31 @@ the app needs — re-vendor before shipping.
 
 ## How to refresh the vendor mirror
 
-If we need to update the pinned version (after the event, or during a
-deliberate FROZEN.md bump):
+After a deliberate `FROZEN.md` pin bump, re-snapshot both mirrors.
 
 ```bash
-# JavaScript
+# JavaScript — extract the installed (lockfile-verified) package bits
 rm -rf vendor/copilotkit-a2ui-renderer
 mkdir vendor/copilotkit-a2ui-renderer
-cd vendor/copilotkit-a2ui-renderer
-npm pack @copilotkit/a2ui-renderer@<new-version>
-tar -xzf copilotkit-a2ui-renderer-<new-version>.tgz --strip-components=1
-rm copilotkit-a2ui-renderer-<new-version>.tgz
-
-# Python
-rm vendor/copilotkit-python/*.whl
-uv run --python 3.12 --with pip python -m pip download \
-  copilotkit==<new-version> --no-deps -d vendor/copilotkit-python/
+cp -RL node_modules/@copilotkit/a2ui-renderer/. vendor/copilotkit-a2ui-renderer/
 ```
 
-Update `FROZEN.md` with the new version + verification date in the same commit.
+For the Python wheel, **`pip download` will not work** while the target version
+is yanked from public PyPI. Reconstruct it from uv's local archive cache (the
+bits `uv sync` already installed):
+
+```bash
+VER=0.1.93
+DI=$(find "$HOME/.cache/uv/archive-v0" -maxdepth 2 -name "copilotkit-$VER.dist-info" -type d | head -1)
+SRC=$(dirname "$DI")
+rm -f vendor/copilotkit-python/*.whl
+( cd "$SRC" && zip -rqX "/tmp/copilotkit-$VER-py3-none-any.whl" copilotkit "copilotkit-$VER.dist-info" )
+mv "/tmp/copilotkit-$VER-py3-none-any.whl" vendor/copilotkit-python/
+unzip -tq vendor/copilotkit-python/copilotkit-$VER-py3-none-any.whl   # integrity check
+```
+
+Update `FROZEN.md` (and the table above) with the new version + date in the same
+commit.
 
 ## What is NOT vendored
 

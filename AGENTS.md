@@ -174,7 +174,7 @@ When the hacker says:
 
 The "slash command vocabulary" above lists recipes, not real CLI commands.
 Follow them when the hacker types them in chat. Skills live at:
-`.claude/skills/create-a2ui-widget/SKILL.md` (when Workstream F lands).
+`.claude/skills/create-a2ui-widget/SKILL.md`.
 
 Useful grep starting points:
 - `grep -r "CUSTOMIZATION SEAM" .` — find all seams in two seconds
@@ -186,7 +186,7 @@ Useful grep starting points:
 
 ## Gemini CLI users
 
-`.gemini/settings.json` (added in Workstream F) sets trust roots and adds
+`.gemini/settings.json` sets trust roots and adds
 `AGENTS.md` to the context filename list. The starter is fully trusted.
 
 Useful one-liners:
@@ -199,7 +199,7 @@ Useful one-liners:
 Linux Foundation) read natively by Cursor, Windsurf, Codex CLI, Kilo Code,
 Aider, and Sourcegraph Cody. No extra config needed.
 
-`.vscode/settings.json` + `.vscode/extensions.json` (added in Workstream F)
+`.vscode/settings.json` + `.vscode/extensions.json`
 enable the CopilotKit A2UI catalog preview extension and recommend it on
 first open.
 

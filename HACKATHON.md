@@ -56,12 +56,13 @@ half-shipped component.
 - `src/hooks/use-theme.tsx` — dark/light/system toggle (see §2 for the UI).
 
 > **Quick note on the chat framework workarounds.** `src/app/globals.css`
-> ends with a clearly labelled block of defensive CSS overrides that patch
-> known issues on our pinned CopilotKit version: restoring `pointer-events`
-> on items below the input pill (disclaimer slot), adding a cushion below the
-> chat input, and making chat descendants transparent so the frosted backdrop
-> shows through. Leave them in place — the CopilotKit version is
-> [FROZEN](FROZEN.md), so you can't upgrade past it anyway.
+> ends with a clearly labelled block of three defensive CSS overrides that
+> patch known issues on our pinned CopilotKit `1.57.4`: (1) restoring
+> `pointer-events` on items below the input pill (disclaimer slot),
+> (2) adding a default 12px cushion below the chat input, and
+> (3) making chat descendants transparent so the frosted backdrop shows
+> through. Leave them in place unless you upgrade CopilotKit past 1.57.4
+> — and you can't, because it's [FROZEN](FROZEN.md).
 
 **Recipe:**
 

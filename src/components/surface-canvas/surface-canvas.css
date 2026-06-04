@@ -1,0 +1,60 @@
+/* Surface paint-in — staggered entrance for the rendered A2UI surface.
+ *
+ * The frozen one-shot `a2ui.render()` ships the whole component tree in a
+ * single op (the canonical other-examples/a2ui-pdf-analyst showcase is
+ * one-shot too), so there is nothing to stream off the wire. Rather than
+ * fabricate a fake partial-tree reveal, we render the real, complete, valid
+ * surface and let CSS stagger its top-level sections in — a cosmetic
+ * entrance that mirrors the chat column's `.chat-scroll > *` pattern
+ * (src/components/example-layout/example-layout.css).
+ *
+ * Selector: the A2UI renderer wraps every surface in a `.a2ui-surface`
+ * container (a stable renderer class — see also the pdf-analyst example).
+ * Its single child is the surface root component (a Column); that root's
+ * children are the top-level sections (title, KPI row, timeline, project
+ * cards). So `.a2ui-surface > * > *` == the sections, regardless of how many
+ * layout wrappers the renderer nests above `.a2ui-surface`. We scope it under
+ * `.surface-paint-in` so only the canvas surface animates, and it re-fires
+ * per surface because that wrapper is keyed by surfaceId in index.tsx.
+ */
+
+@keyframes surface-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stagger the surface root's section children. */
+.surface-paint-in .a2ui-surface > * > * {
+  animation: surface-enter 320ms ease-out both;
+}
+.surface-paint-in .a2ui-surface > * > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.surface-paint-in .a2ui-surface > * > *:nth-child(2) {
+  animation-delay: 70ms;
+}
+.surface-paint-in .a2ui-surface > * > *:nth-child(3) {
+  animation-delay: 140ms;
+}
+.surface-paint-in .a2ui-surface > * > *:nth-child(4) {
+  animation-delay: 210ms;
+}
+.surface-paint-in .a2ui-surface > * > *:nth-child(5) {
+  animation-delay: 280ms;
+}
+.surface-paint-in .a2ui-surface > * > *:nth-child(n + 6) {
+  animation-delay: 350ms;
+}
+
+/* Respect reduced-motion: no entrance animation, surface just appears. */
+@media (prefers-reduced-motion: reduce) {
+  .surface-paint-in .a2ui-surface > * > * {
+    animation: none;
+  }
+}

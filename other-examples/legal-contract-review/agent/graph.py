@@ -23,6 +23,7 @@ from pathlib import Path
 from copilotkit import CopilotKitMiddleware
 from langchain.agents import create_agent
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langgraph.checkpoint.memory import MemorySaver
 
 _HERE = Path(__file__).resolve().parent
 if str(_HERE) not in sys.path:
@@ -53,6 +54,10 @@ agent = create_agent(
 
         Keep all chat responses to 1-2 sentences. The UI does the heavy lifting.
     """,
+    # ag_ui_langgraph calls graph.aget_state() on every run, which requires a
+    # checkpointer (matches fixed_agent.py / dynamic_agent.py). Without it the
+    # /legal stream raises "No checkpointer set" and no surface paints.
+    checkpointer=MemorySaver(),
 )
 
 graph = agent

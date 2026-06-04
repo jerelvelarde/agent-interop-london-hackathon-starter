@@ -38,7 +38,7 @@ and prints an actionable hint. If the chat doesn't respond, the Python agent
 (FastAPI on `:8123`) probably failed to start — check the `agent` pane in your
 terminal, most commonly a missing `GEMINI_API_KEY`. If Gemini rate-limits you,
 switch to your own free key (https://aistudio.google.com/apikey) and keep a
-tested PDF + tight script on hand — the pdf-analyst demo has no offline
-pre-baked path (that shipped with the archived PortKit demo).
+tested PDF + tight script on hand — `OFFLINE=1` only paints the canned
+`/fixed` sample dashboard, not your uploaded document.
 
 Now `cat HACKATHON.md` (or just open it) and start hacking. Good luck.

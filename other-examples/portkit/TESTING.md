@@ -1,5 +1,9 @@
 # End-to-End Testing Plan
 
+> **Archived — PortKit demo.** This is the PortKit-era test plan, kept with
+> the archived demo under `other-examples/portkit/`. For the pdf-analyst
+> default, the manual demo-day checklist lives in `HACKATHON.md`.
+
 This document is the manual + automated test contract for the PortKit
 demo. Two classes of bug have escaped earlier reviews — they share a
 root cause: **typecheck + JSON validation prove the wire is well-formed,

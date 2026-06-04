@@ -16,9 +16,11 @@
   Loom, OBS, or QuickTime all fine.
 - **One-paragraph pitch** — what your demo does, what domain you re-skinned to,
   what makes it memorable.
-- **Envelope sample** — paste 1–2 A2UI envelopes from your envelope inspector
-  into the submission. Judges want to see real A2UI is firing. Right rail of
-  the app → click the copy-to-clipboard icon next to any `createSurface`.
+- **Envelope sample** — paste 1–2 A2UI envelopes the agent streamed during
+  your demo (the `createSurface` / `updateComponents` ops) into the
+  submission. Judges want to see real A2UI is firing. Grab them from the
+  browser DevTools Network tab on the request to `/fixed` or `/dynamic`, or
+  from the `agent` terminal pane.
 
 ## Sponsor credit
 
@@ -33,9 +35,11 @@ If you wired a partner agent via Seam #6, also include:
 
 ## Backup plan
 
-If your live demo flakes during judging, the `OFFLINE=1` path is your insurance.
-The envelope inspector still shows real A2UI surfaces from
-`public/offline-envelopes.json` — same protocol, no network. Don't sweat it.
+If your live demo flakes during judging, `OFFLINE=1` is your insurance for the
+`/fixed` view: it paints a real A2UI surface from a built-in canned sample
+(`agent/src/offline_sample.py`) — no Gemini call, no network. It shows the
+sample dashboard, not your uploaded PDF, and `/dynamic` still needs a key, so
+keep a tested document + tight script on hand too. Don't sweat it.
 
 > This doc is a stub. The canonical submission link and Vercel deploy button
 > land here once the submission platform is announced.

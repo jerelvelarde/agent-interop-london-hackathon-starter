@@ -107,8 +107,11 @@ fallback pool), this is comfortable headroom. Three rate-limit mitigations
 are sufficient; we do NOT need to ship a shared key.
 
 > **HACKATHON.md "if you get rate-limited" runbook:** if a `429` ever appears
-> in chat, fall back to `OFFLINE=1` for the demo. The canvas still paints
-> real A2UI surfaces from `public/offline-envelopes.json`.
+> in chat, fall back to `OFFLINE=1` for the demo. The `/fixed` endpoint then
+> paints a real A2UI surface from a built-in canned sample
+> (`agent/src/offline_sample.py` — a Tesla Q3 FY24 dashboard), no Gemini call
+> and no key. It shows the sample, not your uploaded PDF; `/dynamic` and
+> `/legal` still require a key.
 
 ## Pinned versions (JavaScript)
 

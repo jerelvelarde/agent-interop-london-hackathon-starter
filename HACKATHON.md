@@ -329,11 +329,12 @@ You almost certainly have headroom. But if you see a `429` in chat:
    `.env` as `GEMINI_API_KEY=...`.
 2. **Ask a mentor for a fallback key.** There's a small mentor pool for
    teams who didn't register early.
-3. **Have a known-good PDF + script ready.** The pdf-analyst demo has no
-   offline pre-baked path (the `OFFLINE=1` / `public/offline-envelopes.json`
-   insurance shipped with the archived PortKit demo under
-   `other-examples/portkit/`). Your insurance is a tested document and a
-   tight script, so a single retry recovers the demo fast.
+3. **Have a known-good PDF + script ready.** `OFFLINE=1` only paints a canned
+   sample dashboard on `/fixed` (`agent/src/offline_sample.py`, no key) — it
+   can't reproduce *your* uploaded-PDF demo or the `/dynamic` follow-ups (the
+   old `public/offline-envelopes.json` replay shipped only with the archived
+   PortKit demo under `other-examples/portkit/`). Your real insurance is a
+   tested document and a tight script, so a single retry recovers the demo fast.
 
 ---
 
@@ -382,9 +383,9 @@ demo — judges remember broken demos more than missing features.
 - [ ] **Your PDF demo runs three times.** Same document, no mid-demo
       surprises — `/fixed` paints the dashboard, `/dynamic` answers a
       follow-up.
-- [ ] **Known-good PDF in hand.** The pdf-analyst demo has no `OFFLINE=1`
-      pre-baked path (that shipped with the archived PortKit demo) — a tested
-      document + a tight script is your insurance.
+- [ ] **Known-good PDF in hand.** `OFFLINE=1` only paints the canned `/fixed`
+      sample dashboard (no key) — it can't reproduce your uploaded-PDF demo or
+      `/dynamic`, so a tested document + a tight script is your insurance.
 - [ ] **The canvas paints a real surface** (not just the "Canvas is empty"
       empty state) when you run your demo prompt.
 - [ ] **Read the sponsor footer.** Google DeepMind, CopilotKit, A2A Net —

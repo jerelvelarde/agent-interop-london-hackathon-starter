@@ -27,9 +27,9 @@ If you're here because you want to send a real improvement back upstream
   that breaks multi-turn tool-calling on `langchain-openai`. Don't reopen this.
 - New top-level dependencies that duplicate something the base starter
   already provides (e.g. `framer-motion` when CSS transitions suffice).
-- Changes to `src/components/EnvelopeInspector.tsx` that make it toggleable
-  or hide it. The inspector is the hackathon's "show the wire" affordance —
-  judges need to see A2UI is actually firing.
+- Reintroducing a standalone envelope-inspector rail. The pdf-analyst demo
+  surfaces A2UI through the in-canvas `SurfaceCanvas` plus the chat
+  `MirrorRenderer` pill — there's no separate "show the wire" panel.
 - Hand-rolled React renderers for A2UI primitives. Use the catalog + theme
   system; `@copilotkit/a2ui-renderer` owns rendering.
 

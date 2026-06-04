@@ -175,7 +175,7 @@ function parseSemverMinor(v: string): { major: number; minor: number } | null {
         : "not set",
     hint: ok
       ? undefined
-      : "Get a free-tier key: https://aistudio.google.com/apikey — set in agent/.env, or run with OFFLINE=1 for pre-baked envelopes",
+      : "Get a free-tier key: https://aistudio.google.com/apikey — set in agent/.env, or run with OFFLINE=1 for the built-in /fixed sample dashboard",
   });
 }
 
@@ -207,7 +207,7 @@ function parseSemverMinor(v: string): { major: number; minor: number } | null {
     detail: ok ? `reachable (HTTP ${code})` : "unreachable",
     hint: ok
       ? undefined
-      : "Check internet connectivity. If on flaky venue Wi-Fi, run with OFFLINE=1 for pre-baked envelopes",
+      : "Check internet connectivity. If on flaky venue Wi-Fi, run with OFFLINE=1 for the built-in /fixed sample dashboard",
   });
 }
 

@@ -1,153 +1,46 @@
-"use client";
-
 /**
- * Legal Contract Review demo route.
+ * Legal Contract Review demo route — TEMPORARILY DESCOPED.
  *
  * URL: /other-examples/legal-contract-review
- * Route group: (legal) — provides the legalPaperCatalog + `legal` agent via
- * sibling `src/app/(legal)/layout.tsx`. The route-group convention lets this
- * page coexist with the dashboard at `/` without double-mounting CopilotKit.
  *
- * Behavior:
- *   - Renders a CopilotChat (left) + paper-styled contract surface (right)
- *     reusing `<ExampleLayout>` from the dashboard for the chat-shell affordance.
- *   - On first mount, auto-invokes the agent with a "Review the NDA" prompt
- *     so the demo is wow-on-load. Skip if the agent already has messages
- *     (e.g. user navigated back).
- *   - Sets `data-catalog-style="legal-paper"` on the surface wrapper so the
- *     scoped theme.css rules (warm off-white, serif body) apply without
- *     leaking into the dashboard route.
+ * The interactive contract-review experience is disabled for now. The backend
+ * `/legal` agent runs cleanly (the "No checkpointer set" crash is fixed), but
+ * the review surface does not yet render in the UI — a separate frontend
+ * wiring issue (the auto-review's message + `contract-review` surface don't
+ * paint despite the agent returning 200). Rather than ship a route that loads
+ * but paints nothing, this page shows a short "work in progress" notice.
  *
- * theme.css is imported here so Next.js bundles it for the route.
+ * The full implementation (auto-review chat + paper-styled A2UI canvas) lives
+ * in this branch's git history — restore it in the follow-up PR that fixes the
+ * render. The backend `/legal` endpoint and the `(legal)` route-group layout
+ * stay wired, so re-enabling is just this page.
  */
 
-import { useEffect, useRef } from "react";
-import {
-  CopilotChat,
-  useAgent,
-  useFrontendTool,
-} from "@copilotkit/react-core/v2";
-
-import { ExampleLayout } from "@/components/example-layout";
-
-// Side-effect import: registers the scoped paper theme. The rules are gated
-// by `[data-catalog-style="legal-paper"]` so they only apply inside this page.
-import "../../../../../other-examples/legal-contract-review/catalog/theme.css";
-
-const AGENT_ID = "legal";
-const AUTO_PROMPT =
-  "Please review the NDA from the sample documents. Call review_contract with document_name=\"nda\".";
-
-/**
- * Auto-load the NDA on first mount via a synthetic user message.
- *
- * We use the CopilotChat-shared agent (resolved by agentId match) — adding a
- * user message + kicking runAgent is equivalent to the user typing the prompt
- * themselves. Guarded by a ref so React StrictMode's double-mount doesn't
- * double-fire.
- */
-function useAutoReviewNda() {
-  const { agent } = useAgent({ agentId: AGENT_ID });
-  const firedRef = useRef(false);
-
-  useEffect(() => {
-    if (!agent) return;
-    if (firedRef.current) return;
-
-    // If the user already has a conversation in flight, don't hijack it.
-    const messages =
-      (agent as unknown as { messages?: ReadonlyArray<unknown> }).messages ?? [];
-    if (messages.length > 0) {
-      firedRef.current = true;
-      return;
-    }
-
-    firedRef.current = true;
-    try {
-      (
-        agent as unknown as {
-          addMessage: (m: {
-            id: string;
-            role: "user";
-            content: string;
-          }) => void;
-        }
-      ).addMessage({
-        id: `auto-${crypto.randomUUID()}`,
-        role: "user",
-        content: AUTO_PROMPT,
-      });
-      void (
-        agent as unknown as { runAgent: () => Promise<unknown> }
-      ).runAgent();
-    } catch (err) {
-      // If the agent isn't fully wired yet, log and let the user kick it manually.
-      // eslint-disable-next-line no-console
-      console.warn("[legal-contract-review] auto-review failed:", err);
-    }
-  }, [agent]);
-}
-
-/**
- * Canvas: the rendered A2UI surface lives inside the CopilotKit-provided
- * renderer (auto-mounted by the provider when the runtime reports a2ui).
- * We host it inside a scoped wrapper so the paper theme applies, and the
- * envelopes streamed by the agent paint themselves into the surface.
- */
-function LegalCanvas() {
-  const { agent } = useAgent({ agentId: AGENT_ID });
-  const isRunning =
-    (agent as unknown as { isRunning?: boolean }).isRunning ?? false;
-
-  return (
-    <div
-      data-catalog-style="legal-paper"
-      className="lp-shell h-full overflow-y-auto"
-    >
-      <div className="max-w-3xl mx-auto px-8 py-10">
-        {isRunning && (
-          <p className="lp-disclaimer text-xs italic opacity-70 mb-4">
-            Reviewing contract...
-          </p>
-        )}
-        {/* The actual A2UI surface is mounted by the CopilotKit provider via
-            the catalog. The agent's first envelope creates the surface and
-            populates it. Until then, render a hint. */}
-        <p className="lp-disclaimer text-xs italic opacity-70">
-          Demo mode only — not legal advice. Fictional parties and clauses.
-        </p>
-      </div>
-    </div>
-  );
-}
+import Link from "next/link";
 
 export default function LegalContractReviewPage() {
-  useAutoReviewNda();
-
-  // Suggestion chip — gives the user an obvious "try this" entry point if the
-  // auto-load doesn't kick in (or if they want to try the SaaS sample too).
-  useFrontendTool({
-    name: "noop_legal_chip",
-    description: "Placeholder — never invoked. Suppresses 'no tools' warning.",
-    handler: async () => {},
-  });
-
   return (
-    <div className="h-full w-full">
-      {/* Chat + paper canvas */}
-      <ExampleLayout
-        chatContent={
-          <CopilotChat
-            agentId={AGENT_ID}
-            attachments={{ enabled: false }}
-            input={{
-              disclaimer: () => null,
-              className: "pb-6",
-            }}
-          />
-        }
-        appContent={<LegalCanvas />}
-      />
-    </div>
+    <main className="min-h-screen flex items-center justify-center bg-[var(--background,#fafafa)] px-6">
+      <div className="max-w-md text-center">
+        <p className="text-[11px] uppercase tracking-wide opacity-60 mb-3">
+          Other example · work in progress
+        </p>
+        <h1 className="text-2xl font-semibold mb-3">Contract Review Copilot</h1>
+        <p className="text-sm opacity-75 mb-6">
+          This example is being finalized and is temporarily unavailable. The
+          live pdf-analyst demo — a fixed-schema dashboard and dynamic
+          generative UI, both from one shared A2UI catalog — is ready to
+          explore.
+        </p>
+        <div className="flex items-center justify-center gap-4 text-sm">
+          <Link href="/" className="underline hover:opacity-70">
+            ← Back to the demo
+          </Link>
+          <Link href="/catalog" className="underline hover:opacity-70">
+            Browse the catalog
+          </Link>
+        </div>
+      </div>
+    </main>
   );
 }

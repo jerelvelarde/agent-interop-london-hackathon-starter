@@ -100,13 +100,55 @@ if [[ ! -f "$ROOT/agent/uv.lock" ]]; then
   drift_count=$((drift_count + 1))
 fi
 
+# Python pins (agent/uv.lock) — AGENTS.md hard-rule #1 also names
+# langchain*/langgraph*, which the JS check above can't see. Assert the
+# resolved versions against FROZEN.md's "Pinned versions (Python)" table.
+# Parsed with awk (no python/tomllib dependency, so this still runs before
+# `pnpm install`): within each [[package]] table uv.lock lists `name` then
+# `version`, so we print the version of the first block whose name matches.
+UV_LOCK="$ROOT/agent/uv.lock"
+PY_PINS=(
+  "langchain|1.3.1"
+  "langchain-core|1.4.0"
+  "langgraph|1.2.1"
+)
+
+uv_lock_version() {
+  awk -v pkg="$1" '
+    /^name = / { n=$0; sub(/^name = "/, "", n); sub(/"$/, "", n); cur=n }
+    /^version = / { v=$0; sub(/^version = "/, "", v); sub(/"$/, "", v); if (cur==pkg) { print v; exit } }
+  ' "$UV_LOCK"
+}
+
+check_uv_pin() {
+  local pkg="$1" expected="$2" actual
+  actual=$(uv_lock_version "$pkg" 2>/dev/null || echo "")
+  if [[ -z "$actual" ]]; then
+    echo -e "${RED}DRIFT:${RESET} $pkg ${DIM}not found in agent/uv.lock${RESET} (expected $expected)"
+    drift_count=$((drift_count + 1))
+    return
+  fi
+  if [[ "$actual" != "$expected" ]]; then
+    echo -e "${RED}DRIFT:${RESET} $pkg ${DIM}is${RESET} $actual ${DIM}in agent/uv.lock but FROZEN.md pins${RESET} $expected"
+    drift_count=$((drift_count + 1))
+    return
+  fi
+  echo -e "${GREEN}OK:${RESET} $pkg @ $actual ${DIM}(agent/uv.lock)${RESET}"
+}
+
+if [[ -f "$UV_LOCK" ]]; then
+  for entry in "${PY_PINS[@]}"; do
+    check_uv_pin "${entry%%|*}" "${entry##*|}"
+  done
+fi
+
 echo
 
 if [[ "$drift_count" -eq 0 ]]; then
   echo -e "${GREEN}${BOLD}All pins match FROZEN.md.${RESET}"
   exit 0
 else
-  echo -e "${RED}${BOLD}${drift_count} pin drift detected.${RESET} Fix package.json to match FROZEN.md."
-  echo -e "${DIM}AGENTS.md explicitly forbids changing @copilotkit/* versions.${RESET}"
+  echo -e "${RED}${BOLD}${drift_count} pin drift detected.${RESET} Fix package.json / agent/uv.lock to match FROZEN.md."
+  echo -e "${DIM}AGENTS.md explicitly forbids changing @copilotkit/*, langchain*, or langgraph* versions.${RESET}"
   exit 1
 fi

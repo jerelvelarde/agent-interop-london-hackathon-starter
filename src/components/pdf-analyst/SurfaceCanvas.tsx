@@ -31,6 +31,9 @@ export function SurfaceCanvas({
     <A2UIProvider
       catalog={catalog}
       onAction={(message) => {
+        // The agent handle from useAgent may be undefined on the first
+        // render(s); bail before dereferencing addMessage/runAgent.
+        if (!agent) return;
         console.log(
           `[surface-canvas] chip dispatch channel=${channel}`,
           message,

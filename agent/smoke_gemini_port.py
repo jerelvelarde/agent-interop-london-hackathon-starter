@@ -29,7 +29,7 @@ import sys
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 
 # Import the ported pieces under test.
-from src.dynamic_agent import _RENDER_MODEL, render_a2ui
+from src.dynamic_agent import _render_model, render_a2ui
 from src.catalog import CATALOG_ID, CATALOG_PROMPT
 
 
@@ -49,7 +49,7 @@ def main() -> None:
         sys.exit(2)
 
     print(f"[SMOKE] model={os.getenv('MODEL', 'gemini-3.5-flash')}")
-    model_with_tool = _RENDER_MODEL.bind_tools(
+    model_with_tool = _render_model().bind_tools(
         [render_a2ui], tool_choice="render_a2ui"
     )
 

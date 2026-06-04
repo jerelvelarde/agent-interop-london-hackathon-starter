@@ -144,8 +144,9 @@ are sufficient; we do NOT need to ship a shared key.
 
 | Package | Pin | Notes |
 |---|---|---|
-| `langchain` | `1.2.15` | — |
-| `langgraph` | `1.1.6` | — |
+| `langchain` | `1.3.1` | Re-pinned exact 2026-06-04 (was `1.2.15`). Floated up when pdf-analyst's agent `pyproject.toml` (which used `>=` floors) was adopted as the root agent in Phase 2; re-pinned to the resolved version with owner sign-off. |
+| `langchain-core` | `1.4.0` | Pinned exact 2026-06-04 alongside the `langchain`/`langgraph` re-pin. |
+| `langgraph` | `1.2.1` | Re-pinned exact 2026-06-04 (was `1.1.6`); see the `langchain` note. |
 | `langgraph-cli[inmem]` | `0.4.21` | Only used by the archived PortKit agent (`other-examples/portkit/`). The default agent now serves over FastAPI — see "Serving" below. |
 | `langchain-openai` | `1.1.9` | Drives the OpenAI swap path and the documented Gemini OpenAI-compat fallback |
 | `langchain-anthropic` | `1.4.1` | For the Anthropic swap matrix |
@@ -154,7 +155,9 @@ are sufficient; we do NOT need to ship a shared key.
 | `uvicorn` | (via FastAPI) | ASGI server the default agent runs under (`uvicorn main:app --port 8123`) |
 | `openai` | `1.109.1` | Transitive (used by langchain-openai) |
 
-`agent/uv.lock` is committed and authoritative.
+`agent/uv.lock` is committed and authoritative. `pnpm verify-pins` asserts the
+`langchain` / `langchain-core` / `langgraph` versions above against it (not
+just the JS pins).
 
 ## Serving
 

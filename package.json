@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm doctor && concurrently \"pnpm dev:ui\" \"pnpm dev:agent\" --names ui,agent --prefix-colors blue,green --kill-others",
+    "dev": "pnpm run doctor && concurrently \"pnpm dev:ui\" \"pnpm dev:agent\" --names ui,agent --prefix-colors blue,green --kill-others",
     "dev:debug": "LOG_LEVEL=debug pnpm dev",
     "dev:ui": "next dev --turbopack",
     "dev:agent": "./scripts/run-agent.sh || scripts\\run-agent.bat",

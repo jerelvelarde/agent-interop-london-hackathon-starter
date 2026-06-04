@@ -12,13 +12,15 @@ UI live on stage. The starter does the boring 80% so you can focus on the fun
 pnpm install   # also installs the Python agent via postinstall
 cp .env.example .env
 # Edit .env — set GEMINI_API_KEY (free key: https://aistudio.google.com/apikey)
-pnpm doctor    # confirms your machine is ready
+pnpm run doctor # confirms your machine is ready
 pnpm dev       # boots the web app + the Python agent
 ```
 
-Browser opens at `http://localhost:3000`. Send a chat message like
-*"Show me a flights dashboard"* and watch the agent emit A2UI envelopes that
-render as live UI. The envelope inspector (right rail) shows the raw protocol.
+Browser opens at `http://localhost:3000` (or the next free port — check the
+terminal). The default demo is **pdf-analyst**: open `/fixed`, attach a PDF in
+chat (📎), and ask *"Render the dashboard."* — watch the agent emit A2UI
+envelopes that render as a live dashboard in the canvas. A `MirrorRenderer` pill
+echoes the surface inline so you can see the raw protocol firing.
 
 ## Where to go next
 
@@ -31,8 +33,12 @@ render as live UI. The envelope inspector (right rail) shows the raw protocol.
 
 ## When something breaks
 
-Run `pnpm doctor`. It catches ~80% of "doesn't boot on my machine" issues and
-prints an actionable hint. If Gemini rate-limits you, set `OFFLINE=1` —
-pre-baked envelopes still render and the demo still works.
+Run `pnpm run doctor`. It catches ~80% of "doesn't boot on my machine" issues
+and prints an actionable hint. If the chat doesn't respond, the Python agent
+(FastAPI on `:8123`) probably failed to start — check the `agent` pane in your
+terminal, most commonly a missing `GEMINI_API_KEY`. If Gemini rate-limits you,
+switch to your own free key (https://aistudio.google.com/apikey) and keep a
+tested PDF + tight script on hand — the pdf-analyst demo has no offline
+pre-baked path (that shipped with the archived PortKit demo).
 
 Now `cat HACKATHON.md` (or just open it) and start hacking. Good luck.

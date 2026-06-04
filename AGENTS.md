@@ -118,7 +118,7 @@ When the hacker asks for a new something, grep-find and copy the canonical:
 
 | Command | What it does |
 |---|---|
-| `pnpm doctor` | Preflight env check (Node, pnpm, Python, uv, env vars, ports) |
+| `pnpm run doctor` | Preflight env check (Node, pnpm, Python, uv, env vars, ports) |
 | `pnpm dev` | Boot Next.js + the FastAPI agent (`uvicorn main:app`, `:8123`) concurrently |
 | `pnpm smoke` | Composite gate (validators + pins + offline + canned prompt) |
 | `pnpm validate-widget <path>` | Validate a widget JSON against A2UI v0.9 |

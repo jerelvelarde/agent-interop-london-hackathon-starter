@@ -25,7 +25,7 @@ result in past dry runs.
 
 | Hour                      | Goal                                                                                                | Seams you touch   |
 | ------------------------- | --------------------------------------------------------------------------------------------------- | ----------------- |
-| **0:00–0:30** Boot        | `pnpm install`, `pnpm doctor`, `pnpm dev`. Open `/fixed`, attach a PDF. Confirm the inspector shows envelopes. | —                 |
+| **0:00–0:30** Boot        | `pnpm install`, `pnpm run doctor`, `pnpm dev`. Open `/fixed`, attach a PDF. Confirm the `MirrorRenderer` pill shows envelopes. | —                 |
 | **0:30–1:30** Re-skin     | Pick a domain. Re-theme + re-brand. Land a logo and palette.                                        | §1, §2            |
 | **1:30–2:30** Swap data   | Point the demo at your document type. Tune the extractor + agent prompts.                            | §3, (optional §5) |
 | **2:30–3:30** Widget pass | Pick ONE custom component your demo needs. Add it to the catalog and adapt. | §4                |
@@ -375,7 +375,7 @@ component type that isn't in the catalog.
 Run these before you go up. If anything fails, fix it before you
 demo — judges remember broken demos more than missing features.
 
-- [ ] **`pnpm doctor`** — preflight env still green
+- [ ] **`pnpm run doctor`** — preflight env still green
 - [ ] **`pnpm smoke`** — composite gate (validators + pins + offline-shape
       check + agent-graph registration). This is the load-bearing pre-flight.
 - [ ] **`pnpm test:widgets`** — every catalog schema/fixture validates
@@ -390,7 +390,7 @@ demo — judges remember broken demos more than missing features.
 - [ ] **Read the sponsor footer.** Google DeepMind, CopilotKit, A2A Net —
       credit them, judges will notice.
 
-> The scripts D delivers (`pnpm doctor`, `pnpm smoke`, `pnpm verify-pins`,
+> The scripts D delivers (`pnpm run doctor`, `pnpm smoke`, `pnpm verify-pins`,
 > `pnpm test:widgets`, `pnpm validate-widget`, `pnpm new-widget`, `pnpm
 check-a2a`, `pnpm explain`) are landed by Workstream D in parallel with
 > this doc. If a script isn't yet wired when you read this, check

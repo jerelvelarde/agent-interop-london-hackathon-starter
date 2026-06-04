@@ -38,7 +38,7 @@ If you're here because you want to send a real improvement back upstream
 Run **all** of these and confirm they're green:
 
 ```bash
-pnpm doctor          # preflight env check
+pnpm run doctor      # preflight env check
 pnpm verify-pins     # lockfile drift check
 pnpm smoke           # composite gate: validators + pins + offline + canned prompt
 ```
@@ -77,6 +77,6 @@ Open an issue with:
 - What you ran (`pnpm dev`? `pnpm smoke`? specific seam?)
 - What you expected
 - What you saw (paste the envelope from the inspector if it's a render bug)
-- Output of `pnpm doctor`
+- Output of `pnpm run doctor`
 
 Bugs that reproduce on a fresh `pnpm install` get top priority.

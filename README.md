@@ -42,11 +42,11 @@ cp .env.example .env
 # Edit .env — set GEMINI_API_KEY
 # Free Gemini key (no credit card): https://aistudio.google.com/apikey
 
-pnpm doctor               # preflight: Node, pnpm, Python, uv, env vars, ports
+pnpm run doctor           # preflight: Node, pnpm, Python, uv, env vars, ports
 pnpm dev                  # boots Next.js + the FastAPI agent (uvicorn main:app, :8123) concurrently
 ```
 
-Browser opens at `http://localhost:3000`. The default demo is **pdf-analyst** — chat-with-your-PDF, where the agent builds the answer UI from a 21-component A2UI catalog. The landing page (`/`) routes to two modes; both read the **same** catalog:
+Browser opens at `http://localhost:3000` (or the next free port — Next.js bumps to 3001+ if 3000 is taken, so check the terminal output). The default demo is **pdf-analyst** — chat-with-your-PDF, where the agent builds the answer UI from a 21-component A2UI catalog. The landing page (`/`) routes to two modes; both read the **same** catalog:
 
 - **`/fixed` — fixed-schema dashboard.** You author the dashboard layout once (one JSON file); the agent extracts KPIs, a trend, a share split, and table rows from the PDF and fills them in. Fast, predictable, brand-locked.
 - **`/dynamic` — dynamic A2UI surfaces.** Ask any follow-up question and a secondary LLM invents the component tree for the answer — Recharts bar/line/donut charts, tables, callouts — on demand.
@@ -60,7 +60,7 @@ Try it:
 
 Every surface is generated on demand: the agent picks the components, emits an A2UI envelope, the renderer turns it into React. The surface paints into the canvas beside the chat, with a `MirrorRenderer` pill echoing it inline — that's how you know A2UI is actually working.
 
-> **No `GEMINI_API_KEY` handy?** The agent still serves real A2UI surfaces and the canvas still paints them. (The legacy `OFFLINE=1` pre-baked-envelope path belongs to the archived PortKit demo — see [`other-examples/portkit/`](other-examples/portkit/).) Useful for flaky venue Wi-Fi.
+> **No `GEMINI_API_KEY` handy?** A key is required for the live chat demo — the agent calls Gemini to generate every A2UI surface on `/fixed` and `/dynamic`, so without it the chat won't respond. You can still browse the full catalog at **`/catalog`** with no key: it renders real A2UI surfaces statically in the browser, no agent call. Get a free-tier key (no credit card): https://aistudio.google.com/apikey. (The old `OFFLINE=1` pre-baked-envelope path is gone from this demo — it shipped with the archived PortKit demo at [`other-examples/portkit/`](other-examples/portkit/).)
 
 > **Demoing live?** Have a tested PDF ready and run the walkthrough above. (The previous on-stage script belonged to the archived PortKit demo — see [`other-examples/portkit/DEMO.md`](other-examples/portkit/DEMO.md).)
 
@@ -109,6 +109,7 @@ A2UI isn't the only protocol pillar in this hackathon. If your team's idea fits 
 
 ## Troubleshooting
 
+- **UI loads but the chat doesn't respond.** The Python agent (FastAPI / `uvicorn main:app` on `:8123`) probably failed to start — most commonly a missing or invalid `GEMINI_API_KEY`. Check the `agent` pane in your terminal for a stack trace, set the key (see `.env.example` / `agent/.env.example`), and restart `pnpm dev`. Run `pnpm run doctor` to confirm the key is found and `:8123` is free.
 - **Windows clone: missing `CLAUDE.md` / `GEMINI.md`.** These are symlinks to `AGENTS.md`. Some Windows filesystems drop symlinks on checkout. Run `./scripts/sync-memory-files.sh` (Git Bash / WSL) to re-create them, or just open `AGENTS.md` directly.
 - **`lefthook: Can't find lefthook in PATH` on commit.** Benign — the commit still succeeds. `lefthook` ships as a dev dep; run `pnpm install` once after clone.
 

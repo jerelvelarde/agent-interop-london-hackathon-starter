@@ -98,10 +98,13 @@ uv sync
 uv run --reload langgraph dev      # serves the `sample_agent` graph
 ```
 
-The repo root also still has a PortKit-era `serve.py` (the AG-UI/Docker
-wrapper that does `from main import graph`). It targets *this* graph shape,
-not the FastAPI `agent/main.py` at the repo root — treat it as part of the
-PortKit path, not the pdf-analyst one.
+PortKit used to ship an AG-UI/Docker `serve.py` wrapper (a thin
+`from main import graph` shim) at the repo root. It was removed when
+pdf-analyst became the default — the live demo now serves over FastAPI
+(`agent/main.py`), and this archive runs via `langgraph dev` (above), so the
+wrapper is no longer needed. Recover it from git history if you want the
+standalone AG-UI serving shape; it targeted *this* graph, not the root
+FastAPI app.
 
 ### 3. Routing
 
@@ -121,8 +124,7 @@ checkout**, not as a mountable module:
    `(default)` group, the `route.ts` for the langgraph-cli agent) was intact
    there.
 2. Copy this folder's `src/` and `agent/` over that shell.
-3. Boot the agent with `langgraph dev` (or the root `serve.py`) and the web
-   app with `next dev`.
+3. Boot the agent with `langgraph dev` and the web app with `next dev`.
 4. `OFFLINE=1` still works against `public/offline-envelopes.json` here — the
    pre-baked-envelope insurance the default demo no longer ships.
 

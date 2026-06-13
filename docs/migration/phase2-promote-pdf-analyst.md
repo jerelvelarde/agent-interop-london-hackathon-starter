@@ -134,6 +134,6 @@ From the coupling survey: **3 scripts break outright**, **2 need re-pointing**, 
 
 ## References
 
-- Phase 1 PR (merged): https://github.com/jerelvelarde/agent-interop-london-hackathon-starter/pull/56
+- Phase 1 PR (merged): https://github.com/jerelvelarde/generative-ui-london-hackathon-starter/pull/56
 - Upstream fork: https://github.com/Anmol-Baranwal/CopilotKit/tree/showcase-a2ui-pdf-analyst/examples/showcases/a2ui-pdf-analyst
 - Local Phase-1 branches: feat/a2ui-pdf-analyst, -foundation, -catalog, -agent, -gallery
